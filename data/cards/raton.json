@@ -1,0 +1,30 @@
+[
+  {
+    "id": "raton_raton_invocateur_1",
+    "name": "Raton invocateur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "demon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un demon majeur"}
+      ]
+    },
+    "bonus_text": "Gagne +3 ATQ si Raton Mignon",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Raton lvl 1/Raton invocateur.png"
+  }
+]

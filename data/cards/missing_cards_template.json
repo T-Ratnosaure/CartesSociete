@@ -1,0 +1,2947 @@
+[
+  {
+    "id": "cyborg_copie_de_copie_de_lolo_le_gorille_1",
+    "name": "Copie de Copie de Lolo le gorille",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Copie de Copie de Lolo le gorille.png"
+  },
+  {
+    "id": "cyborg_cyber_phoenix_1",
+    "name": "Cyber Phoenix",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Cyber Phoenix.png"
+  },
+  {
+    "id": "cyborg_cyberaccoon_1",
+    "name": "Cyberaccoon",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Cyberaccoon.png"
+  },
+  {
+    "id": "cyborg_cyberours_1",
+    "name": "Cyberours",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Cyberours.png"
+  },
+  {
+    "id": "cyborg_cyberpique_1",
+    "name": "Cyberpique",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Cyberpique.png"
+  },
+  {
+    "id": "cyborg_dragon_steam_1",
+    "name": "Dragon Steam",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Dragon Steam .png"
+  },
+  {
+    "id": "cyborg_hydre_steam_1",
+    "name": "Hydre Steam",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Hydre Steam.png"
+  },
+  {
+    "id": "cyborg_invocatrice_steam_1",
+    "name": "Invocatrice steam",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Invocatrice steam.png"
+  },
+  {
+    "id": "cyborg_lolo_le_gorille_1",
+    "name": "Lolo le gorille",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Lolo le gorille.png"
+  },
+  {
+    "id": "cyborg_naingénieur_1",
+    "name": "Naingénieur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Naingénieur.png"
+  },
+  {
+    "id": "cyborg_steamtrooper_1",
+    "name": "Steamtrooper",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1\\Steamtrooper.png"
+  },
+  {
+    "id": "cyborg_chasseuse_steam_2",
+    "name": "Chasseuse steam",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Chasseuse steam.png"
+  },
+  {
+    "id": "cyborg_cyber_phoenix2_2",
+    "name": "Cyber Phoenix2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Cyber Phoenix2.png"
+  },
+  {
+    "id": "cyborg_cyberaccoon2_2",
+    "name": "Cyberaccoon2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Cyberaccoon2.png"
+  },
+  {
+    "id": "cyborg_cyberours2_2",
+    "name": "Cyberours2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Cyberours2.png"
+  },
+  {
+    "id": "cyborg_cyberpique2_2",
+    "name": "Cyberpique2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Cyberpique2.png"
+  },
+  {
+    "id": "cyborg_dragon_steam_2_2",
+    "name": "Dragon steam 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Dragon steam 2.png"
+  },
+  {
+    "id": "cyborg_hydre_steam2_2",
+    "name": "Hydre Steam2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Hydre Steam2.png"
+  },
+  {
+    "id": "cyborg_invocatrice_steam2_2",
+    "name": "Invocatrice steam2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Invocatrice steam2.png"
+  },
+  {
+    "id": "cyborg_lolo_le_gorille2_2",
+    "name": "Lolo le gorille2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Lolo le gorille2.png"
+  },
+  {
+    "id": "cyborg_naingénieur2_2",
+    "name": "Naingénieur2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Naingénieur2.png"
+  },
+  {
+    "id": "cyborg_steamtrooper2_2",
+    "name": "Steamtrooper2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Cyborg lvl 2\\Steamtrooper2.png"
+  },
+  {
+    "id": "hall_of_win_chauve_sourire_(1)_1",
+    "name": "Chauve sourire (1)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Chauve sourire (1).png"
+  },
+  {
+    "id": "hall_of_win_cheval_démoniaque_1",
+    "name": "cheval démoniaque",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\cheval démoniaque.png"
+  },
+  {
+    "id": "hall_of_win_chevalier_démoniaque_1",
+    "name": "Chevalier démoniaque",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Chevalier démoniaque.png"
+  },
+  {
+    "id": "hall_of_win_copie_de_copie_de_raton_garou_1",
+    "name": "Copie de Copie de Raton Garou",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Copie de Copie de Raton Garou.png"
+  },
+  {
+    "id": "hall_of_win_cultiste_1",
+    "name": "Cultiste",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Cultiste.png"
+  },
+  {
+    "id": "hall_of_win_liche_inférieur_1",
+    "name": "Liche Inférieur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Liche Inférieur.png"
+  },
+  {
+    "id": "hall_of_win_raton_garou_1",
+    "name": "Raton Garou",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Raton Garou.png"
+  },
+  {
+    "id": "hall_of_win_wyrm_de_glace_1",
+    "name": "Wyrm de Glace",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 1\\Wyrm de Glace.png"
+  },
+  {
+    "id": "hall_of_win_chauve_sourire2_(2)_2",
+    "name": "Chauve sourire2 (2)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\Chauve sourire2 (2).png"
+  },
+  {
+    "id": "hall_of_win_cheval_démoniaque2_2",
+    "name": "cheval démoniaque2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\cheval démoniaque2.png"
+  },
+  {
+    "id": "hall_of_win_chevalier_démoniaque2_2",
+    "name": "Chevalier démoniaque2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\Chevalier démoniaque2.png"
+  },
+  {
+    "id": "hall_of_win_cultiste_2_2",
+    "name": "cultiste 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\cultiste 2.png"
+  },
+  {
+    "id": "hall_of_win_liche_inférieur2_2",
+    "name": "Liche Inférieur2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\Liche Inférieur2.png"
+  },
+  {
+    "id": "hall_of_win_momie_2_2",
+    "name": "Momie 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\Momie 2.png"
+  },
+  {
+    "id": "hall_of_win_raton_garou2_2",
+    "name": "Raton garou2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\Raton garou2.png"
+  },
+  {
+    "id": "hall_of_win_wyrm_de_glace2_2",
+    "name": "Wyrm de Glace2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Hall of win lvl 2\\Wyrm de Glace2.png"
+  },
+  {
+    "id": "lapin_gardien_des_carottes_1",
+    "name": "Gardien des Carottes",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Gardien des Carottes.png"
+  },
+  {
+    "id": "lapin_laphaistos_1",
+    "name": "Laphaistos",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Laphaistos.png"
+  },
+  {
+    "id": "lapin_lapin_des_bois_1",
+    "name": "Lapin des Bois",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapin des Bois.png"
+  },
+  {
+    "id": "lapin_lapinbledore_1",
+    "name": "Lapinbledore",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapinbledore.png"
+  },
+  {
+    "id": "lapin_lapincruste_1",
+    "name": "Lapincruste",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapincruste.png"
+  },
+  {
+    "id": "lapin_lapindomptable_1",
+    "name": "Lapindomptable",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapindomptable.png"
+  },
+  {
+    "id": "lapin_lapindrax_1",
+    "name": "Lapindrax",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapindrax.png"
+  },
+  {
+    "id": "lapin_lapinfini_1",
+    "name": "Lapinfini",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapinfini.png"
+  },
+  {
+    "id": "lapin_lapinflexible_1",
+    "name": "Lapinflexible",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapinflexible.png"
+  },
+  {
+    "id": "lapin_lapinvocateur_1",
+    "name": "Lapinvocateur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 1\\Lapinvocateur.png"
+  },
+  {
+    "id": "lapin_gardien_des_carottes2_2",
+    "name": "Gardien des Carottes2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Gardien des Carottes2.png"
+  },
+  {
+    "id": "lapin_laphaistos2_2",
+    "name": "Laphaistos2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Laphaistos2.png"
+  },
+  {
+    "id": "lapin_lapin_des_bois2_2",
+    "name": "Lapin des Bois2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapin des Bois2.png"
+  },
+  {
+    "id": "lapin_lapinbledore_2_2",
+    "name": "Lapinbledore 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapinbledore 2.png"
+  },
+  {
+    "id": "lapin_lapincruste2_2",
+    "name": "Lapincruste2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapincruste2.png"
+  },
+  {
+    "id": "lapin_lapindomptable2_2",
+    "name": "Lapindomptable2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapindomptable2.png"
+  },
+  {
+    "id": "lapin_lapindrax2_2",
+    "name": "Lapindrax2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapindrax2.png"
+  },
+  {
+    "id": "lapin_lapinfini2_2",
+    "name": "Lapinfini2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapinfini2.png"
+  },
+  {
+    "id": "lapin_lapinflexible2_2",
+    "name": "Lapinflexible2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapinflexible2.png"
+  },
+  {
+    "id": "lapin_lapinvocateur_(1)_2",
+    "name": "Lapinvocateur (1)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lapin lvl 2\\Lapinvocateur (1).png"
+  },
+  {
+    "id": "atlantide_archère_des_flots_1",
+    "name": "Archère des flots",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Archère des flots.png"
+  },
+  {
+    "id": "atlantide_chanteuse_des_flots_1",
+    "name": "Chanteuse des Flots",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Chanteuse des Flots.png"
+  },
+  {
+    "id": "atlantide_diplo-mer_1",
+    "name": "diplo-mer",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\diplo-mer.png"
+  },
+  {
+    "id": "atlantide_forge_royale_1",
+    "name": "Forge Royale",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Forge Royale.png"
+  },
+  {
+    "id": "atlantide_joe_le_fish_1",
+    "name": "Joe le Fish",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Joe le Fish.png"
+  },
+  {
+    "id": "atlantide_le_poulpe_au_yeux_d’or_1",
+    "name": "Le poulpe au yeux d’or",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Le poulpe au yeux d’or.png"
+  },
+  {
+    "id": "atlantide_prétendant_de_la_reine_1",
+    "name": "Prétendant de la Reine",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Prétendant de la Reine.png"
+  },
+  {
+    "id": "atlantide_raie_royale_1",
+    "name": "Raie Royale",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Raie Royale.png"
+  },
+  {
+    "id": "atlantide_rathon_1",
+    "name": "Rathon",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Rathon.png"
+  },
+  {
+    "id": "atlantide_reine_des_flots_(1)_1",
+    "name": "Reine des Flots (1)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "lvl 1 Atlantide\\Reine des Flots (1).png"
+  },
+  {
+    "id": "atlantide_chanteuse_des_flots_2_2",
+    "name": "Chanteuse des flots 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Chanteuse des flots 2.png"
+  },
+  {
+    "id": "atlantide_copie_de_diplo-mer_2_2",
+    "name": "Copie de diplo-Mer 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Copie de diplo-Mer 2.png"
+  },
+  {
+    "id": "atlantide_diplo-mer_2_2",
+    "name": "diplo-Mer 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\diplo-Mer 2.png"
+  },
+  {
+    "id": "atlantide_forge_royale2_2",
+    "name": "Forge Royale2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Forge Royale2.png"
+  },
+  {
+    "id": "atlantide_joe_le_fish_2_2",
+    "name": "Joe le fish 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Joe le fish 2.png"
+  },
+  {
+    "id": "atlantide_le_poulpe_au_yeux_d’or2_2",
+    "name": "Le poulpe au yeux d’or2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Le poulpe au yeux d’or2.png"
+  },
+  {
+    "id": "atlantide_prétendant_de_la_reine2_2",
+    "name": "Prétendant de la Reine2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Prétendant de la Reine2.png"
+  },
+  {
+    "id": "atlantide_raie_royale2_2",
+    "name": "Raie Royale2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Raie Royale2.png"
+  },
+  {
+    "id": "atlantide_rathon2_2",
+    "name": "Rathon2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Rathon2.png"
+  },
+  {
+    "id": "atlantide_reine_des_flots2_(1)_2",
+    "name": "Reine des Flots2 (1)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Lvl 2 Atlantide\\Reine des Flots2 (1).png"
+  },
+  {
+    "id": "unknown_manteau_en_hermine_(1)",
+    "name": "Manteau en hermine (1)",
+    "card_type": "creature",
+    "level": null,
+    "movement": 1,
+    "family": "Unknown",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Manteau en hermine (1).png"
+  },
+  {
+    "id": "nature_ancien_de_la_nature_1",
+    "name": "ancien de la nature",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\ancien de la nature.png"
+  },
+  {
+    "id": "nature_caméléor_(1)_1",
+    "name": "Caméléor (1)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\Caméléor (1).png"
+  },
+  {
+    "id": "nature_diplo_-terre_1",
+    "name": "Diplo -Terre",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\Diplo -Terre.png"
+  },
+  {
+    "id": "nature_golem_de_combat_1",
+    "name": "golem de combat",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\golem de combat.png"
+  },
+  {
+    "id": "nature_licorne_(1)_1",
+    "name": "licorne (1)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\licorne (1).png"
+  },
+  {
+    "id": "nature_loutre_sylvestre_1",
+    "name": "loutre sylvestre",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\loutre sylvestre.png"
+  },
+  {
+    "id": "nature_mutanus_empoisonné_1",
+    "name": "mutanus empoisonné",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\mutanus empoisonné.png"
+  },
+  {
+    "id": "nature_naï_épines_1",
+    "name": "Naï épines",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\Naï épines.png"
+  },
+  {
+    "id": "nature_tir_rex_1",
+    "name": "tir rex",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\tir rex.png"
+  },
+  {
+    "id": "nature_treant_ancien_1",
+    "name": "treant ancien",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 1\\treant ancien.png"
+  },
+  {
+    "id": "nature_ancien_de_la_nature_2_2",
+    "name": "ancien de la nature 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\ancien de la nature 2.png"
+  },
+  {
+    "id": "nature_camcameléoréleon_(1)_2",
+    "name": "camCameléoréleon (1)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\camCameléoréleon (1).png"
+  },
+  {
+    "id": "nature_diplo_-terre_(1)_2",
+    "name": "Diplo -Terre (1)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\Diplo -Terre (1).png"
+  },
+  {
+    "id": "nature_golem_de_combat_2_2",
+    "name": "golem de combat 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\golem de combat 2.png"
+  },
+  {
+    "id": "nature_licorne_2_2",
+    "name": "licorne 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\licorne 2.png"
+  },
+  {
+    "id": "nature_loutre_sylvestre_2_2",
+    "name": "loutre sylvestre 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\loutre sylvestre 2.png"
+  },
+  {
+    "id": "nature_mutanus_empoisonné_2_2",
+    "name": "mutanus empoisonné 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\mutanus empoisonné 2.png"
+  },
+  {
+    "id": "nature_naï_épines_2_2",
+    "name": "Naï épines 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\Naï épines 2.png"
+  },
+  {
+    "id": "nature_tir_rex_2_2",
+    "name": "Tir rex 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\Tir rex 2.png"
+  },
+  {
+    "id": "nature_treant_ancien_2_2",
+    "name": "treant ancien 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Nature lvl 2\\treant ancien 2.png"
+  },
+  {
+    "id": "neige_bonhomme_de_neige_1",
+    "name": "Bonhomme de neige",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Bonhomme de neige.png"
+  },
+  {
+    "id": "neige_combattante_de_galce_1",
+    "name": "Combattante de galce",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Combattante de galce.png"
+  },
+  {
+    "id": "neige_copie_de_fée_des_neige_1",
+    "name": "Copie de Fée des neige",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Copie de Fée des neige.png"
+  },
+  {
+    "id": "neige_fée_des_neige_1",
+    "name": "Fée des neige",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Fée des neige.png"
+  },
+  {
+    "id": "neige_hermimi_1",
+    "name": "Hermimi",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Hermimi.png"
+  },
+  {
+    "id": "neige_mur_de_glace_1",
+    "name": "mur de glace",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\mur de glace.png"
+  },
+  {
+    "id": "neige_panthours_1",
+    "name": "panthours",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\panthours.png"
+  },
+  {
+    "id": "neige_pere_noel_1",
+    "name": "Pere noel",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Pere noel.png"
+  },
+  {
+    "id": "neige_yetiir_1",
+    "name": "Yetiir",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige Lvl 1\\Yetiir.png"
+  },
+  {
+    "id": "neige_bonhomme_de_neige_2_2",
+    "name": "Bonhomme de neige 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\Bonhomme de neige 2.png"
+  },
+  {
+    "id": "neige_combattante_de_glace_2_2",
+    "name": "Combattante de glace 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\Combattante de glace 2.png"
+  },
+  {
+    "id": "neige_copie_de_fée_des_neiges_2_2",
+    "name": "Copie de fée des neiges 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\Copie de fée des neiges 2.png"
+  },
+  {
+    "id": "neige_fée_des_neiges_2_2",
+    "name": "fée des neiges 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\fée des neiges 2.png"
+  },
+  {
+    "id": "neige_hermimi2_2",
+    "name": "hermimi2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\hermimi2.png"
+  },
+  {
+    "id": "neige_mur_de_glace_2_2",
+    "name": "mur de glace 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\mur de glace 2.png"
+  },
+  {
+    "id": "neige_panthours_2_2",
+    "name": "Panthours 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\Panthours 2.png"
+  },
+  {
+    "id": "neige_père_noel_2_2",
+    "name": "Père noel 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\Père noel 2.png"
+  },
+  {
+    "id": "neige_yetiir_2_2",
+    "name": "Yetiir 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Neige lvl 2\\Yetiir 2.png"
+  },
+  {
+    "id": "ninja_chippeur_ninja_(2)_1",
+    "name": "Chippeur Ninja (2)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Chippeur Ninja (2).png"
+  },
+  {
+    "id": "ninja_chouette_forgeuse_1",
+    "name": "Chouette forgeuse",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Chouette forgeuse.png"
+  },
+  {
+    "id": "ninja_copie_de_tortue_ninja_1",
+    "name": "Copie de Tortue ninja",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Copie de Tortue ninja.png"
+  },
+  {
+    "id": "ninja_diplo-air_1",
+    "name": "diplo-air",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\diplo-air.png"
+  },
+  {
+    "id": "ninja_dryade_lotus_(1)_1",
+    "name": "dryade lotus (1)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\dryade lotus (1).png"
+  },
+  {
+    "id": "ninja_invocatrice_ninja_1",
+    "name": "Invocatrice Ninja",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Invocatrice Ninja.png"
+  },
+  {
+    "id": "ninja_maître_rat_1",
+    "name": "Maître Rat",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Maître Rat.png"
+  },
+  {
+    "id": "ninja_panda_kung_fu_1",
+    "name": "panda kung fu",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\panda kung fu.png"
+  },
+  {
+    "id": "ninja_tigre_lotus_1",
+    "name": "Tigre Lotus",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Tigre Lotus.png"
+  },
+  {
+    "id": "ninja_tortue_ninja_1",
+    "name": "Tortue ninja",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja Lvl 1\\Tortue ninja.png"
+  },
+  {
+    "id": "ninja_chippeur_ninja_(1)_2",
+    "name": "Chippeur Ninja (1)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Chippeur Ninja (1).png"
+  },
+  {
+    "id": "ninja_chouette_forgeuse2_2",
+    "name": "Chouette forgeuse2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Chouette forgeuse2.png"
+  },
+  {
+    "id": "ninja_copie_de_diplo-air_2_2",
+    "name": "Copie de diplo-air 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Copie de diplo-air 2.png"
+  },
+  {
+    "id": "ninja_dryade_lotus_2_2",
+    "name": "Dryade lotus 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Dryade lotus 2.png"
+  },
+  {
+    "id": "ninja_ecureuil_ninja_2_2",
+    "name": "ecureuil ninja 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\ecureuil ninja 2.png"
+  },
+  {
+    "id": "ninja_invocatrice_ninja2_2",
+    "name": "Invocatrice Ninja2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Invocatrice Ninja2.png"
+  },
+  {
+    "id": "ninja_maître_rat2_2",
+    "name": "Maître Rat2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Maître Rat2.png"
+  },
+  {
+    "id": "ninja_panda_kung-fu_2_2",
+    "name": "panda kung-fu 2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\panda kung-fu 2.png"
+  },
+  {
+    "id": "ninja_tigre_lotus2_2",
+    "name": "Tigre Lotus2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Tigre Lotus2.png"
+  },
+  {
+    "id": "ninja_tortue_ninja2_2",
+    "name": "Tortue ninja2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Ninja lvl 2\\Tortue ninja2.png"
+  },
+  {
+    "id": "raton_archimage_raton_1",
+    "name": "Archimage Raton",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Archimage Raton.png"
+  },
+  {
+    "id": "raton_ecraseur_raton_1",
+    "name": "Ecraseur Raton",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Ecraseur Raton.png"
+  },
+  {
+    "id": "raton_eraton_1",
+    "name": "Eraton",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Eraton.png"
+  },
+  {
+    "id": "raton_forgeraton_1",
+    "name": "Forgeraton",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Forgeraton.png"
+  },
+  {
+    "id": "raton_guerrier_raton_(1)_1",
+    "name": "Guerrier Raton (1)",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Guerrier Raton (1).png"
+  },
+  {
+    "id": "raton_raton_comptable_1",
+    "name": "Raton Comptable",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Raton Comptable.png"
+  },
+  {
+    "id": "raton_raton_des_bois_1",
+    "name": "Raton des Bois",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Raton des Bois.png"
+  },
+  {
+    "id": "raton_raton_invocateur_1",
+    "name": "Raton invocateur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Raton invocateur.png"
+  },
+  {
+    "id": "raton_ratons_mignons_1",
+    "name": "Ratons Mignons",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 1\\Ratons Mignons.png"
+  },
+  {
+    "id": "raton_archimage_raton2_2",
+    "name": "Archimage Raton2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Archimage Raton2.png"
+  },
+  {
+    "id": "raton_ecraseur_raton2_2",
+    "name": "Ecraseur Raton2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Ecraseur Raton2.png"
+  },
+  {
+    "id": "raton_eraton2_2",
+    "name": "Eraton2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Eraton2.png"
+  },
+  {
+    "id": "raton_forgeraton2_(1)_2",
+    "name": "Forgeraton2 (1)",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Forgeraton2 (1).png"
+  },
+  {
+    "id": "raton_guerrier_raton2_2",
+    "name": "Guerrier Raton2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Guerrier Raton2.png"
+  },
+  {
+    "id": "raton_raton_comptable2_2",
+    "name": "Raton Comptable2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Raton Comptable2.png"
+  },
+  {
+    "id": "raton_raton_des_bois2_2",
+    "name": "Raton des Bois2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Raton des Bois2.png"
+  },
+  {
+    "id": "raton_raton_invocateur2_2",
+    "name": "Raton invocateur2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Raton invocateur2.png"
+  },
+  {
+    "id": "raton_ratons_mignons2_2",
+    "name": "Ratons Mignons2",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "TODO",
+    "family_abilities": {
+      "scaling": []
+    },
+    "class_abilities": {
+      "scaling": []
+    },
+    "bonus_text": null,
+    "health": 0,
+    "attack": 0,
+    "image_path": "Raton lvl 2\\Ratons Mignons2.png"
+  }
+]

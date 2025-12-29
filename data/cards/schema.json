@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cartessociete.local/schemas/card.json",
+  "title": "CartesSociete Card Schema",
+  "description": "Schema for card data in the CartesSociete game",
+  "type": "object",
+  "required": ["id", "name", "card_type", "movement", "family", "card_class", "health", "attack", "image_path"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the card (snake_case)",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name of the card"
+    },
+    "card_type": {
+      "type": "string",
+      "enum": ["creature", "weapon", "demon"],
+      "description": "Type of card"
+    },
+    "level": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Card level (1-5 for creatures, null for weapons/demons)"
+    },
+    "movement": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "description": "Movement points"
+    },
+    "family": {
+      "type": "string",
+      "enum": ["Cyborg", "Nature", "Atlantide", "Ninja", "Neige", "Lapin", "Raton", "Hall of win", "Arme", "Démon"],
+      "description": "Card family/faction"
+    },
+    "card_class": {
+      "type": "string",
+      "enum": ["Archer", "Berseker", "Combattant", "Défenseur", "Dragon", "Invocateur", "Mage", "Monture", "S-Team", "Arme", "Démon"],
+      "description": "Card class/role"
+    },
+    "family_abilities": {
+      "type": "object",
+      "description": "Abilities granted by family",
+      "properties": {
+        "scaling": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["threshold", "effect"],
+            "properties": {
+              "threshold": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of family members required"
+              },
+              "effect": {
+                "type": "string",
+                "description": "Effect description"
+              }
+            }
+          }
+        },
+        "passive": {
+          "type": ["string", "null"],
+          "description": "Passive ability text"
+        }
+      }
+    },
+    "class_abilities": {
+      "type": "object",
+      "description": "Abilities granted by class",
+      "properties": {
+        "scaling": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["threshold", "effect"],
+            "properties": {
+              "threshold": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Number of class members required"
+              },
+              "effect": {
+                "type": "string",
+                "description": "Effect description"
+              }
+            }
+          }
+        },
+        "conditional": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["condition", "effect"],
+            "properties": {
+              "condition": {
+                "type": "string",
+                "description": "Condition to activate (e.g., '1 PO')"
+              },
+              "effect": {
+                "type": "string",
+                "description": "Effect description"
+              }
+            }
+          }
+        },
+        "passive": {
+          "type": ["string", "null"],
+          "description": "Passive ability text"
+        }
+      }
+    },
+    "bonus_text": {
+      "type": ["string", "null"],
+      "description": "Special bonus effect at bottom of card"
+    },
+    "health": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Health points (PV)"
+    },
+    "attack": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Attack points (ATQ)"
+    },
+    "image_path": {
+      "type": "string",
+      "description": "Relative path to card image file"
+    },
+    "equip_restriction": {
+      "type": ["string", "null"],
+      "description": "For weapons: restriction on what can equip it"
+    },
+    "summon_cost": {
+      "type": ["integer", "null"],
+      "description": "For demons: invocateur threshold to summon"
+    }
+  }
+}

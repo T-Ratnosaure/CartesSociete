@@ -1,0 +1,28 @@
+[
+  {
+    "id": "ninja_tigre_lotus_1",
+    "name": "Tigre Lotus",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Défenseur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+2PV pour les defenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8PV"}
+      ]
+    },
+    "bonus_text": "+2 ATQ si c'est le seul ninja",
+    "health": 1,
+    "attack": 2,
+    "image_path": "Ninja Lvl 1/Tigre Lotus.png"
+  }
+]
