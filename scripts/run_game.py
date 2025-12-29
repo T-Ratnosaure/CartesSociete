@@ -11,6 +11,7 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent
@@ -22,7 +23,11 @@ from src.players import (  # noqa: E402
     MCTSPlayer,
     RandomPlayer,
 )
+from src.players.base import Player  # noqa: E402
 from src.simulation import GameRunner  # noqa: E402
+
+if TYPE_CHECKING:
+    from src.players.base import Player
 
 PLAYER_TYPES = {
     "random": RandomPlayer,
@@ -31,8 +36,46 @@ PLAYER_TYPES = {
     "mcts": MCTSPlayer,
 }
 
+# Validation constants
+MIN_MAX_TURNS = 1
+MAX_MAX_TURNS = 1000
 
-def create_player(player_type: str, player_id: int, seed: int | None = None) -> object:
+
+def validate_output_path(path_str: str) -> Path:
+    """Validate and sanitize output file path.
+
+    Args:
+        path_str: The path string to validate.
+
+    Returns:
+        Validated Path object.
+
+    Raises:
+        ValueError: If path is invalid or attempts path traversal.
+    """
+    path = Path(path_str).resolve()
+
+    # Check for path traversal attempts
+    if ".." in path_str:
+        raise ValueError("Path traversal not allowed: '..' in path")
+
+    # Ensure path is within project or current directory
+    cwd = Path.cwd().resolve()
+    try:
+        path.relative_to(cwd)
+    except ValueError:
+        # Path is outside cwd, check if it's within project root
+        try:
+            path.relative_to(project_root.resolve())
+        except ValueError:
+            raise ValueError(
+                f"Output path must be within project directory: {path}"
+            ) from None
+
+    return path
+
+
+def create_player(player_type: str, player_id: int, seed: int | None = None) -> Player:
     """Create a player of the specified type.
 
     Args:
@@ -112,10 +155,17 @@ Examples:
         "--max-turns",
         type=int,
         default=100,
-        help="Maximum turns before draw (default: 100)",
+        help=f"Maximum turns before draw (default: 100, range: {MIN_MAX_TURNS}-{MAX_MAX_TURNS})",  # noqa: E501
     )
 
     args = parser.parse_args()
+
+    # Validate max_turns bounds
+    if not MIN_MAX_TURNS <= args.max_turns <= MAX_MAX_TURNS:
+        parser.error(
+            f"--max-turns must be between {MIN_MAX_TURNS} and {MAX_MAX_TURNS}, "
+            f"got {args.max_turns}"
+        )
 
     # Create players
     try:
@@ -166,10 +216,16 @@ Examples:
 
     # Save events if requested
     if args.log_file:
+        try:
+            output_path = validate_output_path(args.log_file)
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+
         events_data = [e.to_dict() for e in result.events]
-        with open(args.log_file, "w", encoding="utf-8") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(events_data, f, indent=2)
-        print(f"\nEvents saved to: {args.log_file}")
+        print(f"\nEvents saved to: {output_path}")
 
     return 0
 

@@ -33,6 +33,44 @@ PLAYER_TYPES = {
     "mcts": MCTSPlayer,
 }
 
+# Validation constants (matches MatchConfig.MAX_GAMES)
+MIN_GAMES = 1
+MAX_GAMES = 10000
+
+
+def validate_output_path(path_str: str) -> Path:
+    """Validate and sanitize output file path.
+
+    Args:
+        path_str: The path string to validate.
+
+    Returns:
+        Validated Path object.
+
+    Raises:
+        ValueError: If path is invalid or attempts path traversal.
+    """
+    path = Path(path_str).resolve()
+
+    # Check for path traversal attempts
+    if ".." in path_str:
+        raise ValueError("Path traversal not allowed: '..' in path")
+
+    # Ensure path is within project or current directory
+    cwd = Path.cwd().resolve()
+    try:
+        path.relative_to(cwd)
+    except ValueError:
+        # Path is outside cwd, check if it's within project root
+        try:
+            path.relative_to(project_root.resolve())
+        except ValueError:
+            raise ValueError(
+                f"Output path must be within project directory: {path}"
+            ) from None
+
+    return path
+
 
 def create_player_factory(
     player_type: str,
@@ -100,6 +138,12 @@ def run_head_to_head(args: argparse.Namespace) -> int:
 
     # Save results if requested
     if args.output:
+        try:
+            output_path = validate_output_path(args.output)
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+
         output_data = {
             "type": "head_to_head",
             "player1": args.p1,
@@ -110,9 +154,9 @@ def run_head_to_head(args: argparse.Namespace) -> int:
             "win_rates": result.win_rates,
             "avg_game_length": result.avg_game_length,
         }
-        with open(args.output, "w", encoding="utf-8") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(output_data, f, indent=2)
-        print(f"\nResults saved to: {args.output}")
+        print(f"\nResults saved to: {output_path}")
 
     return 0
 
@@ -158,6 +202,12 @@ def run_round_robin(args: argparse.Namespace) -> int:
 
     # Save results if requested
     if args.output:
+        try:
+            output_path = validate_output_path(args.output)
+        except ValueError as e:
+            print(f"Error: {e}", file=sys.stderr)
+            return 1
+
         output_data = {
             "type": "round_robin",
             "players": player_types,
@@ -173,9 +223,9 @@ def run_round_robin(args: argparse.Namespace) -> int:
                 "win_rates": result.win_rates,
                 "avg_game_length": result.avg_game_length,
             }
-        with open(args.output, "w", encoding="utf-8") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(output_data, f, indent=2)
-        print(f"\nResults saved to: {args.output}")
+        print(f"\nResults saved to: {output_path}")
 
     return 0
 
@@ -229,7 +279,7 @@ Examples:
         "--games",
         type=int,
         default=100,
-        help="Number of games (default: 100)",
+        help=f"Number of games (default: 100, range: {MIN_GAMES}-{MAX_GAMES})",
     )
     parser.add_argument(
         "--seed",
@@ -255,6 +305,12 @@ Examples:
     )
 
     args = parser.parse_args()
+
+    # Validate games bounds
+    if not MIN_GAMES <= args.games <= MAX_GAMES:
+        parser.error(
+            f"--games must be between {MIN_GAMES} and {MAX_GAMES}, got {args.games}"
+        )
 
     # Validate arguments
     if args.round_robin:
