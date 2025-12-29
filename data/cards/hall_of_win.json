@@ -122,14 +122,12 @@
     },
     "class_abilities": {
       "scaling": [
-        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
-        {"threshold": 4, "effect": "+7 ATQ"},
-        {"threshold": 6, "effect": "+8 ATQ"}
+        {"threshold": 3, "effect": "les mages lancent 2 fois leurs sorts"}
       ]
     },
     "bonus_text": "+2 ATQ si Hall of win 4 ou Raton 4",
-    "health": 3,
-    "attack": 2,
+    "health": 1,
+    "attack": 1,
     "image_path": "Hall of win lvl 1/Liche Inférieur.png"
   },
   {
