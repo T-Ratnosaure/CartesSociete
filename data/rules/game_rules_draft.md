@@ -54,16 +54,17 @@ After each even turn, mix remaining cards into higher cost pile:
 4. Discard the other half
 
 ## PO Progression
-- **Formula**: `current_card_cost × 2 + 1`
-- PO depends on which cost pile is currently in the market
+- **2 turns per card cost level**
+- **Formula**: `card_cost × 2 + 1`
+- After 2 turns, deck mixes and moves to next cost level
 
-| Market Cost | PO Available |
-|-------------|--------------|
-| Cost 1 | 3 PO (Turn 1 = 4 PO) |
-| Cost 2 | 5 PO |
-| Cost 3 | 7 PO |
-| Cost 4 | 9 PO |
-| Cost 5 | 11 PO |
+| Turns | Market Cost | PO Available |
+|-------|-------------|--------------|
+| 1-2 | Cost 1 | 3 PO (Turn 1 = 4 PO) |
+| 3-4 | Cost 2 | 5 PO |
+| 5-6 | Cost 3 | 7 PO |
+| 7-8 | Cost 4 | 9 PO |
+| 9-10 | Cost 5 | 11 PO |
 
 ## Board Limits
 - **Maximum 8 cards on board** at any time

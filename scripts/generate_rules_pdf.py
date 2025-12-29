@@ -65,14 +65,14 @@ def generate_rules_pdf(output_path: str) -> None:
 
     # PO Progression
     title("PO Progression")
+    text("2 turns per card cost level")
     text("Formula: card_cost x 2 + 1")
-    text("PO depends on which cost pile is in the market")
     pdf.ln(3)
-    text("Cost 1 cards: 3 PO (Turn 1 = 4 PO)")
-    text("Cost 2 cards: 5 PO")
-    text("Cost 3 cards: 7 PO")
-    text("Cost 4 cards: 9 PO")
-    text("Cost 5 cards: 11 PO")
+    text("Turns 1-2:  Cost 1 cards = 3 PO (Turn 1 = 4 PO)")
+    text("Turns 3-4:  Cost 2 cards = 5 PO")
+    text("Turns 5-6:  Cost 3 cards = 7 PO")
+    text("Turns 7-8:  Cost 4 cards = 9 PO")
+    text("Turns 9-10: Cost 5 cards = 11 PO")
     pdf.ln(5)
 
     # Evolution
