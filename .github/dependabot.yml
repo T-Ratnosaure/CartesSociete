@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+
+  # Maintain Python dependencies (if using pip-based requirements in future)
+  # Currently using uv with pyproject.toml, which dependabot supports
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    # Only security updates for dependencies
+    open-pull-requests-limit: 5
