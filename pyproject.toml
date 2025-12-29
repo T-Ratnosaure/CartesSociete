@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Solutions and tools for a cardboard/card game design"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fpdf2>=2.8.5",
+]
 
 [dependency-groups]
 dev = [

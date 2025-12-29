@@ -3,8 +3,8 @@
     "id": "demon_demon_majeur",
     "name": "Demon Majeur",
     "card_type": "demon",
-    "level": null,
-    "movement": 1,
+    "cost": null,
+    "level": 1,
     "family": "Démon",
     "card_class": "Démon",
     "family_abilities": {
@@ -23,8 +23,8 @@
     "id": "demon_demon_mineur",
     "name": "Demon mineur",
     "card_type": "demon",
-    "level": null,
-    "movement": 1,
+    "cost": null,
+    "level": 1,
     "family": "Démon",
     "card_class": "Démon",
     "family_abilities": {
@@ -43,8 +43,8 @@
     "id": "demon_diablotin",
     "name": "Diablotin",
     "card_type": "demon",
-    "level": null,
-    "movement": 1,
+    "cost": null,
+    "level": 1,
     "family": "Démon",
     "card_class": "Démon",
     "family_abilities": {
@@ -63,8 +63,8 @@
     "id": "demon_succube",
     "name": "Succube",
     "card_type": "demon",
-    "level": null,
-    "movement": 1,
+    "cost": null,
+    "level": 1,
     "family": "Démon",
     "card_class": "Démon",
     "family_abilities": {

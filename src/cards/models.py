@@ -32,10 +32,15 @@ class CardClass(Enum):
     BERSEKER = "Berseker"
     COMBATTANT = "Combattant"
     DEFENSEUR = "Défenseur"
+    DIPLO = "Diplo"
     DRAGON = "Dragon"
+    ECONOME = "Econome"
+    ENVOUTEUR = "Envouteur"
+    FORGERON = "Forgeron"
     INVOCATEUR = "Invocateur"
     MAGE = "Mage"
     MONTURE = "Monture"
+    PROTECTEUR = "Protecteur"
     S_TEAM = "S-Team"
     ARME = "Arme"
     DEMON = "Démon"
@@ -149,7 +154,13 @@ class CreatureCard(Card):
             raise ValueError(
                 f"CreatureCard must have card_type CREATURE, got {self.card_type}"
             )
-        if self.level is None or not (1 <= self.level <= 5):
+        # S-Team cards have level X (None), others must have level 1-5
+        if self.card_class == CardClass.S_TEAM:
+            if self.level is not None:
+                raise ValueError(
+                    f"S-Team cards must have level None (X), got {self.level}"
+                )
+        elif self.level is None or not (1 <= self.level <= 5):
             raise ValueError(f"CreatureCard level must be 1-5, got {self.level}")
 
 
