@@ -11,6 +11,10 @@ import random
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from src.game.combat import resolve_combat
+from src.game.executor import execute_action, get_legal_actions_for_player
+from src.game.state import GamePhase
+
 if TYPE_CHECKING:
     from src.game.state import GameState, PlayerState
 
@@ -160,6 +164,13 @@ class MCTSPlayer(Player):
     2. Expansion: Add new child nodes for unexplored actions
     3. Simulation: Random rollout from the new node
     4. Backpropagation: Update visit counts and values up the tree
+
+    Note:
+        Simulations use depth-limited rollouts (default: 10 moves) with
+        heuristic position evaluation rather than playing to game completion.
+        This tradeoff improves performance while maintaining reasonable
+        play quality. For deeper analysis, increase max_rollout_depth in
+        MCTSConfig, though this will slow decision-making.
     """
 
     def __init__(
@@ -352,6 +363,9 @@ class MCTSPlayer(Player):
     ) -> float:
         """Run a random rollout and return the value.
 
+        Performs a depth-limited random rollout from the current state,
+        then evaluates the resulting position using a heuristic.
+
         Args:
             state: Simulation state.
             player_state: Player state.
@@ -359,10 +373,6 @@ class MCTSPlayer(Player):
         Returns:
             Value between 0 and 1 representing the outcome.
         """
-        from src.game.executor import get_legal_actions_for_player
-
-        # Simple heuristic evaluation
-        # In a full implementation, this would run until game end
         depth = 0
 
         while depth < self.config.max_rollout_depth and not state.is_game_over():
@@ -492,16 +502,15 @@ class MCTSPlayer(Player):
             player_state: Player state.
             action: Action to execute.
         """
-        from src.game.executor import execute_action
-
         if action.action_type == ActionType.END_PHASE:
             return
 
         try:
             execute_action(state, player_state, action)
-        except Exception:
-            # Ignore invalid actions during simulation
-            pass
+        except (ValueError, KeyError, IndexError, AttributeError) as e:
+            # Invalid actions can occur during random rollouts due to
+            # state divergence from the actual game. This is expected.
+            logger.debug(f"Invalid action during MCTS simulation: {e}")
 
     def _advance_phase(self, state: "GameState") -> None:
         """Advance to the next game phase.
@@ -509,8 +518,6 @@ class MCTSPlayer(Player):
         Args:
             state: Game state to advance.
         """
-        from src.game.state import GamePhase
-
         if state.phase == GamePhase.MARKET:
             state.phase = GamePhase.PLAY
         elif state.phase == GamePhase.PLAY:
@@ -532,10 +539,9 @@ class MCTSPlayer(Player):
         Args:
             state: Game state.
         """
-        from src.game.combat import resolve_combat
-
         try:
             resolve_combat(state)
-        except Exception:
-            # Ignore combat errors in simulation
-            pass
+        except (ValueError, KeyError, IndexError, AttributeError) as e:
+            # Combat errors can occur during simulation due to
+            # inconsistent state from random rollouts. This is expected.
+            logger.debug(f"Combat error during MCTS simulation: {e}")
