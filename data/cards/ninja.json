@@ -1,9 +1,186 @@
 [
   {
+    "id": "ninja_chippeur_ninja_1",
+    "name": "Chippeur Ninja",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Econome",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "les économes apportent 1- nb d'économes PO/Tour"
+    },
+    "bonus_text": "+2 PO si ninja choisi",
+    "health": 1,
+    "attack": 1,
+    "image_path": "Ninja Lvl 1/Chippeur Ninja (2).png"
+  },
+  {
+    "id": "ninja_chouette_forgeuse_1",
+    "name": "Chouette forgeuse",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Forgeron",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "Piocher une arme"},
+        {"threshold": 2, "effect": "2 armes"},
+        {"threshold": 3, "effect": "3 armes"}
+      ]
+    },
+    "bonus_text": "Toutes les armes +1 ATQ si ninja choisi",
+    "health": 1,
+    "attack": 1,
+    "image_path": "Ninja Lvl 1/Chouette forgeuse.png"
+  },
+  {
+    "id": "ninja_diplo_air_1",
+    "name": "Diplo-Air",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Diplo",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "sacrifier une carte à la fin du tour"},
+        {"threshold": 2, "effect": "et +1 PV"},
+        {"threshold": 3, "effect": "et +2 ATQ"}
+      ]
+    },
+    "bonus_text": "Les +3 ATQ si diplo Terre, +3 PV si Diplo Mer",
+    "health": 7,
+    "attack": 7,
+    "image_path": "Ninja Lvl 1/diplo-air.png"
+  },
+  {
+    "id": "ninja_dryade_lotus_1",
+    "name": "Dryade Lotus",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Mage",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "les mages lancent leurs sorts 2 fois"}
+      ]
+    },
+    "bonus_text": "+2 ATQ si c'est le seul ninja",
+    "health": 3,
+    "attack": 7,
+    "image_path": "Ninja Lvl 1/dryade lotus (1).png"
+  },
+  {
+    "id": "ninja_invocatrice_ninja_1",
+    "name": "Invocatrice Ninja",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "démon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un démon majeur"}
+      ]
+    },
+    "bonus_text": "+1 ATQ / -1 PV pour le démon",
+    "health": 1,
+    "attack": 1,
+    "image_path": "Ninja Lvl 1/Invocatrice Ninja.png"
+  },
+  {
+    "id": "ninja_maitre_rat_1",
+    "name": "Maître Rat",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "+1 ATQ/+2 PV si maître rat",
+    "health": 8,
+    "attack": 6,
+    "image_path": "Ninja Lvl 1/Maître Rat.png"
+  },
+  {
+    "id": "ninja_panda_kung_fu_1",
+    "name": "Panda kung-fu",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "+2 ATQ si c'est le seul ninja",
+    "health": 1,
+    "attack": 2,
+    "image_path": "Ninja Lvl 1/panda kung fu.png"
+  },
+  {
     "id": "ninja_tigre_lotus_1",
     "name": "Tigre Lotus",
     "card_type": "creature",
-    "level": 1,
+    "level": 3,
     "movement": 1,
     "family": "Ninja",
     "card_class": "Défenseur",
@@ -15,14 +192,40 @@
     },
     "class_abilities": {
       "scaling": [
-        {"threshold": 2, "effect": "+2PV pour les defenseurs"},
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
         {"threshold": 4, "effect": "+5 PV"},
-        {"threshold": 6, "effect": "+8PV"}
+        {"threshold": 6, "effect": "+8 PV"}
       ]
     },
     "bonus_text": "+2 ATQ si c'est le seul ninja",
     "health": 1,
     "attack": 2,
     "image_path": "Ninja Lvl 1/Tigre Lotus.png"
+  },
+  {
+    "id": "ninja_tortue_ninja_1",
+    "name": "Tortue ninja",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Ninja",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "choisir un ninja, il rejoue"},
+        {"threshold": 5, "effect": "2 ninjas"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "+1 ATQ/+2 PV si maître rat",
+    "health": 1,
+    "attack": 2,
+    "image_path": "Ninja Lvl 1/Tortue ninja.png"
   }
 ]

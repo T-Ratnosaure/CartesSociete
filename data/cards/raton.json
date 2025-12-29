@@ -1,9 +1,192 @@
 [
   {
+    "id": "raton_archimage_raton_1",
+    "name": "Archimage Raton",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Mage",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "les mages lancent 2 fois leurs sorts"}
+      ]
+    },
+    "bonus_text": "sort: 10 DGT de feu",
+    "health": 2,
+    "attack": 7,
+    "image_path": "Raton lvl 1/Archimage Raton.png"
+  },
+  {
+    "id": "raton_ecraseur_raton_1",
+    "name": "Ecraseur Raton",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "Gagne +1 ATQ par économes sur le plateau ennemi",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Raton lvl 1/Ecraseur Raton.png"
+  },
+  {
+    "id": "raton_eraton_1",
+    "name": "Eraton",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "+1 ATQ par raton"},
+        {"condition": "2 PO", "effect": "et +1 PV par raton"},
+        {"condition": "3 PO", "effect": "et +3 ATQ aux dragons"}
+      ]
+    },
+    "bonus_text": "+3 ATQ pour les Raton",
+    "health": 9,
+    "attack": 9,
+    "image_path": "Raton lvl 1/Eraton.png"
+  },
+  {
+    "id": "raton_forgeraton_1",
+    "name": "Forgeraton",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Forgeron",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "Piocher une arme"},
+        {"threshold": 2, "effect": "2 armes"},
+        {"threshold": 3, "effect": "3 armes"}
+      ]
+    },
+    "bonus_text": "+1 ATQ sur une arme par raton en jeu",
+    "health": 4,
+    "attack": 4,
+    "image_path": "Raton lvl 1/Forgeraton.png"
+  },
+  {
+    "id": "raton_guerrier_raton_1",
+    "name": "Guerrier Raton",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "Gagne +3 ATQ si Raton Mignon",
+    "health": 1,
+    "attack": 2,
+    "image_path": "Raton lvl 1/Guerrier Raton (1).png"
+  },
+  {
+    "id": "raton_raton_comptable_1",
+    "name": "Raton Comptable",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Econome",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "les économes apportent 1- nb d'économes PO/Tour"
+    },
+    "bonus_text": "+1 PO par tranche de 3 ratons",
+    "health": 1,
+    "attack": 1,
+    "image_path": "Raton lvl 1/Raton Comptable.png"
+  },
+  {
+    "id": "raton_raton_des_bois_1",
+    "name": "Raton des Bois",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Archer",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
+        {"threshold": 4, "effect": "+7"},
+        {"threshold": 6, "effect": "+10"}
+      ]
+    },
+    "bonus_text": "Gagne +1 ATQ par économes sur le plateau ennemi",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Raton lvl 1/Raton des Bois.png"
+  },
+  {
     "id": "raton_raton_invocateur_1",
     "name": "Raton invocateur",
     "card_type": "creature",
-    "level": 1,
+    "level": 3,
     "movement": 1,
     "family": "Raton",
     "card_class": "Invocateur",
@@ -17,14 +200,41 @@
     "class_abilities": {
       "scaling": [
         {"threshold": 1, "effect": "invoque un diablotin"},
-        {"threshold": 2, "effect": "demon mineur"},
+        {"threshold": 2, "effect": "démon mineur"},
         {"threshold": 4, "effect": "une succube"},
-        {"threshold": 6, "effect": "un demon majeur"}
+        {"threshold": 6, "effect": "un démon majeur"}
       ]
     },
     "bonus_text": "Gagne +3 ATQ si Raton Mignon",
     "health": 1,
     "attack": 4,
     "image_path": "Raton lvl 1/Raton invocateur.png"
+  },
+  {
+    "id": "raton_ratons_mignons_1",
+    "name": "Ratons Mignons",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 1,
+    "family": "Raton",
+    "card_class": "Envouteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 ATQ/+1 PV pour les ratons"},
+        {"threshold": 3, "effect": "+2/+2"},
+        {"threshold": 6, "effect": "+3/+3"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 dgt pour tous les monstres"},
+        {"threshold": 3, "effect": "+2 dgt"},
+        {"threshold": 4, "effect": "+3 dgt"}
+      ]
+    },
+    "bonus_text": "-2 ATQ pour le monstre ennemi avec le plus d'ATQ",
+    "health": 3,
+    "attack": 3,
+    "image_path": "Raton lvl 1/Ratons Mignons.png"
   }
 ]
