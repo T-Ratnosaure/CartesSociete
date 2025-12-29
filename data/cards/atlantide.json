@@ -1,22 +1,22 @@
 [
   {
     "id": "atlantide_archere_des_flots_1",
-    "name": "Archere des flots",
+    "name": "Archère des flots",
     "card_type": "creature",
-    "level": 1,
+    "level": 3,
     "movement": 1,
     "family": "Atlantide",
     "card_class": "Archer",
     "family_abilities": {
       "scaling": [
-        {"threshold": 2, "effect": "+4 pv a la fin du tour"},
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
         {"threshold": 4, "effect": "+8"},
         {"threshold": 6, "effect": "+13"}
       ]
     },
     "class_abilities": {
       "scaling": [
-        {"threshold": 2, "effect": "+4 dgt si 2 defenseurs"},
+        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
         {"threshold": 4, "effect": "+7"},
         {"threshold": 6, "effect": "+10"}
       ]
@@ -25,5 +25,219 @@
     "health": 1,
     "attack": 5,
     "image_path": "lvl 1 Atlantide/Archère des flots.png"
+  },
+  {
+    "id": "atlantide_chanteuse_des_flots_1",
+    "name": "Chanteuse des Flots",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Envouteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 dgt pour tous les monstres"},
+        {"threshold": 3, "effect": "+2 dgt"},
+        {"threshold": 4, "effect": "+3 dgt"}
+      ]
+    },
+    "bonus_text": "+1 ATQ pour les Atlantide",
+    "health": 3,
+    "attack": 2,
+    "image_path": "lvl 1 Atlantide/Chanteuse des Flots.png"
+  },
+  {
+    "id": "atlantide_diplo_mer_1",
+    "name": "Diplo-Mer",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Diplo",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "sacrifier une carte à la fin du tour"},
+        {"threshold": 2, "effect": "et +1 PV"},
+        {"threshold": 3, "effect": "et +2 ATQ"}
+      ]
+    },
+    "bonus_text": "Les +3 ATQ si diplo Terre, +3 PV si Diplo air",
+    "health": 7,
+    "attack": 7,
+    "image_path": "lvl 1 Atlantide/diplo-mer.png"
+  },
+  {
+    "id": "atlantide_forge_royale_1",
+    "name": "Forge Royale",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Forgeron",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "Piocher une arme"},
+        {"threshold": 2, "effect": "2 armes"},
+        {"threshold": 3, "effect": "3 armes"}
+      ]
+    },
+    "bonus_text": "+2 ATQ pour les femmes Atlantide",
+    "health": 1,
+    "attack": 2,
+    "image_path": "lvl 1 Atlantide/Forge Royale.png"
+  },
+  {
+    "id": "atlantide_joe_le_fish_1",
+    "name": "Joe le Fish",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Défenseur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8 PV"}
+      ]
+    },
+    "bonus_text": "Pouvoir: trempette",
+    "health": 3,
+    "attack": 1,
+    "image_path": "lvl 1 Atlantide/Joe le Fish.png"
+  },
+  {
+    "id": "atlantide_pretendant_de_la_reine_1",
+    "name": "Prétendant de la Reine",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "+3 ATQ si la Reine est en jeu sur n'importe quel plateau",
+    "health": 2,
+    "attack": 3,
+    "image_path": "lvl 1 Atlantide/Prétendant de la Reine.png"
+  },
+  {
+    "id": "atlantide_raie_royale_1",
+    "name": "Raie Royale",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Monture",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "piocher une carte coût 5 dans la pile (au hasard)"}
+      ]
+    },
+    "bonus_text": "si 3 monture, sacrifier cette carte après activation",
+    "health": 3,
+    "attack": 3,
+    "image_path": "lvl 1 Atlantide/Raie Royale.png"
+  },
+  {
+    "id": "atlantide_rathon_1",
+    "name": "Rathon",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "Les raccoon Familly gagne +2 ATQ",
+    "health": 1,
+    "attack": 2,
+    "image_path": "lvl 1 Atlantide/Rathon.png"
+  },
+  {
+    "id": "atlantide_reine_des_flots_1",
+    "name": "Reine des Flots",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "Inflige 1 DGT par PV rendu ce tour ci",
+    "health": 8,
+    "attack": 7,
+    "image_path": "lvl 1 Atlantide/Reine des Flots (1).png"
   }
 ]
