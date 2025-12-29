@@ -225,9 +225,9 @@
     },
     "class_abilities": {
       "scaling": [
-        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
-        {"threshold": 4, "effect": "+7"},
-        {"threshold": 6, "effect": "+10"}
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8 PV"}
       ]
     },
     "bonus_text": "+2 PV /tour si lapin 4",
@@ -488,9 +488,9 @@
     },
     "class_abilities": {
       "scaling": [
-        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
-        {"threshold": 4, "effect": "+7"},
-        {"threshold": 6, "effect": "+10"}
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8 PV"}
       ]
     },
     "bonus_text": "+4 PV /tour si lapin 4",

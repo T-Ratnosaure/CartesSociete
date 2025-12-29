@@ -25,12 +25,10 @@ These issues were identified during quality control review and require client in
 
 ---
 
-### 4. Lapinflexible Wrong Class Abilities
-**File**: `lapin.json`
-**Cards**: `lapin_lapinflexible_1` and `lapin_lapinflexible_2`
-**Problem**: Card has `card_class: "Defenseur"` but has Archer class abilities (+4 dgt si 2 defenseurs)
-**Should have**: Defenseur class abilities (+2 PV pour les defenseurs)
-**Question for client**: Confirm this is a copy-paste error to fix?
+### ~~4. Lapinflexible Wrong Class Abilities~~
+**Status**: FIXED
+**Client response**: Confirmed as copy-paste error
+**Fix applied**: Changed class abilities from Archer (+4 dgt si 2 défenseurs) to Défenseur (+2 PV pour les défenseurs)
 
 ---
 
@@ -72,7 +70,7 @@ These issues were identified during quality control review and require client in
 | Cyborg lvl 1 attack = 0 | ~~CRITICAL~~ | RESOLVED - Intentional |
 | Missing Momie lvl 1 | CRITICAL | Pending client response |
 | Liche Inferieur wrong abilities | ~~HIGH~~ | FIXED |
-| Lapinflexible wrong abilities | HIGH | Pending client response |
+| Lapinflexible wrong abilities | ~~HIGH~~ | FIXED |
 | Cyborg lvl 2 family abilities | HIGH | Pending client response |
 | Lapin no Combattant | MEDIUM | Pending client response |
 
