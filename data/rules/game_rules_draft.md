@@ -32,10 +32,10 @@
 
 ### Evolution Mechanic
 - **Requirement**: 3 cards with the **exact same name**
-- **Result**: 1 Level 2 card of the **same name**
+- **Result**: 1 card is **flipped** to Level 2 (cards are double-sided!)
 - Can happen on the board OR in hand
 - 2 cards go to **discard pile** (recyclable)
-- 1 card is **removed from game** (exile)
+- 1 card **stays and is flipped** to its Level 2 side (verso)
 
 ### Deck Mixing (after every even turn)
 After each even turn, mix remaining cards into higher cost pile:
@@ -54,20 +54,16 @@ After each even turn, mix remaining cards into higher cost pile:
 4. Discard the other half
 
 ## PO Progression
-- **Turn 1**: 4 PO (fixed)
-- **Turn 2+**: `turn × 2 + 1`
+- **Formula**: `current_card_cost × 2 + 1`
+- PO depends on which cost pile is currently in the market
 
-| Turn | PO |
-|------|-----|
-| 1 | 4 |
-| 2 | 5 |
-| 3 | 7 |
-| 4 | 9 |
-| 5 | 11 |
-| 6 | 13 |
-| 7 | 15 |
-| 8 | 17 |
-| 9 | 19 |
+| Market Cost | PO Available |
+|-------------|--------------|
+| Cost 1 | 3 PO (Turn 1 = 4 PO) |
+| Cost 2 | 5 PO |
+| Cost 3 | 7 PO |
+| Cost 4 | 9 PO |
+| Cost 5 | 11 PO |
 
 ## Board Limits
 - **Maximum 8 cards on board** at any time

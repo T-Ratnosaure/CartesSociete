@@ -65,21 +65,23 @@ def generate_rules_pdf(output_path: str) -> None:
 
     # PO Progression
     title("PO Progression")
-    text("Turn 1: 4 PO (fixed)")
-    text("Turn 2+: turn x 2 + 1")
+    text("Formula: card_cost x 2 + 1")
+    text("PO depends on which cost pile is in the market")
     pdf.ln(3)
-    text("Turn 1: 4 PO  |  Turn 2: 5 PO  |  Turn 3: 7 PO")
-    text("Turn 4: 9 PO  |  Turn 5: 11 PO |  Turn 6: 13 PO")
-    text("Turn 7: 15 PO |  Turn 8: 17 PO |  Turn 9: 19 PO")
+    text("Cost 1 cards: 3 PO (Turn 1 = 4 PO)")
+    text("Cost 2 cards: 5 PO")
+    text("Cost 3 cards: 7 PO")
+    text("Cost 4 cards: 9 PO")
+    text("Cost 5 cards: 11 PO")
     pdf.ln(5)
 
     # Evolution
     title("Evolution Mechanic")
     bullet("Requirement: 3 cards with the exact same name")
-    bullet("Result: 1 Level 2 card of the same name")
+    bullet("Cards are DOUBLE-SIDED (Level 1 front / Level 2 back)")
     bullet("Can happen on the board OR in hand")
     bullet("2 cards go to discard pile (recyclable)")
-    bullet("1 card is removed from game (exile)")
+    bullet("1 card STAYS and is FLIPPED to Level 2 side (verso)")
     pdf.ln(5)
 
     # Deck Mixing
