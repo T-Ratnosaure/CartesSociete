@@ -4,7 +4,7 @@
   "title": "CartesSociete Card Schema",
   "description": "Schema for card data in the CartesSociete game",
   "type": "object",
-  "required": ["id", "name", "card_type", "movement", "family", "card_class", "health", "attack", "image_path"],
+  "required": ["id", "name", "card_type", "level", "family", "card_class", "health", "attack", "image_path"],
   "properties": {
     "id": {
       "type": "string",
@@ -20,17 +20,17 @@
       "enum": ["creature", "weapon", "demon"],
       "description": "Type of card"
     },
-    "level": {
+    "cost": {
       "type": ["integer", "null"],
       "minimum": 1,
       "maximum": 5,
-      "description": "Card level (1-5 for creatures, null for weapons/demons)"
+      "description": "Card cost to play (1-5 for creatures, null for weapons/demons)"
     },
-    "movement": {
+    "level": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 3,
-      "description": "Movement points"
+      "maximum": 2,
+      "description": "Card tier/level (1 or 2)"
     },
     "family": {
       "type": "string",
