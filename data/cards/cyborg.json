@@ -352,5 +352,184 @@
     "health": 5,
     "attack": 11,
     "image_path": "Cyborg lvl 2/Chasseuse steam.png"
+  },
+  {
+    "id": "cyborg_cyber_phoenix_2",
+    "name": "Cyber Phoenix",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "+6 ATQ si raccoon familly 2",
+    "health": 6,
+    "attack": 5,
+    "image_path": "Cyborg lvl 2/Cyber Phoenix2.png"
+  },
+  {
+    "id": "cyborg_cyberours_2",
+    "name": "Cyberours",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "+6 ATQ si lapins 2",
+    "health": 5,
+    "attack": 10,
+    "image_path": "Cyborg lvl 2/Cyberours2.png"
+  },
+  {
+    "id": "cyborg_cyberpique_2",
+    "name": "Cyberpique",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "Défenseur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8 PV"}
+      ]
+    },
+    "bonus_text": "Inflige 2 points de dgt quand attaqué",
+    "health": 8,
+    "attack": 2,
+    "image_path": "Cyborg lvl 2/Cyberpique2.png"
+  },
+  {
+    "id": "cyborg_hydre_steam_2",
+    "name": "Hydre Steam",
+    "card_type": "creature",
+    "level": null,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "S-Team",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "cyborg niv 2: hydre niv 2"},
+        {"threshold": 5, "effect": "cyborg niv 2: drag Niv 2"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "Ne compte pas comme un monstre du plateau"
+    },
+    "bonus_text": "-1 ATQ pour les cyborgs (pas en dessous de 0)",
+    "health": 5,
+    "attack": 15,
+    "image_path": "Cyborg lvl 2/Hydre Steam2.png"
+  },
+  {
+    "id": "cyborg_dragon_steam_2",
+    "name": "Dragon Steam",
+    "card_type": "creature",
+    "level": null,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "S-Team",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "cyborg niv 2: hydre niv 2"},
+        {"threshold": 5, "effect": "cyborg niv 2: drag Niv 2"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "Ne compte pas comme un monstre du plateau"
+    },
+    "bonus_text": "+2 ATQ pour les cyborgs et S-Team",
+    "health": 10,
+    "attack": 22,
+    "image_path": "Cyborg lvl 2/Dragon steam 2.png"
+  },
+  {
+    "id": "cyborg_invocatrice_steam_2",
+    "name": "Invocatrice steam",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "invoque hydre steam"},
+        {"threshold": 6, "effect": "Invoque dragon steam"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "démon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un démon majeur"}
+      ]
+    },
+    "bonus_text": "Les Démons gagnent les bonus comme les autres",
+    "health": 5,
+    "attack": 9,
+    "image_path": "Cyborg lvl 2/Invocatrice steam2.png"
+  },
+  {
+    "id": "cyborg_naingenieur_2",
+    "name": "Naingénieur",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "Forgeron",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv à la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "Piocher une arme"},
+        {"threshold": 2, "effect": "2 armes"},
+        {"threshold": 3, "effect": "3 armes"}
+      ]
+    },
+    "bonus_text": "+3 ATQ pour tous les Cyborgs",
+    "health": 7,
+    "attack": 2,
+    "image_path": "Cyborg lvl 2/Naingénieur2.png"
   }
 ]

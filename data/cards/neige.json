@@ -207,5 +207,214 @@
     "health": 2,
     "attack": 5,
     "image_path": "Neige Lvl 1/Yetiir.png"
+  },
+  {
+    "id": "neige_bonhomme_de_neige_2",
+    "name": "Bonhomme de neige",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Econome",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "les économes apportent 1- nb d'économes PO/Tour"
+    },
+    "bonus_text": "PV = 0 si magie de feu, +2 ATQ",
+    "health": 6,
+    "attack": 2,
+    "image_path": "Neige lvl 2/Bonhomme de neige2.png"
+  },
+  {
+    "id": "neige_combattante_de_glace_2",
+    "name": "Combattante de glace",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "+2 ATQ / -1 PV pour les combattants",
+    "health": 4,
+    "attack": 6,
+    "image_path": "Neige lvl 2/Combattante de glace2.png"
+  },
+  {
+    "id": "neige_fee_des_neiges_2",
+    "name": "Fée des neiges",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Mage",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "les mages lancent 2 fois leurs sorts"}
+      ]
+    },
+    "bonus_text": "sorts: 12 dgt de glace +2 par Kdo",
+    "health": 4,
+    "attack": 4,
+    "image_path": "Neige lvl 2/Fée des neiges2.png"
+  },
+  {
+    "id": "neige_hermimi_2",
+    "name": "Hermimi",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Envouteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 dgt pour tous les monstres"},
+        {"threshold": 3, "effect": "+2 dgt"},
+        {"threshold": 4, "effect": "+3 dgt"}
+      ]
+    },
+    "bonus_text": "sacrifier cette carte, vous gagnez manteau en hermine amélioré",
+    "health": 4,
+    "attack": 4,
+    "image_path": "Neige lvl 2/Hermimi2.png"
+  },
+  {
+    "id": "neige_mur_de_glace_2",
+    "name": "Mur de glace",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Défenseur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8 PV"}
+      ]
+    },
+    "bonus_text": "Bloque 8 points de dgt magique",
+    "health": 16,
+    "attack": 4,
+    "image_path": "Neige lvl 2/mur de glace2.png"
+  },
+  {
+    "id": "neige_panthours_2",
+    "name": "Panthours",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "+4 PV par Kdo équipé sur lui",
+    "health": 6,
+    "attack": 6,
+    "image_path": "Neige lvl 2/panthours2.png"
+  },
+  {
+    "id": "neige_pere_noel_2",
+    "name": "Père Noël",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+5 dgt / -2 PV"},
+        {"threshold": 4, "effect": "+10 dgt / -5 PV"}
+      ]
+    },
+    "bonus_text": "Les Kdo donnent +2 ATQ supplémentaire",
+    "health": 10,
+    "attack": 16,
+    "image_path": "Neige lvl 2/Pere noel2.png"
+  },
+  {
+    "id": "neige_yetiir_2",
+    "name": "Yetiir",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Neige",
+    "card_class": "Archer",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
+        {"threshold": 4, "effect": "+7"},
+        {"threshold": 6, "effect": "+10"}
+      ]
+    },
+    "bonus_text": "1/tour, +ATQ de la 1ère carte de la pile x2, jusqu'à la fin du tour",
+    "health": 4,
+    "attack": 10,
+    "image_path": "Neige lvl 2/Yetiir2.png"
   }
 ]

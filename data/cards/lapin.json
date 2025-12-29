@@ -262,5 +262,268 @@
     "health": 4,
     "attack": 6,
     "image_path": "Lapin lvl 1/Lapinvocateur.png"
+  },
+  {
+    "id": "lapin_gardien_des_carottes_2",
+    "name": "Gardien des Carottes",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "Les lapins ont minimum 4 ATQ",
+    "health": 12,
+    "attack": 6,
+    "image_path": "Lapin lvl 2/Gardien des Carottes2.png"
+  },
+  {
+    "id": "lapin_laphaistos_2",
+    "name": "Laphaistos",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Forgeron",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "Piocher une arme"},
+        {"threshold": 2, "effect": "2 armes"},
+        {"threshold": 3, "effect": "3 armes"}
+      ]
+    },
+    "bonus_text": "+6 ATQ si équipé de la Hallebarde antique",
+    "health": 8,
+    "attack": 6,
+    "image_path": "Lapin lvl 2/Laphaistos2.png"
+  },
+  {
+    "id": "lapin_lapin_des_bois_2",
+    "name": "Lapin des Bois",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Archer",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
+        {"threshold": 4, "effect": "+7"},
+        {"threshold": 6, "effect": "+10"}
+      ]
+    },
+    "bonus_text": "+1 PO / tour si lapin 4",
+    "health": 2,
+    "attack": 6,
+    "image_path": "Lapin lvl 2/Lapin des Bois2.png"
+  },
+  {
+    "id": "lapin_lapinbledore_2",
+    "name": "Lapinbledore",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Mage",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "les mages lancent 2 fois leurs sorts"}
+      ]
+    },
+    "bonus_text": "Magie de carottes 5 DGT des sorts",
+    "health": 2,
+    "attack": 3,
+    "image_path": "Lapin lvl 2/Lapinbledore 2.png"
+  },
+  {
+    "id": "lapin_lapincruste_2",
+    "name": "Lapincruste",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Envouteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 dgt pour tous les monstres"},
+        {"threshold": 3, "effect": "+2 dgt"},
+        {"threshold": 4, "effect": "+3 dgt"}
+      ]
+    },
+    "bonus_text": "Le joueur peut poser 4 lapins supplémentaires en jeu",
+    "health": 1,
+    "attack": 1,
+    "image_path": "Lapin lvl 2/Lapincruste2.png"
+  },
+  {
+    "id": "lapin_lapindomptable_2",
+    "name": "Lapindomptable",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "piocher une carte dans la pile 5 PO (au hasard)"}
+      ]
+    },
+    "bonus_text": "A chaque tour, retourner une carte de la pile, gagne son ATQ",
+    "health": 8,
+    "attack": 5,
+    "image_path": "Lapin lvl 2/Lapindomptable2.png"
+  },
+  {
+    "id": "lapin_lapindrax_2",
+    "name": "Lapindrax",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "+6 ATQ"},
+        {"condition": "2 PO", "effect": "et +6 PV"},
+        {"condition": "4 PO", "effect": "+3 ATQ pour tous les lapins"}
+      ]
+    },
+    "bonus_text": "+1 PO / tour si lapin 4",
+    "health": 10,
+    "attack": 10,
+    "image_path": "Lapin lvl 2/Lapindrax2.png"
+  },
+  {
+    "id": "lapin_lapinfini_2",
+    "name": "Lapinfini",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Econome",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "les économes apportent 1- nb d'économes PO/Tour"
+    },
+    "bonus_text": "+1 PO / tour si lapin 4",
+    "health": 2,
+    "attack": 4,
+    "image_path": "Lapin lvl 2/Lapinfini2.png"
+  },
+  {
+    "id": "lapin_lapinflexible_2",
+    "name": "Lapinflexible",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Défenseur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
+        {"threshold": 4, "effect": "+7"},
+        {"threshold": 6, "effect": "+10"}
+      ]
+    },
+    "bonus_text": "+4 PV /tour si lapin 4",
+    "health": 6,
+    "attack": 2,
+    "image_path": "Lapin lvl 2/Lapinflexible2.png"
+  },
+  {
+    "id": "lapin_lapinvocateur_2",
+    "name": "Lapinvocateur",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Lapin",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le plateau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "démon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un démon majeur"}
+      ]
+    },
+    "bonus_text": "-2 ATQ si Gardien des Carottes",
+    "health": 6,
+    "attack": 10,
+    "image_path": "Lapin lvl 2/Lapinvocateur (1).png"
   }
 ]

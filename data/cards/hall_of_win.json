@@ -185,5 +185,217 @@
     "health": 6,
     "attack": 5,
     "image_path": "Hall of win lvl 1/Wyrm de Glace.png"
+  },
+  {
+    "id": "hall_of_win_chauve_sourire_2",
+    "name": "Chauve sourire",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Envouteur",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 dgt pour tous les monstres"},
+        {"threshold": 3, "effect": "+2 dgt"},
+        {"threshold": 4, "effect": "+3 dgt"}
+      ]
+    },
+    "bonus_text": "Gagne en PV le nombre de DGT qu'elle inflige",
+    "health": 4,
+    "attack": 6,
+    "image_path": "Hall of win lvl 2/Chauve sourire2 (2).png"
+  },
+  {
+    "id": "hall_of_win_cheval_demoniaque_2",
+    "name": "Cheval Démoniaque",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Monture",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "piocher une carte coût 5 dans la pile (au hasard)"}
+      ]
+    },
+    "bonus_text": "il suffit de 2 cavalier pour activer l'effet, puis sacrifier licorne",
+    "health": 6,
+    "attack": 6,
+    "image_path": "Hall of win lvl 2/cheval démoniaque2.png"
+  },
+  {
+    "id": "hall_of_win_chevalier_demoniaque_2",
+    "name": "Chevalier démoniaque",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+5 dgt / -2 PV"},
+        {"threshold": 4, "effect": "+10 dgt / -5 PV"}
+      ]
+    },
+    "bonus_text": "-2 PV s'il y a un défenseur en face",
+    "health": 2,
+    "attack": 14,
+    "image_path": "Hall of win lvl 2/Chevalier démoniaque2.png"
+  },
+  {
+    "id": "hall_of_win_cultiste_2",
+    "name": "Cultiste",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "démon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un démon majeur"}
+      ]
+    },
+    "bonus_text": "Compte pour 2 invocateur, sacrifier 2 cartes par tour",
+    "health": 6,
+    "attack": 6,
+    "image_path": "Hall of win lvl 2/cultiste 2.png"
+  },
+  {
+    "id": "hall_of_win_liche_inferieur_2",
+    "name": "Liche Inférieur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Mage",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "les mages lancent 2 fois leurs sorts"}
+      ]
+    },
+    "bonus_text": "Compte pour 2 invocateur, sacrifier 2 cartes par tour",
+    "health": 6,
+    "attack": 6,
+    "image_path": "Hall of win lvl 2/Liche Inférieur2.png"
+  },
+  {
+    "id": "hall_of_win_momie_2",
+    "name": "Momie",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "+5 ATQ si Hall of win 4 ou Raton 4",
+    "health": 6,
+    "attack": 7,
+    "image_path": "Hall of win lvl 2/Momie 2.png"
+  },
+  {
+    "id": "hall_of_win_raton_garou_2",
+    "name": "Raton Garou",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "+4 ATQ si Hall of win 4 ou Raton 4",
+    "health": 2,
+    "attack": 6,
+    "image_path": "Hall of win lvl 2/Raton garou2.png"
+  },
+  {
+    "id": "hall_of_win_wyrm_de_glace_2",
+    "name": "Wyrm de Glace",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Hall of win",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "double son attaque"},
+        {"condition": "2 PO", "effect": "triple son attaque"},
+        {"condition": "4 PO", "effect": "quadruple son attaque"}
+      ]
+    },
+    "bonus_text": "+3 ATQ si Combattant 2",
+    "health": 13,
+    "attack": 8,
+    "image_path": "Hall of win lvl 2/Wyrm de Glace2.png"
   }
 ]

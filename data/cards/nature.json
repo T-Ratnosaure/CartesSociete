@@ -260,5 +260,267 @@
     "health": 9,
     "attack": 4,
     "image_path": "Nature lvl 1/treant ancien.png"
+  },
+  {
+    "id": "nature_ancien_de_la_nature_2",
+    "name": "Ancien de la nature",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocable"},
+        {"threshold": 4, "effect": "5 dgt imblocable"},
+        {"threshold": 6, "effect": "8 dgt imblocable"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "4 dgt imblocable"},
+        {"condition": "2 PO", "effect": "6 dgt imblocable"},
+        {"condition": "3 PO", "effect": "10 dgt imblocable"}
+      ]
+    },
+    "bonus_text": "+2 au dgt des sorts des mages",
+    "health": 9,
+    "attack": 13,
+    "image_path": "Nature lvl 2/ancien de la nature2.png"
+  },
+  {
+    "id": "nature_cameleor_2",
+    "name": "Caméléor",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Econome",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "les économes apportent 1- nb d'économes PO/Tour"
+    },
+    "bonus_text": "+2 d'or si des dgt imblocable sont infligés",
+    "health": 6,
+    "attack": 2,
+    "image_path": "Nature lvl 2/Caméléor2.png"
+  },
+  {
+    "id": "nature_diplo_terre_2",
+    "name": "Diplo-Terre",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Diplo",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "sacrifier une carte à la fin du tour"},
+        {"threshold": 2, "effect": "et +1 PV"},
+        {"threshold": 3, "effect": "et +2 ATQ"}
+      ]
+    },
+    "bonus_text": "Les +5 ATQ si diplo air, +5 PV si Diplo Mer",
+    "health": 10,
+    "attack": 11,
+    "image_path": "Nature lvl 2/Diplo-Terre2.png"
+  },
+  {
+    "id": "nature_golem_de_combat_2",
+    "name": "Golem de combat",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+3 ATQ pour les combattants"},
+        {"threshold": 4, "effect": "+7 ATQ"},
+        {"threshold": 6, "effect": "+8 ATQ"}
+      ]
+    },
+    "bonus_text": "Bloque 2 dgt par sort",
+    "health": 6,
+    "attack": 8,
+    "image_path": "Nature lvl 2/golem de combat2.png"
+  },
+  {
+    "id": "nature_licorne_2",
+    "name": "Licorne",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Monture",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "piocher une carte coût 5 dans la pile (au hasard)"}
+      ]
+    },
+    "bonus_text": "il suffit de 2 montures pour activer l'effet",
+    "health": 6,
+    "attack": 6,
+    "image_path": "Nature lvl 2/licorne2.png"
+  },
+  {
+    "id": "nature_loutre_sylvestre_2",
+    "name": "Loutre sylvestre",
+    "card_type": "creature",
+    "level": 4,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "démon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un démon majeur"}
+      ]
+    },
+    "bonus_text": "+4 dgts imblocable pour le démon",
+    "health": 2,
+    "attack": 8,
+    "image_path": "Nature lvl 2/loutre sylvestre2.png"
+  },
+  {
+    "id": "nature_mutanus_empoisonne_2",
+    "name": "Mutanus empoisonné",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+5 dgt / -2 PV"},
+        {"threshold": 4, "effect": "+10 dgt / -5 PV"}
+      ]
+    },
+    "bonus_text": "Vous perdez 2 PV imblocables par tour, +3 ATQ",
+    "health": 2,
+    "attack": 8,
+    "image_path": "Nature lvl 2/mutanus empoisonné2.png"
+  },
+  {
+    "id": "nature_nai_epines_2",
+    "name": "Naï épines",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Mage",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "les mages lancent 2 fois leurs sorts"}
+      ]
+    },
+    "bonus_text": "sorts: 8 dégâts imblocables",
+    "health": 4,
+    "attack": 6,
+    "image_path": "Nature lvl 2/Naï épines2.png"
+  },
+  {
+    "id": "nature_tir_rex_2",
+    "name": "Tir-rex",
+    "card_type": "creature",
+    "level": 3,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Archer",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 dgt si 2 défenseurs"},
+        {"threshold": 4, "effect": "+7"},
+        {"threshold": 6, "effect": "+10"}
+      ]
+    },
+    "bonus_text": "+2 dgt imblocable/tour",
+    "health": 6,
+    "attack": 6,
+    "image_path": "Nature lvl 2/tir rex2.png"
+  },
+  {
+    "id": "nature_treant_ancien_2",
+    "name": "Treant ancien",
+    "card_type": "creature",
+    "level": 5,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Protecteur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocables"},
+        {"threshold": 4, "effect": "5 dgt imblocables"},
+        {"threshold": 6, "effect": "8 dgt imblocables"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 pv pour tous les monstres"},
+        {"threshold": 4, "effect": "+3 pv"},
+        {"threshold": 6, "effect": "+5 pv"}
+      ]
+    },
+    "bonus_text": "+2 dgt imblocable tous les 2 dgt imblocables",
+    "health": 14,
+    "attack": 8,
+    "image_path": "Nature lvl 2/treant ancien2.png"
   }
 ]
