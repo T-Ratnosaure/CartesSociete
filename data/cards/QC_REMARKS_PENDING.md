@@ -57,9 +57,9 @@ These issues were identified during quality control review and require client in
 
 ---
 
-### 6. Lapin Missing Combattant Class
-**Problem**: Lapin is the only major family without a Combattant class card
-**Question for client**: Is this intentional, or should a Lapin Combattant be added?
+### ~~6. Lapin Missing Combattant Class~~
+**Status**: DEFERRED
+**Client response**: Will be added later
 
 ---
 
@@ -72,7 +72,7 @@ These issues were identified during quality control review and require client in
 | Liche Inferieur wrong abilities | ~~HIGH~~ | FIXED |
 | Lapinflexible wrong abilities | ~~HIGH~~ | FIXED |
 | Cyborg lvl 2 family abilities | HIGH | Pending client response |
-| Lapin no Combattant | MEDIUM | Pending client response |
+| Lapin no Combattant | ~~MEDIUM~~ | DEFERRED - Will add later |
 
 ---
 
