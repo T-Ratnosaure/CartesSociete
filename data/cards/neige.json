@@ -1,0 +1,28 @@
+[
+  {
+    "id": "neige_pere_noel_1",
+    "name": "Pere Noel",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Neige",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+1 PO/tour"},
+        {"threshold": 4, "effect": "1 carte gratuite/tour"},
+        {"threshold": 6, "effect": "et +1 Kdo"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+5 dgt / -2 PV"},
+        {"threshold": 4, "effect": "+10 dgt / -5 PV"}
+      ]
+    },
+    "bonus_text": "Les Kdo donnent +1 ATQ supplementaire",
+    "health": 6,
+    "attack": 11,
+    "image_path": "Neige Lvl 1/Pere noel.png"
+  }
+]

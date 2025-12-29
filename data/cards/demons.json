@@ -1,0 +1,82 @@
+[
+  {
+    "id": "demon_demon_majeur",
+    "name": "Demon Majeur",
+    "card_type": "demon",
+    "level": null,
+    "movement": 1,
+    "family": "Démon",
+    "card_class": "Démon",
+    "family_abilities": {
+      "passive": "Un seul demon peut apparaitre sur le plateau a la fois"
+    },
+    "class_abilities": {
+      "passive": "Les demons ne peuvent pas gagner de Bonus autres que les bonus invocateur"
+    },
+    "bonus_text": "10 dgt imblocable",
+    "health": 10,
+    "attack": 10,
+    "image_path": "Démon Majeur.png",
+    "summon_cost": 6
+  },
+  {
+    "id": "demon_demon_mineur",
+    "name": "Demon mineur",
+    "card_type": "demon",
+    "level": null,
+    "movement": 1,
+    "family": "Démon",
+    "card_class": "Démon",
+    "family_abilities": {
+      "passive": "Un seul demon peut apparaitre sur le plateau a la fois"
+    },
+    "class_abilities": {
+      "passive": "Les demons ne peuvent pas gagner de Bonus autres que les bonus invocateur"
+    },
+    "bonus_text": null,
+    "health": 4,
+    "attack": 4,
+    "image_path": "Démon mineur.png",
+    "summon_cost": 2
+  },
+  {
+    "id": "demon_diablotin",
+    "name": "Diablotin",
+    "card_type": "demon",
+    "level": null,
+    "movement": 1,
+    "family": "Démon",
+    "card_class": "Démon",
+    "family_abilities": {
+      "passive": "Un seul demon peut apparaitre sur le plateau a la fois"
+    },
+    "class_abilities": {
+      "passive": "Les demons ne peuvent pas gagner de Bonus autres que les bonus invocateur"
+    },
+    "bonus_text": null,
+    "health": 2,
+    "attack": 2,
+    "image_path": "Diablotin.png",
+    "summon_cost": 1
+  },
+  {
+    "id": "demon_succube",
+    "name": "Succube",
+    "card_type": "demon",
+    "level": null,
+    "movement": 1,
+    "family": "Démon",
+    "card_class": "Démon",
+    "family_abilities": {
+      "passive": "Un seul demon peut apparaitre sur le plateau a la fois"
+    },
+    "class_abilities": {
+      "passive": "Les demons ne peuvent pas gagner de Bonus autres que les bonus invocateur"
+    },
+    "bonus_text": null,
+    "health": 5,
+    "attack": 5,
+    "image_path": "succube.png",
+    "summon_cost": 4
+  }
+]

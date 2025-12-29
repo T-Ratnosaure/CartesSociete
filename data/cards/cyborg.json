@@ -1,0 +1,128 @@
+[
+  {
+    "id": "cyborg_lolo_le_gorille_1",
+    "name": "Lolo le gorille",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "invoque hydre steam"},
+        {"threshold": 6, "effect": "Invoque dragon steam"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+5 dgt / -2 PV"},
+        {"threshold": 4, "effect": "+10 dgt / -5 PV"}
+      ]
+    },
+    "bonus_text": "+ 4 ATQ si raccoon familly 2",
+    "health": 3,
+    "attack": 0,
+    "image_path": "Cyborg lvl 1/Lolo le gorille.png"
+  },
+  {
+    "id": "cyborg_cyber_phoenix_1",
+    "name": "Cyber Phoenix",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "invoque hydre steam"},
+        {"threshold": 6, "effect": "Invoque dragon steam"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "2 dgt imblocable"},
+        {"condition": "2 PO", "effect": "3 dgt imblocable"},
+        {"condition": "3 PO", "effect": "5 dgt imblocable"}
+      ]
+    },
+    "bonus_text": null,
+    "health": 3,
+    "attack": 3,
+    "image_path": "Cyborg lvl 1/Cyber Phoenix.png"
+  },
+  {
+    "id": "cyborg_cyberaccoon_1",
+    "name": "Cyberaccoon",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "Combattant",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "invoque hydre steam"},
+        {"threshold": 6, "effect": "Invoque dragon steam"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+2 ATQ"},
+        {"threshold": 4, "effect": "+4 ATQ"},
+        {"threshold": 6, "effect": "+6 ATQ"}
+      ]
+    },
+    "bonus_text": null,
+    "health": 2,
+    "attack": 3,
+    "image_path": "Cyborg lvl 1/Cyberaccoon.png"
+  },
+  {
+    "id": "cyborg_invocatrice_steam_1",
+    "name": "Invocatrice steam",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Cyborg",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "invoque hydre steam"},
+        {"threshold": 6, "effect": "Invoque dragon steam"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "demon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un demon majeur"}
+      ]
+    },
+    "bonus_text": null,
+    "health": 2,
+    "attack": 2,
+    "image_path": "Cyborg lvl 1/Invocatrice steam.png"
+  },
+  {
+    "id": "cyborg_hydre_steam_2",
+    "name": "Hydre Steam",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Cyborg",
+    "card_class": "S-Team",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "cyborg niv 2: hydre niv 2"},
+        {"threshold": 5, "effect": "cyborg niv 2: drag Niv 2"}
+      ]
+    },
+    "class_abilities": {
+      "passive": "Ne compte pas comme un monstre du plateau"
+    },
+    "bonus_text": "-1 ATQ pour les cyborgs (pas en dessous de 0)",
+    "health": 5,
+    "attack": 15,
+    "image_path": "Cyborg lvl 2/Hydre Steam2.png"
+  }
+]

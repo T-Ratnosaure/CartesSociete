@@ -1,0 +1,29 @@
+[
+  {
+    "id": "atlantide_archere_des_flots_1",
+    "name": "Archere des flots",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Atlantide",
+    "card_class": "Archer",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 pv a la fin du tour"},
+        {"threshold": 4, "effect": "+8"},
+        {"threshold": 6, "effect": "+13"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+4 dgt si 2 defenseurs"},
+        {"threshold": 4, "effect": "+7"},
+        {"threshold": 6, "effect": "+10"}
+      ]
+    },
+    "bonus_text": "+2 dgts si Joe est sur plateau",
+    "health": 1,
+    "attack": 5,
+    "image_path": "lvl 1 Atlantide/Archère des flots.png"
+  }
+]

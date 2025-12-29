@@ -1,0 +1,30 @@
+[
+  {
+    "id": "lapin_lapinvocateur_1",
+    "name": "Lapinvocateur",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Lapin",
+    "card_class": "Invocateur",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 3, "effect": "+1 cartes sur le platau"},
+        {"threshold": 5, "effect": "+2 cartes sur le plateau"},
+        {"threshold": 8, "effect": "+2 ATQ pour tous les lapins"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "invoque un diablotin"},
+        {"threshold": 2, "effect": "demon mineur"},
+        {"threshold": 4, "effect": "une succube"},
+        {"threshold": 6, "effect": "un demon majeur"}
+      ]
+    },
+    "bonus_text": "-3 ATQ si Gardien des Carottes",
+    "health": 4,
+    "attack": 6,
+    "image_path": "Lapin lvl 1/Lapinvocateur.png"
+  }
+]

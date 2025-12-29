@@ -1,0 +1,56 @@
+[
+  {
+    "id": "nature_ancien_de_la_nature_1",
+    "name": "Ancien de la nature",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Nature",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocable"},
+        {"threshold": 4, "effect": "5 dgt imblocable"},
+        {"threshold": 6, "effect": "8 dgt imblocable"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "2 dgt imblocable"},
+        {"condition": "2 PO", "effect": "3 dgt imblocable"},
+        {"condition": "3 PO", "effect": "5 dgt imblocable"}
+      ]
+    },
+    "bonus_text": "+1 au dgt des sorts des mages",
+    "health": 7,
+    "attack": 7,
+    "image_path": "Nature lvl 1/ancien de la nature.png"
+  },
+  {
+    "id": "nature_ancien_de_la_nature_2",
+    "name": "Ancien de la nature",
+    "card_type": "creature",
+    "level": 2,
+    "movement": 2,
+    "family": "Nature",
+    "card_class": "Dragon",
+    "family_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "2 dgt imblocable"},
+        {"threshold": 4, "effect": "5 dgt imblocable"},
+        {"threshold": 6, "effect": "8 dgt imblocable"}
+      ]
+    },
+    "class_abilities": {
+      "conditional": [
+        {"condition": "1 PO", "effect": "2 dgt imblocable"},
+        {"condition": "2 PO", "effect": "3 dgt imblocable"},
+        {"condition": "3 PO", "effect": "5 dgt imblocable"}
+      ]
+    },
+    "bonus_text": "+1 au dgt des sorts des mages",
+    "health": 9,
+    "attack": 13,
+    "image_path": "Nature lvl 2/ancien de la nature 2.png"
+  }
+]

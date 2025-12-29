@@ -1,0 +1,151 @@
+[
+  {
+    "id": "arme_hache_runique",
+    "name": "Hache Runique",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 1, "effect": "+2 ATQ sur Hall of win"},
+        {"threshold": 1, "effect": "+2 PV sur defenseur"}
+      ]
+    },
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 5,
+    "image_path": "Hache runique.png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_arc_de_magie_des_flots",
+    "name": "Arc de Magie des flots",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Arc de Magie des flots.png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_cimeterre_runique",
+    "name": "Cimeterre runique",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Cimeterre runique.png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_fusil_a_harpons",
+    "name": "Fusil a Harpons",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Fusil à Harpons .png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_griffe_de_dragon_runique",
+    "name": "Griffe de dragon runique",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 5,
+    "image_path": "Griffe de dragon runique.png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_hallebarde_antique",
+    "name": "Hallebarde antique",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Hallebarde antique .png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_manteau_en_hermine",
+    "name": "Manteau en hermine",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 2,
+    "attack": 3,
+    "image_path": "Manteau en hermine.png",
+    "equip_restriction": "n'importe quel monstre"
+  },
+  {
+    "id": "arme_masse_lapine",
+    "name": "Masse lapine",
+    "card_type": "weapon",
+    "level": null,
+    "movement": 1,
+    "family": "Arme",
+    "card_class": "Arme",
+    "family_abilities": {
+      "passive": "L'arme peut etre equipee sur n'importe quel monstre"
+    },
+    "class_abilities": {},
+    "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
+    "health": 1,
+    "attack": 4,
+    "image_path": "Masse lapine.png",
+    "equip_restriction": "n'importe quel monstre"
+  }
+]

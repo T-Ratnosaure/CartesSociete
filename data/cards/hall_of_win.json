@@ -1,0 +1,28 @@
+[
+  {
+    "id": "hall_of_win_chevalier_demoniaque_1",
+    "name": "Chevalier demoniaque",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "Berseker",
+    "family_abilities": {
+      "passive": "Lancer une piece par tour",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+5 dgt / -2 PV"},
+        {"threshold": 4, "effect": "+10 dgt / -5 PV"}
+      ]
+    },
+    "bonus_text": "-2 Pv s'il y a un defenseur en face",
+    "health": 1,
+    "attack": 9,
+    "image_path": "Hall of win lvl 1/Chevalier démoniaque.png"
+  }
+]
