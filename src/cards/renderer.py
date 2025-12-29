@@ -81,9 +81,9 @@ def render_card_ascii(card: Card, width: int = 40) -> str:
 
     lines = [border]
 
-    # Header: Movement | Name | Level
-    level_str = str(card.level) if card.level else "X"
-    header = f" ^{card.movement}  {card.name}  ({level_str})"
+    # Header: Tier | Name | Cost
+    cost_str = str(card.cost) if card.cost else "X"
+    header = f" ^{card.level}  {card.name}  ({cost_str})"
     lines.append(make_line(center_text(header)))
     lines.append("|" + "-" * (width - 2) + "|")
 
@@ -158,7 +158,7 @@ def render_card_html(
 
     # Determine card type class for styling
     type_class = html_escape(card.card_type.value)
-    level_class = f"level-{card.level}" if card.level else "level-x"
+    cost_class = f"level-{card.cost}" if card.cost else "level-x"
 
     # Build and validate image path
     image_src = _validate_image_path(card.image_path, image_base_path)
@@ -204,8 +204,8 @@ def render_card_html(
         safe_bonus = html_escape(card.bonus_text)
         bonus_html = f'<div class="bonus-text">{safe_bonus}</div>'
 
-    # Level display
-    level_display = str(card.level) if card.level else "X"
+    # Cost display
+    cost_display = str(card.cost) if card.cost else "X"
 
     # Image section
     image_html = ""
@@ -216,11 +216,11 @@ def render_card_html(
         )
 
     html = f"""
-<div class="card {type_class} {level_class}" data-card-id="{safe_id}">
+<div class="card {type_class} {cost_class}" data-card-id="{safe_id}">
     <div class="card-header">
-        <span class="movement">^{card.movement}</span>
+        <span class="tier">^{card.level}</span>
         <span class="name">{safe_name}</span>
-        <span class="level">{level_display}</span>
+        <span class="cost">{cost_display}</span>
     </div>
     {image_html}
     <div class="card-body">
@@ -288,7 +288,7 @@ def get_card_css() -> str:
     border-bottom: 2px solid #8B4513;
 }
 
-.card-header .movement {
+.card-header .tier {
     font-size: 14px;
     font-weight: bold;
     background: #F5DEB3;
@@ -311,7 +311,7 @@ def get_card_css() -> str:
     margin: 0 8px;
 }
 
-.card-header .level {
+.card-header .cost {
     font-size: 18px;
     font-weight: bold;
     background: #F5DEB3;
