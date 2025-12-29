@@ -6,8 +6,6 @@ special damage types (imblocable), and applying damage to players.
 
 from dataclasses import dataclass, field
 
-from src.cards.models import Family
-
 from .state import GameState, PlayerState
 
 
@@ -50,38 +48,23 @@ class CombatResult:
 
 
 def calculate_imblocable_damage(player: PlayerState) -> int:
-    """Calculate imblocable damage from Nature family cards.
+    """Calculate imblocable damage from cards with imblocable abilities.
 
-    Nature family has abilities that deal imblocable damage,
-    which bypasses the normal combat formula.
+    Imblocable damage bypasses the normal combat formula (ATK - HP).
+    This is primarily a Nature family ability but can appear on other cards.
 
     Args:
         player: The player whose imblocable damage to calculate.
 
     Returns:
-        Total imblocable damage from Nature cards.
+        Total imblocable damage from all cards on the board.
     """
     imblocable = 0
 
     for card in player.board:
-        if card.family == Family.NATURE:
-            # Check for imblocable effects in class abilities
-            for ability in card.class_abilities.conditional:
-                if "imblocable" in ability.effect.lower():
-                    # Parse damage value from effect (e.g., "2 dgt imblocable")
-                    parts = ability.effect.split()
-                    for i, part in enumerate(parts):
-                        if part.isdigit():
-                            imblocable += int(part)
-                            break
-
-            # Check bonus text for imblocable damage
-            if card.bonus_text and "imblocable" in card.bonus_text.lower():
-                parts = card.bonus_text.split()
-                for i, part in enumerate(parts):
-                    if part.isdigit():
-                        imblocable += int(part)
-                        break
+        # Use the structured imblocable_damage field from ClassAbilities
+        # This is pre-parsed during card loading for reliability
+        imblocable += card.class_abilities.imblocable_damage
 
     return imblocable
 

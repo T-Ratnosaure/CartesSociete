@@ -6,10 +6,17 @@ including buying cards, playing cards, evolving cards, and ending turns.
 
 from dataclasses import dataclass
 from enum import Enum
+from typing import NoReturn
 
 from src.cards.models import Card, CardType, Family
+from src.cards.repository import CardRepository, get_repository
 
 from .state import GamePhase, GameState, PlayerState
+
+
+def _assert_never(value: NoReturn) -> NoReturn:
+    """Assert that a value is never reached (for exhaustive matching)."""
+    raise AssertionError(f"Unhandled value: {value!r}")
 
 
 class ActionType(Enum):
@@ -148,7 +155,7 @@ def play_card(
     # Check board limit (Lapin family can exceed limit)
     is_lapin = card.family == Family.LAPIN
     is_demon = card.card_type == CardType.DEMON
-    max_board = 8
+    max_board = state.config.max_board_size
 
     # Demons don't count towards limit, Lapin can exceed limit
     if not is_demon and not is_lapin and not player.can_play_card(max_board):
@@ -215,6 +222,7 @@ def evolve_cards(
     state: GameState,
     player: PlayerState,
     cards: list[Card],
+    repository: CardRepository | None = None,
 ) -> ActionResult:
     """Evolve 3 matching cards into a Level 2 version.
 
@@ -226,6 +234,7 @@ def evolve_cards(
         state: Current game state.
         player: The player evolving cards.
         cards: List of 3 cards to evolve.
+        repository: Card repository for Level 2 lookup. Uses default if not provided.
 
     Returns:
         ActionResult with the outcome.
@@ -233,8 +242,17 @@ def evolve_cards(
     Raises:
         EvolutionError: If evolution requirements are not met.
     """
-    if len(cards) != 3:
-        raise EvolutionError(f"Evolution requires exactly 3 cards, got {len(cards)}")
+    required_cards = state.config.cards_required_for_evolution
+
+    if len(cards) != required_cards:
+        raise EvolutionError(
+            f"Evolution requires exactly {required_cards} cards, got {len(cards)}"
+        )
+
+    # Verify cards are distinct instances (not the same card reference 3 times)
+    card_ids = [id(card) for card in cards]
+    if len(set(card_ids)) != len(cards):
+        raise EvolutionError("Cannot evolve the same card instance multiple times")
 
     # All cards must have the same name
     names = {card.name for card in cards}
@@ -247,17 +265,23 @@ def evolve_cards(
     if not all(card.level == 1 for card in cards):
         raise EvolutionError("All cards must be Level 1 to evolve")
 
-    # Cards can be from hand or board
-    all_player_cards = player.hand + player.board
+    # Cards must be from hand or board - check each card individually
     for card in cards:
-        if card not in all_player_cards:
+        if card not in player.hand and card not in player.board:
             raise EvolutionError(f"Card {card.name} not found in hand or board")
 
-    # Find the evolved version (Level 2)
-    # For now, we just mark which card "stays" and simulate the flip
-    # In a real implementation, we'd look up the Level 2 card from repository
-    evolved_card = cards[0]  # The first card stays and is "flipped"
-    discard_cards = cards[1:3]  # These go to discard
+    # Get the card repository for Level 2 lookup
+    if repository is None:
+        repository = get_repository()
+
+    # Look up the Level 2 version
+    card_name = cards[0].name
+    evolved_card = repository.get_by_name_and_level(card_name, level=2)
+
+    if evolved_card is None:
+        raise EvolutionError(
+            f"No Level 2 version found for '{card_name}'. This card cannot be evolved."
+        )
 
     # Remove all 3 cards from hand/board
     for card in cards:
@@ -266,17 +290,15 @@ def evolve_cards(
         elif card in player.board:
             player.board.remove(card)
 
-    # For now, we put the evolved card back
-    # In real game, it would be the Level 2 version
-    # TODO: Replace with actual Level 2 card lookup from repository
+    # Add the evolved Level 2 card to board
     player.board.append(evolved_card)
 
-    # Discard cards go to discard pile
-    state.discard_pile.extend(discard_cards)
+    # Discard the Level 1 cards (all 3 go to discard, Level 2 is new)
+    state.discard_pile.extend(cards)
 
     return ActionResult(
         success=True,
-        message=f"{player.name} evolved {cards[0].name} to Level 2",
+        message=f"{player.name} evolved {card_name} to Level 2",
         state=state,
     )
 
@@ -289,6 +311,9 @@ def end_turn(state: GameState) -> ActionResult:
 
     Returns:
         ActionResult with the outcome.
+
+    Raises:
+        AssertionError: If an unhandled phase is encountered.
     """
     phase = state.phase
 
@@ -301,7 +326,7 @@ def end_turn(state: GameState) -> ActionResult:
             state=state,
         )
 
-    elif phase == GamePhase.PLAY:
+    if phase == GamePhase.PLAY:
         # Move to combat phase
         state.phase = GamePhase.COMBAT
         return ActionResult(
@@ -310,7 +335,7 @@ def end_turn(state: GameState) -> ActionResult:
             state=state,
         )
 
-    elif phase == GamePhase.COMBAT:
+    if phase == GamePhase.COMBAT:
         # Move to end phase
         state.phase = GamePhase.END
         return ActionResult(
@@ -319,7 +344,7 @@ def end_turn(state: GameState) -> ActionResult:
             state=state,
         )
 
-    elif phase == GamePhase.END:
+    if phase == GamePhase.END:
         # Start new turn
         state.turn += 1
         state.phase = GamePhase.MARKET
@@ -329,8 +354,8 @@ def end_turn(state: GameState) -> ActionResult:
         for player in state.players:
             player.po = new_po
 
-        # Rotate buy order every 2 turns
-        if state.turn % 2 == 1:
+        # Rotate buy order every 2 turns (per game rules)
+        if state.turn % 2 == 1 and state.buy_order:
             state.buy_order = state.buy_order[1:] + [state.buy_order[0]]
 
         return ActionResult(
@@ -339,8 +364,5 @@ def end_turn(state: GameState) -> ActionResult:
             state=state,
         )
 
-    return ActionResult(
-        success=False,
-        message=f"Unknown phase: {phase}",
-        state=state,
-    )
+    # This should never be reached - ensures exhaustive matching
+    _assert_never(phase)  # type: ignore[arg-type]
