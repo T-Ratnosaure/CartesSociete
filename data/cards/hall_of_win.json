@@ -316,6 +316,33 @@
     "image_path": "Hall of win lvl 2/Liche Inférieur2.png"
   },
   {
+    "id": "hall_of_win_momie_1",
+    "name": "Momie",
+    "card_type": "creature",
+    "level": 1,
+    "movement": 1,
+    "family": "Hall of win",
+    "card_class": "Défenseur",
+    "family_abilities": {
+      "passive": "Lancer une pièce par tour, Imblocable",
+      "scaling": [
+        {"threshold": 2, "effect": "Pile: 11 DGT/Face -5PV"},
+        {"threshold": 4, "effect": "Pile: 18DGT/Face -7PV"}
+      ]
+    },
+    "class_abilities": {
+      "scaling": [
+        {"threshold": 2, "effect": "+2 PV pour les défenseurs"},
+        {"threshold": 4, "effect": "+5 PV"},
+        {"threshold": 6, "effect": "+8 PV"}
+      ]
+    },
+    "bonus_text": "Bloque 2 DGT des sorts ce tour",
+    "health": 3,
+    "attack": 1,
+    "image_path": "Hall of win lvl 1/Momie.png"
+  },
+  {
     "id": "hall_of_win_momie_2",
     "name": "Momie",
     "card_type": "creature",

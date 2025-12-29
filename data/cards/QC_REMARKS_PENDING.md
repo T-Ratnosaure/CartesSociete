@@ -17,11 +17,10 @@ These issues were identified during quality control review and require client in
 
 ## Still Pending
 
-### 2. Missing Hall of Win Momie Level 1
-**File**: `hall_of_win.json`
-**Problem**: `hall_of_win_momie_2` exists but `hall_of_win_momie_1` does not
-**Question for client**: Should we add Momie level 1? If yes, what are the stats?
-- Suggested stats based on patterns: ~3 HP, ~3-4 ATQ, movement: 1
+### ~~2. Missing Hall of Win Momie Level 1~~
+**Status**: FIXED
+**Client response**: Provided card image
+**Fix applied**: Added hall_of_win_momie_1 - Défenseur class, 3 HP / 1 ATQ, "Bloque 2 DGT des sorts ce tour", Imblocable
 
 ---
 
@@ -68,7 +67,7 @@ These issues were identified during quality control review and require client in
 | Issue | Priority | Status |
 |-------|----------|--------|
 | Cyborg lvl 1 attack = 0 | ~~CRITICAL~~ | RESOLVED - Intentional |
-| Missing Momie lvl 1 | CRITICAL | Pending client response |
+| Missing Momie lvl 1 | ~~CRITICAL~~ | FIXED |
 | Liche Inferieur wrong abilities | ~~HIGH~~ | FIXED |
 | Lapinflexible wrong abilities | ~~HIGH~~ | FIXED |
 | Cyborg lvl 2 family abilities | HIGH | Pending client response |
