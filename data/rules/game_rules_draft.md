@@ -37,25 +37,21 @@
 - 2 cards go to **discard pile** (recyclable)
 - 1 card is **removed from game** (exile)
 
-### End of Turn 1: First Deck Mixing
-- Take remaining cost-1 pile
-- Shuffle and split randomly (not symmetric)
-- Mix one half with cost-2 pile
-- Discard the other half
+### Deck Mixing (after every even turn)
+After each even turn, mix remaining cards into higher cost pile:
 
-### Turns 3-4
-- Turn 3: **7 PO** | Turn 4: **9 PO** (formula: turn × 2 + 1)
+| After Turn | Mix remaining into |
+|------------|-------------------|
+| 2 | Cost-2 pile |
+| 4 | Cost-3 pile |
+| 6 | Cost-4 pile |
+| 8 | Cost-5 pile |
 
-### Turn 5: Second Deck Mixing
-- Take remaining cards, split randomly in 2
-- Mix one part with cost-3 pile
-- Discard the other part
-
-### Turn 7: Third Deck Mixing
-- Same process with cost-4 pile
-
-### Turn 9: Fourth Deck Mixing
-- Same process with cost-5 pile
+**Mixing process:**
+1. Take remaining cards from current pile
+2. Shuffle and split randomly (not symmetric)
+3. Mix one half with next cost pile
+4. Discard the other half
 
 ## PO Progression
 - **Turn 1**: 4 PO (fixed)
