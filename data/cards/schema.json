@@ -39,7 +39,7 @@
     },
     "card_class": {
       "type": "string",
-      "enum": ["Archer", "Berseker", "Combattant", "Défenseur", "Dragon", "Invocateur", "Mage", "Monture", "S-Team", "Arme", "Démon"],
+      "enum": ["Archer", "Berseker", "Combattant", "Défenseur", "Diplo", "Dragon", "Econome", "Envouteur", "Forgeron", "Invocateur", "Mage", "Monture", "Protecteur", "S-Team", "Arme", "Démon"],
       "description": "Card class/role"
     },
     "family_abilities": {

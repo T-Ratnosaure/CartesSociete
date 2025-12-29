@@ -249,7 +249,7 @@
     "bonus_text": "+2 ATQ pour les cyborgs et S-Team",
     "health": 8,
     "attack": 15,
-    "image_path": "Cyborg lvl 1/Dragon Steam .png"
+    "image_path": "Cyborg lvl 1/Dragon Steam.png"
   },
   {
     "id": "cyborg_steamtrooper_2",

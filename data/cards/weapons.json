@@ -73,7 +73,7 @@
     "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
     "health": 1,
     "attack": 4,
-    "image_path": "Fusil à Harpons .png",
+    "image_path": "Fusil à Harpons.png",
     "equip_restriction": "n'importe quel monstre"
   },
   {
@@ -109,7 +109,7 @@
     "bonus_text": "Ajoute l'ATQ et les PV au monstre equipe",
     "health": 1,
     "attack": 4,
-    "image_path": "Hallebarde antique .png",
+    "image_path": "Hallebarde antique.png",
     "equip_restriction": "n'importe quel monstre"
   },
   {
