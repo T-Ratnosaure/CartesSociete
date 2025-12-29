@@ -4,11 +4,43 @@ This module provides heuristic functions for evaluating cards and board position
 These are used by greedy and heuristic players to make decisions.
 """
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.cards.models import Card
     from src.game.state import GameState, PlayerState
+
+
+@dataclass(frozen=True)
+class EvaluationWeights:
+    """Configuration for card evaluation heuristics.
+
+    All weights can be tuned to adjust AI behavior.
+
+    Attributes:
+        family_synergy_multiplier: Bonus per matching family member on board.
+        class_synergy_multiplier: Bonus per matching class member on board.
+        evolution_two_copies_bonus: Bonus when 2 copies exist (1 away from evolve).
+        evolution_one_copy_bonus: Bonus when 1 copy exists (building towards evolve).
+        imblocable_damage_multiplier: Multiplier for imblocable damage value.
+        late_game_attack_bonus: Bonus per attack point after turn threshold.
+        late_game_turn_threshold: Turn number when late game bonuses apply.
+        board_imblocable_multiplier: Multiplier for imblocable in board evaluation.
+    """
+
+    family_synergy_multiplier: float = 0.5
+    class_synergy_multiplier: float = 0.3
+    evolution_two_copies_bonus: float = 3.0
+    evolution_one_copy_bonus: float = 1.0
+    imblocable_damage_multiplier: float = 2.5
+    late_game_attack_bonus: float = 0.3
+    late_game_turn_threshold: int = 7
+    board_imblocable_multiplier: float = 2.0
+
+
+# Default weights used by evaluation functions
+DEFAULT_WEIGHTS = EvaluationWeights()
 
 
 def calculate_base_value(card: "Card") -> float:
@@ -26,6 +58,7 @@ def calculate_base_value(card: "Card") -> float:
 def calculate_family_synergy(
     card: "Card",
     player_state: "PlayerState",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
 ) -> float:
     """Calculate family synergy bonus.
 
@@ -36,6 +69,7 @@ def calculate_family_synergy(
     Args:
         card: The card being evaluated.
         player_state: Current player state.
+        weights: Evaluation weights configuration.
 
     Returns:
         Synergy bonus based on family members on board.
@@ -44,13 +78,14 @@ def calculate_family_synergy(
     # Scaling bonuses typically activate at 2, 3, 4, 5, 6, 8
     # Give bonus for approaching thresholds
     if family_count >= 1:
-        return family_count * 0.5
+        return family_count * weights.family_synergy_multiplier
     return 0.0
 
 
 def calculate_class_synergy(
     card: "Card",
     player_state: "PlayerState",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
 ) -> float:
     """Calculate class synergy bonus.
 
@@ -59,19 +94,21 @@ def calculate_class_synergy(
     Args:
         card: The card being evaluated.
         player_state: Current player state.
+        weights: Evaluation weights configuration.
 
     Returns:
         Synergy bonus based on class members on board.
     """
     class_count = sum(1 for c in player_state.board if c.card_class == card.card_class)
     if class_count >= 1:
-        return class_count * 0.3
+        return class_count * weights.class_synergy_multiplier
     return 0.0
 
 
 def calculate_evolution_potential(
     card: "Card",
     player_state: "PlayerState",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
 ) -> float:
     """Calculate evolution potential bonus.
 
@@ -80,6 +117,7 @@ def calculate_evolution_potential(
     Args:
         card: The card being evaluated.
         player_state: Current player state.
+        weights: Evaluation weights configuration.
 
     Returns:
         Evolution potential bonus.
@@ -95,24 +133,28 @@ def calculate_evolution_potential(
     # 1 copy: small bonus (we have 1, need 2 more)
     # 2 copies: large bonus (we're 1 away from evolution!)
     if name_count >= 2:
-        return 3.0  # Very close to evolution
+        return weights.evolution_two_copies_bonus
     elif name_count == 1:
-        return 1.0  # Building towards it
+        return weights.evolution_one_copy_bonus
     return 0.0
 
 
-def calculate_imblocable_bonus(card: "Card") -> float:
+def calculate_imblocable_bonus(
+    card: "Card",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
+) -> float:
     """Calculate bonus for imblocable damage.
 
     Imblocable damage is extremely valuable as it bypasses defense.
 
     Args:
         card: The card being evaluated.
+        weights: Evaluation weights configuration.
 
     Returns:
         Imblocable damage bonus.
     """
-    return card.class_abilities.imblocable_damage * 2.5
+    return card.class_abilities.imblocable_damage * weights.imblocable_damage_multiplier
 
 
 def calculate_cost_efficiency(card: "Card") -> float:
@@ -133,6 +175,7 @@ def evaluate_card_for_purchase(
     card: "Card",
     player_state: "PlayerState",
     state: "GameState",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
 ) -> float:
     """Comprehensive card evaluation for purchase decisions.
 
@@ -142,20 +185,21 @@ def evaluate_card_for_purchase(
         card: The card to evaluate.
         player_state: Current player state.
         state: Current game state.
+        weights: Evaluation weights configuration.
 
     Returns:
         Total evaluation score (higher is better).
     """
     score = calculate_base_value(card)
-    score += calculate_family_synergy(card, player_state)
-    score += calculate_class_synergy(card, player_state)
-    score += calculate_evolution_potential(card, player_state)
-    score += calculate_imblocable_bonus(card)
+    score += calculate_family_synergy(card, player_state, weights)
+    score += calculate_class_synergy(card, player_state, weights)
+    score += calculate_evolution_potential(card, player_state, weights)
+    score += calculate_imblocable_bonus(card, weights)
     score += calculate_cost_efficiency(card)
 
     # Late game bonus for high-stat cards
-    if state.turn >= 7:
-        score += card.attack * 0.3  # Prioritize damage late game
+    if state.turn >= weights.late_game_turn_threshold:
+        score += card.attack * weights.late_game_attack_bonus
 
     return score
 
@@ -164,6 +208,7 @@ def evaluate_card_for_play(
     card: "Card",
     player_state: "PlayerState",
     state: "GameState",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
 ) -> float:
     """Evaluate a card for playing from hand to board.
 
@@ -171,23 +216,28 @@ def evaluate_card_for_play(
         card: The card to evaluate.
         player_state: Current player state.
         state: Current game state.
+        weights: Evaluation weights configuration.
 
     Returns:
         Play priority score (higher = play first).
     """
     score = calculate_base_value(card)
-    score += calculate_family_synergy(card, player_state)
-    score += calculate_class_synergy(card, player_state)
-    score += calculate_imblocable_bonus(card)
+    score += calculate_family_synergy(card, player_state, weights)
+    score += calculate_class_synergy(card, player_state, weights)
+    score += calculate_imblocable_bonus(card, weights)
 
     return score
 
 
-def evaluate_board_position(player_state: "PlayerState") -> float:
+def evaluate_board_position(
+    player_state: "PlayerState",
+    weights: EvaluationWeights = DEFAULT_WEIGHTS,
+) -> float:
     """Evaluate the strength of a player's board position.
 
     Args:
         player_state: The player state to evaluate.
+        weights: Evaluation weights configuration.
 
     Returns:
         Board strength score.
@@ -198,7 +248,9 @@ def evaluate_board_position(player_state: "PlayerState") -> float:
     # Calculate imblocable damage
     imblocable = sum(c.class_abilities.imblocable_damage for c in player_state.board)
 
-    return float(total_atk + total_hp + imblocable * 2)
+    return float(
+        total_atk + total_hp + imblocable * weights.board_imblocable_multiplier
+    )
 
 
 def evaluate_threat_level(

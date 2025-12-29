@@ -6,6 +6,7 @@ for future full implementation.
 """
 
 import logging
+import math
 import random
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
@@ -25,9 +26,9 @@ class MCTSConfig:
     """Configuration for MCTS player.
 
     Attributes:
-        num_simulations: Number of simulations per decision.
+        num_simulations: Number of simulations per decision (1-10000).
         exploration_constant: UCB1 exploration parameter (sqrt(2) default).
-        max_rollout_depth: Maximum depth for random rollouts.
+        max_rollout_depth: Maximum depth for random rollouts (1-100).
         use_stub: When True, falls back to random play.
     """
 
@@ -35,6 +36,28 @@ class MCTSConfig:
     exploration_constant: float = 1.414  # sqrt(2)
     max_rollout_depth: int = 10
     use_stub: bool = True
+
+    # Maximum bounds to prevent DoS
+    MAX_SIMULATIONS: int = field(default=10000, repr=False, init=False)
+    MAX_ROLLOUT_DEPTH: int = field(default=100, repr=False, init=False)
+
+    def __post_init__(self) -> None:
+        """Validate configuration bounds."""
+        if not 1 <= self.num_simulations <= self.MAX_SIMULATIONS:
+            raise ValueError(
+                f"num_simulations must be between 1 and {self.MAX_SIMULATIONS}, "
+                f"got {self.num_simulations}"
+            )
+        if not 1 <= self.max_rollout_depth <= self.MAX_ROLLOUT_DEPTH:
+            raise ValueError(
+                f"max_rollout_depth must be between 1 and {self.MAX_ROLLOUT_DEPTH}, "
+                f"got {self.max_rollout_depth}"
+            )
+        if self.exploration_constant < 0:
+            raise ValueError(
+                f"exploration_constant must be non-negative, "
+                f"got {self.exploration_constant}"
+            )
 
 
 @dataclass
@@ -76,8 +99,6 @@ class MCTSNode:
 
         if self.parent is None or self.parent.visits == 0:
             return exploitation
-
-        import math
 
         exploration = 1.414 * math.sqrt(
             math.log(self.parent.visits + 1) / (self.visits + 1)
@@ -211,7 +232,13 @@ class MCTSPlayer(Player):
 
         Returns:
             The best action found by MCTS.
+
+        Raises:
+            ValueError: If legal_actions is empty.
         """
+        if not legal_actions:
+            raise ValueError("legal_actions cannot be empty")
+
         # Placeholder implementation - random selection
         logger.debug(f"MCTS would run {self.config.num_simulations} simulations here")
 

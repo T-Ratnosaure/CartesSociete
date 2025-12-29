@@ -25,6 +25,8 @@ Example usage:
 from .action import Action, ActionType
 from .base import Player, PlayerInfo
 from .evaluation import (
+    DEFAULT_WEIGHTS,
+    EvaluationWeights,
     calculate_base_value,
     calculate_class_synergy,
     calculate_cost_efficiency,
@@ -54,7 +56,9 @@ __all__ = [
     "MCTSPlayer",
     "MCTSConfig",
     "MCTSNode",
-    # Evaluation functions
+    # Evaluation functions and weights
+    "EvaluationWeights",
+    "DEFAULT_WEIGHTS",
     "calculate_base_value",
     "calculate_class_synergy",
     "calculate_cost_efficiency",

@@ -64,7 +64,12 @@ class RandomPlayer(Player):
 
         Returns:
             A randomly selected action.
+
+        Raises:
+            ValueError: If legal_actions is empty.
         """
+        if not legal_actions:
+            raise ValueError("legal_actions cannot be empty")
         return self._rng.choice(legal_actions)
 
     def choose_play_action(
@@ -82,5 +87,10 @@ class RandomPlayer(Player):
 
         Returns:
             A randomly selected action.
+
+        Raises:
+            ValueError: If legal_actions is empty.
         """
+        if not legal_actions:
+            raise ValueError("legal_actions cannot be empty")
         return self._rng.choice(legal_actions)
