@@ -57,14 +57,18 @@ After each even turn, mix remaining cards into higher cost pile:
 - **2 turns per card cost level**
 - **Formula**: `card_cost × 2 + 1`
 - After 2 turns, deck mixes and moves to next cost level
+- **After Turn 10**: Stays at **11 PO** until end of game
+- **Note**: Some cards have abilities that increase PO!
 
 | Turns | Market Cost | PO Available |
 |-------|-------------|--------------|
-| 1-2 | Cost 1 | 3 PO (Turn 1 = 4 PO) |
+| 1 | Cost 1 | 4 PO (exception) |
+| 2 | Cost 1 | 3 PO |
 | 3-4 | Cost 2 | 5 PO |
 | 5-6 | Cost 3 | 7 PO |
 | 7-8 | Cost 4 | 9 PO |
 | 9-10 | Cost 5 | 11 PO |
+| 11+ | - | 11 PO (stays) |
 
 ## Board Limits
 - **Maximum 8 cards on board** at any time
