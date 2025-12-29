@@ -395,25 +395,31 @@ class TestMCTSPlayer:
         """Test creating an MCTS player."""
         player = MCTSPlayer(player_id=0)
         assert player.info.agent_type == "mcts"
-        assert "stub" in player.info.version
+        assert player.info.version == "1.0.0"
 
-    def test_stub_mode_default(self) -> None:
-        """MCTS defaults to stub mode."""
+    def test_full_mcts_mode_default(self) -> None:
+        """MCTS defaults to full implementation (not stub)."""
         player = MCTSPlayer(player_id=0)
-        assert player.config.use_stub is True
+        assert player.config.use_stub is False
 
     def test_stub_mode_logs_warning(self, caplog: pytest.LogCaptureFixture) -> None:
-        """Stub mode logs a warning."""
+        """Stub mode logs a warning when explicitly enabled."""
         import logging
 
+        from src.players.mcts_player import MCTSConfig
+
         with caplog.at_level(logging.WARNING):
-            MCTSPlayer(player_id=0)
+            MCTSPlayer(player_id=0, config=MCTSConfig(use_stub=True))
 
         assert "STUB mode" in caplog.text
 
-    def test_stub_fallback_to_random(self) -> None:
-        """Stub mode uses random player fallback."""
-        player = MCTSPlayer(player_id=0, seed=42)
+    def test_mcts_chooses_valid_action(self) -> None:
+        """MCTS chooses a valid action from legal actions."""
+        from src.players.mcts_player import MCTSConfig
+
+        # Use low sim count for speed
+        config = MCTSConfig(num_simulations=5, max_rollout_depth=3)
+        player = MCTSPlayer(player_id=0, config=config, seed=42)
         state = create_initial_game_state(2)
         player_state = state.players[0]
 
