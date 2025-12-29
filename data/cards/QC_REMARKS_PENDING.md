@@ -31,28 +31,9 @@ These issues were identified during quality control review and require client in
 
 ---
 
-### 5. Cyborg Level 2 Wrong Family Abilities
-**File**: `cyborg.json`
-**Problem**: Most level 2 Cyborg cards have "+4 pv a la fin du tour" instead of the Cyborg invocation mechanic
-**Affected cards**:
-- `cyborg_steamtrooper_2`
-- `cyborg_lolo_le_gorille_2`
-- `cyborg_cyberaccoon_2`
-- `cyborg_cyber_phoenix_2`
-- `cyborg_cyberours_2`
-- `cyborg_cyberpique_2`
-- `cyborg_naingenieur_2`
-
-**Expected** (Cyborg invocation):
-```json
-"family_abilities": {
-  "scaling": [
-    {"threshold": 3, "effect": "invoque hydre steam"},
-    {"threshold": 6, "effect": "Invoque dragon steam"}
-  ]
-}
-```
-**Question for client**: Should level 2 Cyborgs keep the invocation mechanic?
+### ~~5. Cyborg Level 2 Family Abilities~~
+**Status**: RESOLVED - Intentional design
+**Client response**: Validated as correct - level 2 Cyborgs intentionally have different family abilities
 
 ---
 
@@ -70,7 +51,7 @@ These issues were identified during quality control review and require client in
 | Missing Momie lvl 1 | ~~CRITICAL~~ | FIXED |
 | Liche Inferieur wrong abilities | ~~HIGH~~ | FIXED |
 | Lapinflexible wrong abilities | ~~HIGH~~ | FIXED |
-| Cyborg lvl 2 family abilities | HIGH | Pending client response |
+| Cyborg lvl 2 family abilities | ~~HIGH~~ | RESOLVED - Intentional |
 | Lapin no Combattant | ~~MEDIUM~~ | DEFERRED - Will add later |
 
 ---
