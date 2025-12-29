@@ -28,6 +28,11 @@ from .combat import (
     resolve_combat,
 )
 from .engine import GameEngine, TurnResult
+from .executor import (
+    InvalidActionError,
+    execute_action,
+    get_legal_actions_for_player,
+)
 from .market import (
     get_market_summary,
     mix_decks,
@@ -84,4 +89,8 @@ __all__ = [
     # Engine
     "GameEngine",
     "TurnResult",
+    # Executor
+    "InvalidActionError",
+    "execute_action",
+    "get_legal_actions_for_player",
 ]
