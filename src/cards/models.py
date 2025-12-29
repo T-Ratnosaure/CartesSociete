@@ -113,8 +113,8 @@ class Card:
         id: Unique identifier for the card (e.g., "cyborg_lolo_le_gorille").
         name: Display name of the card.
         card_type: Type of card (creature, weapon, demon).
-        level: Card level (1-5 for creatures, None/X for weapons/demons).
-        movement: Movement points (1-2 for most cards).
+        cost: Card cost to play (1-5 for creatures, None for weapons/demons).
+        level: Card tier (1 or 2, indicates Level 1 or Level 2 version).
         family: Card's family affiliation.
         card_class: Card's class/role.
         family_abilities: Abilities from family.
@@ -128,8 +128,8 @@ class Card:
     id: str
     name: str
     card_type: CardType
-    level: int | None  # None for X-level cards (weapons, demons)
-    movement: int
+    cost: int | None  # None for X-cost cards (weapons, demons)
+    level: int  # 1 or 2 (card tier)
     family: Family
     card_class: CardClass
     family_abilities: FamilyAbilities
@@ -144,7 +144,7 @@ class Card:
 class CreatureCard(Card):
     """A creature card that can be played on the board.
 
-    Creature cards have a level (1-5), belong to a family and class,
+    Creature cards have a cost (1-5), belong to a family and class,
     and can attack and defend.
     """
 
@@ -154,14 +154,17 @@ class CreatureCard(Card):
             raise ValueError(
                 f"CreatureCard must have card_type CREATURE, got {self.card_type}"
             )
-        # S-Team cards have level X (None), others must have level 1-5
+        # S-Team cards have cost X (None), others must have cost 1-5
         if self.card_class == CardClass.S_TEAM:
-            if self.level is not None:
+            if self.cost is not None:
                 raise ValueError(
-                    f"S-Team cards must have level None (X), got {self.level}"
+                    f"S-Team cards must have cost None (X), got {self.cost}"
                 )
-        elif self.level is None or not (1 <= self.level <= 5):
-            raise ValueError(f"CreatureCard level must be 1-5, got {self.level}")
+        elif self.cost is None or not (1 <= self.cost <= 5):
+            raise ValueError(f"CreatureCard cost must be 1-5, got {self.cost}")
+        # Level must be 1 or 2 (card tier)
+        if self.level not in (1, 2):
+            raise ValueError(f"CreatureCard level must be 1 or 2, got {self.level}")
 
 
 @dataclass

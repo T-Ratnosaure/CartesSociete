@@ -135,7 +135,9 @@ def generate_rules_pdf(output_path: str) -> None:
     bullet("Defense = HP (health stat on card)")
     pdf.ln(3)
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(0, 6, "Combat Calculation (for each opponent):", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(
+        0, 6, "Combat Calculation (for each opponent):", new_x="LMARGIN", new_y="NEXT"
+    )
     bullet("1. Calculate total attack of your board")
     bullet("2. Calculate opponent's total HP (their defense)")
     bullet("3. Damage = Your Attack - Their Total HP")

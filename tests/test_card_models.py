@@ -101,8 +101,8 @@ class TestCreatureCard:
             id="cyborg_lolo_le_gorille_1",
             name="Lolo le gorille",
             card_type=CardType.CREATURE,
+            cost=1,
             level=1,
-            movement=1,
             family=Family.CYBORG,
             card_class=CardClass.BERSEKER,
             family_abilities=FamilyAbilities(),
@@ -113,6 +113,7 @@ class TestCreatureCard:
             image_path="Cyborg lvl 1/Lolo le gorille.png",
         )
         assert card.name == "Lolo le gorille"
+        assert card.cost == 1
         assert card.level == 1
         assert card.family == Family.CYBORG
         assert card.health == 3
@@ -126,8 +127,8 @@ class TestCreatureCard:
                 id="test",
                 name="Test",
                 card_type=CardType.WEAPON,
+                cost=1,
                 level=1,
-                movement=1,
                 family=Family.CYBORG,
                 card_class=CardClass.BERSEKER,
                 family_abilities=FamilyAbilities(),
@@ -138,15 +139,15 @@ class TestCreatureCard:
                 image_path="test.png",
             )
 
-    def test_creature_invalid_level_none(self) -> None:
-        """Test that creature card must have a level."""
-        with pytest.raises(ValueError, match="CreatureCard level must be 1-5"):
+    def test_creature_invalid_cost_none(self) -> None:
+        """Test that creature card must have a cost."""
+        with pytest.raises(ValueError, match="CreatureCard cost must be 1-5"):
             CreatureCard(
                 id="test",
                 name="Test",
                 card_type=CardType.CREATURE,
-                level=None,
-                movement=1,
+                cost=None,
+                level=1,
                 family=Family.CYBORG,
                 card_class=CardClass.BERSEKER,
                 family_abilities=FamilyAbilities(),
@@ -157,15 +158,15 @@ class TestCreatureCard:
                 image_path="test.png",
             )
 
-    def test_creature_invalid_level_out_of_range(self) -> None:
-        """Test that creature card level must be 1-5."""
-        with pytest.raises(ValueError, match="CreatureCard level must be 1-5"):
+    def test_creature_invalid_cost_out_of_range(self) -> None:
+        """Test that creature card cost must be 1-5."""
+        with pytest.raises(ValueError, match="CreatureCard cost must be 1-5"):
             CreatureCard(
                 id="test",
                 name="Test",
                 card_type=CardType.CREATURE,
-                level=6,
-                movement=1,
+                cost=6,
+                level=1,
                 family=Family.CYBORG,
                 card_class=CardClass.BERSEKER,
                 family_abilities=FamilyAbilities(),
@@ -186,8 +187,8 @@ class TestWeaponCard:
             id="arme_hache_runique",
             name="Hache Runique",
             card_type=CardType.WEAPON,
-            level=None,
-            movement=1,
+            cost=None,
+            level=1,
             family=Family.ARME,
             card_class=CardClass.ARME,
             family_abilities=FamilyAbilities(passive="Equip restriction"),
@@ -199,7 +200,7 @@ class TestWeaponCard:
             equip_restriction="n'importe quel monstre",
         )
         assert card.name == "Hache Runique"
-        assert card.level is None
+        assert card.cost is None
         assert card.equip_restriction == "n'importe quel monstre"
 
     def test_weapon_invalid_type(self) -> None:
@@ -209,8 +210,8 @@ class TestWeaponCard:
                 id="test",
                 name="Test",
                 card_type=CardType.CREATURE,
-                level=None,
-                movement=1,
+                cost=None,
+                level=1,
                 family=Family.ARME,
                 card_class=CardClass.ARME,
                 family_abilities=FamilyAbilities(),
@@ -228,8 +229,8 @@ class TestWeaponCard:
                 id="test",
                 name="Test",
                 card_type=CardType.WEAPON,
-                level=None,
-                movement=1,
+                cost=None,
+                level=1,
                 family=Family.CYBORG,
                 card_class=CardClass.ARME,
                 family_abilities=FamilyAbilities(),
@@ -250,8 +251,8 @@ class TestDemonCard:
             id="demon_demon_majeur",
             name="Demon Majeur",
             card_type=CardType.DEMON,
-            level=None,
-            movement=1,
+            cost=None,
+            level=1,
             family=Family.DEMON,
             card_class=CardClass.DEMON,
             family_abilities=FamilyAbilities(),
@@ -272,8 +273,8 @@ class TestDemonCard:
                 id="test",
                 name="Test",
                 card_type=CardType.CREATURE,
-                level=None,
-                movement=1,
+                cost=None,
+                level=1,
                 family=Family.DEMON,
                 card_class=CardClass.DEMON,
                 family_abilities=FamilyAbilities(),

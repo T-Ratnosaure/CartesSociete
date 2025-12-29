@@ -87,8 +87,8 @@ def _parse_card(data: dict) -> Card:
         "id": data["id"],
         "name": data["name"],
         "card_type": card_type,
-        "level": data.get("level"),
-        "movement": data["movement"],
+        "cost": data.get("cost"),
+        "level": data["level"],
         "family": family,
         "card_class": card_class,
         "family_abilities": _parse_family_abilities(data.get("family_abilities", {})),
@@ -318,17 +318,30 @@ class CardRepository:
         return [card for card in self._cards.values() if card.card_class == card_class]
 
     def get_by_level(self, level: int) -> list[Card]:
-        """Get all cards of a specific level.
+        """Get all cards of a specific tier/level.
 
         Args:
-            level: The level to filter by (1-5).
+            level: The card tier to filter by (1 or 2).
 
         Returns:
-            List of cards at the specified level.
+            List of cards at the specified tier.
         """
         if not self._loaded:
             self.load()
         return [card for card in self._cards.values() if card.level == level]
+
+    def get_by_cost(self, cost: int) -> list[Card]:
+        """Get all cards of a specific cost.
+
+        Args:
+            cost: The cost to filter by (1-5 for creatures).
+
+        Returns:
+            List of cards with the specified cost.
+        """
+        if not self._loaded:
+            self.load()
+        return [card for card in self._cards.values() if card.cost == cost]
 
     def get_by_type(self, card_type: CardType) -> list[Card]:
         """Get all cards of a specific type.
@@ -384,6 +397,7 @@ class CardRepository:
         name: str | None = None,
         family: Family | None = None,
         card_class: CardClass | None = None,
+        cost: int | None = None,
         level: int | None = None,
         card_type: CardType | None = None,
         min_health: int | None = None,
@@ -397,7 +411,8 @@ class CardRepository:
             name: Partial name match (case-insensitive).
             family: Filter by family.
             card_class: Filter by class.
-            level: Filter by level.
+            cost: Filter by cost (1-5 for creatures).
+            level: Filter by tier/level (1 or 2).
             card_type: Filter by card type.
             min_health: Minimum health.
             max_health: Maximum health.
@@ -421,6 +436,9 @@ class CardRepository:
 
         if card_class is not None:
             results = [c for c in results if c.card_class == card_class]
+
+        if cost is not None:
+            results = [c for c in results if c.cost == cost]
 
         if level is not None:
             results = [c for c in results if c.level == level]

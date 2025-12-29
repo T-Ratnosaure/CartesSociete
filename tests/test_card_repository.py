@@ -20,8 +20,8 @@ def sample_card_data() -> list[dict]:
             "id": "cyborg_test_creature_1",
             "name": "Test Creature",
             "card_type": "creature",
+            "cost": 1,
             "level": 1,
-            "movement": 1,
             "family": "Cyborg",
             "card_class": "Berseker",
             "family_abilities": {
@@ -37,8 +37,8 @@ def sample_card_data() -> list[dict]:
             "id": "cyborg_test_creature_2",
             "name": "Test Creature 2",
             "card_type": "creature",
+            "cost": 2,
             "level": 2,
-            "movement": 2,
             "family": "Cyborg",
             "card_class": "Dragon",
             "family_abilities": {},
@@ -54,8 +54,8 @@ def sample_card_data() -> list[dict]:
             "id": "arme_test_weapon",
             "name": "Test Weapon",
             "card_type": "weapon",
-            "level": None,
-            "movement": 1,
+            "cost": None,
+            "level": 1,
             "family": "Arme",
             "card_class": "Arme",
             "family_abilities": {"passive": "Can equip"},
@@ -70,8 +70,8 @@ def sample_card_data() -> list[dict]:
             "id": "demon_test_demon",
             "name": "Test Demon",
             "card_type": "demon",
-            "level": None,
-            "movement": 1,
+            "cost": None,
+            "level": 1,
             "family": "Démon",
             "card_class": "Démon",
             "family_abilities": {"passive": "Only one"},
@@ -150,13 +150,15 @@ class TestCardRepository:
         assert len(dragon_cards) == 1
 
     def test_get_by_level(self, temp_data_dir: Path) -> None:
-        """Test filtering cards by level."""
+        """Test filtering cards by tier/level."""
         repo = CardRepository(temp_data_dir)
         repo.load()
 
+        # Tier 1: Test Creature, Test Weapon, Test Demon
         level1_cards = repo.get_by_level(1)
-        assert len(level1_cards) == 1
+        assert len(level1_cards) == 3
 
+        # Tier 2: Test Creature 2
         level2_cards = repo.get_by_level(2)
         assert len(level2_cards) == 1
 
