@@ -68,7 +68,7 @@ def generate_rules_pdf(output_path: str) -> None:
     text("2 turns per card cost level | Formula: card_cost x 2 + 1")
     text("After Turn 10: stays at 11 PO | Some cards increase PO!")
     pdf.ln(3)
-    text("Turn 1: 4 PO (exception) | Turn 2: 3 PO")
+    text("Turns 1-2:  Cost 1 = 4 PO")
     text("Turns 3-4:  Cost 2 = 5 PO")
     text("Turns 5-6:  Cost 3 = 7 PO")
     text("Turns 7-8:  Cost 4 = 9 PO")
@@ -105,6 +105,26 @@ def generate_rules_pdf(output_path: str) -> None:
     bullet("Maximum 8 cards on board at any time")
     bullet("Play 1 card OR replace 1 card per turn (not both)")
     bullet("Exception: Lapin family can exceed 8-card limit")
+    bullet("Exception: Demons don't count towards board limit")
+    pdf.ln(5)
+
+    # Weapons
+    title("Weapons (Forgeron Class)")
+    bullet("Forgeron class can draw weapons from weapon pile")
+    bullet("Weapons are equipped on creatures")
+    bullet("When Forgeron leaves board, weapon also leaves")
+    pdf.ln(5)
+
+    # Demons
+    title("Demons (Invocateur Class)")
+    bullet("Invocateur class summons demons at thresholds")
+    bullet("Demons don't count towards board limit")
+    bullet("Summons: diablotin(1) > demon mineur(2) > succube(4) > demon majeur(6)")
+    pdf.ln(5)
+
+    # Special Damage
+    title("Special Damage")
+    bullet("Imblocable (Nature): Bypasses combat, direct to opponent PV")
     pdf.ln(5)
 
     # Combat

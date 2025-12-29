@@ -62,8 +62,7 @@ After each even turn, mix remaining cards into higher cost pile:
 
 | Turns | Market Cost | PO Available |
 |-------|-------------|--------------|
-| 1 | Cost 1 | 4 PO (exception) |
-| 2 | Cost 1 | 3 PO |
+| 1-2 | Cost 1 | 4 PO |
 | 3-4 | Cost 2 | 5 PO |
 | 5-6 | Cost 3 | 7 PO |
 | 7-8 | Cost 4 | 9 PO |
@@ -73,7 +72,22 @@ After each even turn, mix remaining cards into higher cost pile:
 ## Board Limits
 - **Maximum 8 cards on board** at any time
 - **Play 1 card OR replace 1 card** per turn (not both)
-- Exception: Lapin family can exceed 8-card limit (card-specific ability)
+- Exception: **Lapin family** can exceed 8-card limit (card-specific ability)
+- Exception: **Demons don't count** towards board limit
+
+## Weapons (Forgeron Class)
+- **Forgeron** class can draw weapons from weapon pile
+- Weapons are equipped on creatures
+- **When Forgeron leaves board, equipped weapon also leaves**
+
+## Demons (Invocateur Class)
+- **Invocateur** class summons demons at thresholds
+- Demons **don't count towards board limit**
+- Summons: diablotin (1) → démon mineur (2) → succube (4) → démon majeur (6)
+
+## Special Damage
+- **Imblocable damage** (Nature family): Bypasses combat formula
+- Goes **directly to opponent's PV**
 
 ## Combat Resolution
 - **Simultaneous combat** - all players resolve at the same time
