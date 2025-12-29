@@ -23,12 +23,12 @@ from .combat import (
     CombatResult,
     DamageBreakdown,
     calculate_damage,
+    calculate_imblocable_damage,
     get_combat_summary,
     resolve_combat,
 )
 from .engine import GameEngine, TurnResult
 from .market import (
-    MarketConfig,
     get_market_summary,
     mix_decks,
     refresh_market,
@@ -36,12 +36,21 @@ from .market import (
     setup_decks,
     should_mix_decks,
 )
-from .state import GamePhase, GameState, PlayerState, create_initial_game_state
+from .state import (
+    GamePhase,
+    GameState,
+    InvalidGameStateError,
+    InvalidPlayerError,
+    PlayerState,
+    create_initial_game_state,
+)
 
 __all__ = [
     # State
     "GamePhase",
     "GameState",
+    "InvalidGameStateError",
+    "InvalidPlayerError",
     "PlayerState",
     "create_initial_game_state",
     # Actions
@@ -62,10 +71,10 @@ __all__ = [
     "CombatResult",
     "DamageBreakdown",
     "calculate_damage",
+    "calculate_imblocable_damage",
     "get_combat_summary",
     "resolve_combat",
     # Market
-    "MarketConfig",
     "get_market_summary",
     "mix_decks",
     "refresh_market",

@@ -16,17 +16,24 @@ from src.cards.models import (
 )
 from src.game import (
     BoardFullError,
+    EvolutionError,
     GameEngine,
     GamePhase,
     InsufficientPOError,
+    InvalidGameStateError,
     InvalidPhaseError,
+    InvalidPlayerError,
     PlayerState,
     buy_card,
     calculate_damage,
+    calculate_imblocable_damage,
     create_initial_game_state,
+    evolve_cards,
+    mix_decks,
     play_card,
     replace_card,
     resolve_combat,
+    should_mix_decks,
 )
 
 
@@ -453,3 +460,424 @@ class TestGameEngine:
         assert "Alice" in summary
         assert "Bob" in summary
         assert "400 PV" in summary
+
+
+class TestImblocableDamage:
+    """Tests for imblocable damage calculation."""
+
+    def test_imblocable_damage_from_class_abilities(self) -> None:
+        """Test imblocable damage using structured field."""
+        # Create a creature with imblocable damage
+        creature = CreatureCard(
+            id="nature_archer_1",
+            name="Nature Archer",
+            card_type=CardType.CREATURE,
+            cost=2,
+            level=1,
+            family=Family.NATURE,
+            card_class=CardClass.ARCHER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(
+                conditional=[
+                    ConditionalAbility(condition="1 PO", effect="2 dgt imblocable"),
+                ],
+                imblocable_damage=2,  # Structured field
+            ),
+            bonus_text=None,
+            health=2,
+            attack=1,
+            image_path="nature.png",
+        )
+
+        player = PlayerState(player_id=0, name="Test")
+        player.board = [creature]
+
+        imblocable = calculate_imblocable_damage(player)
+        assert imblocable == 2
+
+    def test_imblocable_damage_multiple_cards(self) -> None:
+        """Test imblocable damage from multiple cards."""
+        creature1 = CreatureCard(
+            id="card1",
+            name="Card 1",
+            card_type=CardType.CREATURE,
+            cost=2,
+            level=1,
+            family=Family.NATURE,
+            card_class=CardClass.ARCHER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(imblocable_damage=2),
+            bonus_text=None,
+            health=2,
+            attack=1,
+            image_path="c1.png",
+        )
+        creature2 = CreatureCard(
+            id="card2",
+            name="Card 2",
+            card_type=CardType.CREATURE,
+            cost=3,
+            level=1,
+            family=Family.NATURE,
+            card_class=CardClass.ARCHER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(imblocable_damage=3),
+            bonus_text=None,
+            health=3,
+            attack=2,
+            image_path="c2.png",
+        )
+
+        player = PlayerState(player_id=0, name="Test")
+        player.board = [creature1, creature2]
+
+        imblocable = calculate_imblocable_damage(player)
+        assert imblocable == 5  # 2 + 3
+
+    def test_imblocable_damage_in_combat(self) -> None:
+        """Test imblocable damage is added to combat damage."""
+        state = create_initial_game_state(2)
+
+        # Attacker has card with high imblocable but low ATK
+        attacker_card = CreatureCard(
+            id="imblocable",
+            name="Imblocable Dealer",
+            card_type=CardType.CREATURE,
+            cost=2,
+            level=1,
+            family=Family.NATURE,
+            card_class=CardClass.ARCHER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(imblocable_damage=5),
+            bonus_text=None,
+            health=1,
+            attack=1,  # Low ATK
+            image_path="imb.png",
+        )
+
+        # Defender has high HP
+        defender_card = CreatureCard(
+            id="tank",
+            name="Tank",
+            card_type=CardType.CREATURE,
+            cost=5,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.DEFENSEUR,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=10,  # High defense
+            attack=1,
+            image_path="tank.png",
+        )
+
+        state.players[0].board = [attacker_card]
+        state.players[1].board = [defender_card]
+
+        result = calculate_damage(state.players[0], state.players[1])
+
+        # Base damage: 1 ATK - 10 HP = 0 (capped at 0)
+        assert result.base_damage == 0
+        # Imblocable: 5
+        assert result.imblocable_damage == 5
+        # Total: 0 + 5 = 5
+        assert result.total_damage == 5
+
+
+class TestEvolution:
+    """Tests for card evolution."""
+
+    def test_evolution_requires_3_cards(self) -> None:
+        """Test evolution fails with wrong number of cards."""
+        state = create_initial_game_state(2)
+        player = state.players[0]
+
+        card = CreatureCard(
+            id="test_1",
+            name="Test Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="test.png",
+        )
+
+        player.hand = [card, card]  # Only 2 cards
+
+        with pytest.raises(EvolutionError, match="exactly 3 cards"):
+            evolve_cards(state, player, player.hand)
+
+    def test_evolution_same_name_required(self) -> None:
+        """Test evolution fails with different card names."""
+        state = create_initial_game_state(2)
+        player = state.players[0]
+
+        # Create three distinct card instances: two "Card A" and one "Card B"
+        card_a1 = CreatureCard(
+            id="card_a_1",
+            name="Card A",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="a.png",
+        )
+        card_a2 = CreatureCard(
+            id="card_a_2",
+            name="Card A",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="a.png",
+        )
+        card_b = CreatureCard(
+            id="card_b_1",
+            name="Card B",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="b.png",
+        )
+
+        player.hand = [card_a1, card_a2, card_b]
+
+        with pytest.raises(EvolutionError, match="same name"):
+            evolve_cards(state, player, player.hand)
+
+    def test_evolution_level_1_required(self) -> None:
+        """Test evolution fails if card is not Level 1."""
+        state = create_initial_game_state(2)
+        player = state.players[0]
+
+        # Create card instances (can't use level=2 in CreatureCard)
+        card1 = CreatureCard(
+            id="test_1_a",
+            name="Test Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="test.png",
+        )
+        card2 = CreatureCard(
+            id="test_1_b",
+            name="Test Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="test.png",
+        )
+        card3 = CreatureCard(
+            id="test_1_c",
+            name="Test Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="test.png",
+        )
+
+        # All level 1, so this should attempt evolution but fail
+        # because no Level 2 card exists
+        player.hand = [card1, card2, card3]
+
+        with pytest.raises(EvolutionError, match="No Level 2 version"):
+            evolve_cards(state, player, player.hand)
+
+    def test_evolution_distinct_cards_required(self) -> None:
+        """Test evolution fails if same card instance used multiple times."""
+        state = create_initial_game_state(2)
+        player = state.players[0]
+
+        card = CreatureCard(
+            id="test_1",
+            name="Test Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="test.png",
+        )
+
+        player.hand = [card]
+        # Try to evolve with same instance 3 times
+        with pytest.raises(EvolutionError, match="same card instance"):
+            evolve_cards(state, player, [card, card, card])
+
+
+class TestDeckMixing:
+    """Tests for deck mixing mechanics."""
+
+    def test_should_mix_on_even_turns(self) -> None:
+        """Test deck mixing occurs on even turns."""
+        state = create_initial_game_state(2)
+
+        state.turn = 1
+        assert not should_mix_decks(state)
+
+        state.turn = 2
+        assert should_mix_decks(state)
+
+        state.turn = 3
+        assert not should_mix_decks(state)
+
+        state.turn = 4
+        assert should_mix_decks(state)
+
+    def test_should_not_mix_after_turn_10(self) -> None:
+        """Test deck mixing stops after turn 10."""
+        state = create_initial_game_state(2)
+
+        state.turn = 10
+        assert not should_mix_decks(state)
+
+        state.turn = 12
+        assert not should_mix_decks(state)
+
+    def test_mix_decks_transfers_cards(self) -> None:
+        """Test mix_decks moves cards to next tier."""
+        state = create_initial_game_state(2)
+        state.turn = 2  # Cost tier 1
+
+        # Add some cards to cost_1_deck
+        card = CreatureCard(
+            id="cost1_card",
+            name="Cost 1 Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="c1.png",
+        )
+
+        state.cost_1_deck = [card] * 10
+        state.cost_2_deck = []
+        state.market_cards = []
+
+        mixed_count = mix_decks(state)
+
+        # Should have mixed half (5) to cost_2
+        assert mixed_count == 5
+        assert len(state.cost_2_deck) == 5
+        assert len(state.discard_pile) == 5
+        assert len(state.cost_1_deck) == 0
+
+    def test_mix_decks_clears_market(self) -> None:
+        """Test mix_decks clears market cards back to deck first."""
+        state = create_initial_game_state(2)
+        state.turn = 2
+
+        card = CreatureCard(
+            id="market_card",
+            name="Market Card",
+            card_type=CardType.CREATURE,
+            cost=1,
+            level=1,
+            family=Family.CYBORG,
+            card_class=CardClass.BERSEKER,
+            family_abilities=FamilyAbilities(),
+            class_abilities=ClassAbilities(),
+            bonus_text=None,
+            health=2,
+            attack=2,
+            image_path="m.png",
+        )
+
+        state.cost_1_deck = [card] * 4
+        state.market_cards = [card] * 2  # 2 cards in market
+        state.cost_2_deck = []
+
+        mix_decks(state)
+
+        # Market should be cleared
+        assert len(state.market_cards) == 0
+
+
+class TestValidation:
+    """Tests for validation and error handling."""
+
+    def test_invalid_player_name_empty(self) -> None:
+        """Test empty player name raises error."""
+        with pytest.raises(InvalidPlayerError, match="cannot be empty"):
+            PlayerState(player_id=0, name="")
+
+    def test_invalid_player_name_too_long(self) -> None:
+        """Test too long player name raises error."""
+        with pytest.raises(InvalidPlayerError, match="cannot exceed"):
+            PlayerState(player_id=0, name="A" * 51)
+
+    def test_invalid_active_player_index(self) -> None:
+        """Test invalid active player index raises error."""
+        state = create_initial_game_state(2)
+        state.active_player_index = 10  # Invalid
+
+        with pytest.raises(InvalidGameStateError, match="Invalid active_player_index"):
+            state.get_active_player()
+
+    def test_invalid_deck_tier(self) -> None:
+        """Test invalid deck tier raises error."""
+        state = create_initial_game_state(2)
+
+        with pytest.raises(ValueError, match="Invalid cost tier"):
+            state.get_deck_for_tier(0)
+
+        with pytest.raises(ValueError, match="Invalid cost tier"):
+            state.get_deck_for_tier(6)

@@ -6,6 +6,7 @@ query cards by various criteria.
 
 import json
 import logging
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -24,6 +25,10 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Pre-compiled regex patterns for imblocable damage extraction
+_IMBLOCABLE_PATTERN = re.compile(r"(\d+)\s*(?:dgt|dgts|damage)?\s*imblocable")
+_IMBLOCABLE_REVERSE_PATTERN = re.compile(r"imblocable\s*(\d+)")
 
 
 @dataclass
@@ -58,12 +63,44 @@ def _parse_family_abilities(data: dict) -> FamilyAbilities:
     )
 
 
+def _extract_imblocable_damage(conditional: list[ConditionalAbility]) -> int:
+    """Extract imblocable damage value from conditional abilities.
+
+    Parses conditional abilities looking for "imblocable" effects and
+    extracts the damage value.
+
+    Args:
+        conditional: List of conditional abilities to parse.
+
+    Returns:
+        Total imblocable damage from all abilities.
+    """
+    total = 0
+    for ability in conditional:
+        effect_lower = ability.effect.lower()
+        if "imblocable" in effect_lower:
+            # Look for patterns like "2 dgt imblocable" or "imblocable 2"
+            match = _IMBLOCABLE_PATTERN.search(effect_lower)
+            if match:
+                total += int(match.group(1))
+            else:
+                # Try reverse pattern: "imblocable 2 dgt"
+                match = _IMBLOCABLE_REVERSE_PATTERN.search(effect_lower)
+                if match:
+                    total += int(match.group(1))
+    return total
+
+
 def _parse_class_abilities(data: dict) -> ClassAbilities:
     """Parse class abilities from JSON data."""
+    conditional = _parse_conditional_abilities(data.get("conditional", []))
+    imblocable = _extract_imblocable_damage(conditional)
+
     return ClassAbilities(
         scaling=_parse_scaling_abilities(data.get("scaling", [])),
-        conditional=_parse_conditional_abilities(data.get("conditional", [])),
+        conditional=conditional,
         passive=data.get("passive"),
+        imblocable_damage=imblocable,
     )
 
 
@@ -391,6 +428,23 @@ class CardRepository:
             for card in self.get_by_type(CardType.DEMON)
             if isinstance(card, DemonCard)
         ]
+
+    def get_by_name_and_level(self, name: str, level: int) -> Card | None:
+        """Get a card by exact name and level for evolution lookup.
+
+        Args:
+            name: Exact card name to match.
+            level: The card level (1 or 2).
+
+        Returns:
+            The matching card, or None if not found.
+        """
+        if not self._loaded:
+            self.load()
+        for card in self._cards.values():
+            if card.name == name and card.level == level:
+                return card
+        return None
 
     def search(
         self,

@@ -5,24 +5,10 @@ card revealing, deck mixing, and market refreshing.
 """
 
 import random
-from dataclasses import dataclass
 
 from src.cards.models import Card, CardType, CreatureCard, DemonCard, WeaponCard
 
 from .state import GameState
-
-
-@dataclass
-class MarketConfig:
-    """Configuration for the market system.
-
-    Attributes:
-        cards_per_reveal: Number of cards to reveal in market each turn.
-        copies_per_card: Number of copies of each card in the game.
-    """
-
-    cards_per_reveal: int = 5
-    copies_per_card: int = 5
 
 
 def setup_decks(
@@ -124,13 +110,14 @@ def mix_decks(state: GameState) -> int:
         Number of cards mixed into next tier.
     """
     current_tier = state.get_current_cost_tier()
+    max_tier = state.config.max_cost_tier
 
     # Can't mix if we're at max tier
-    if current_tier >= 5:
+    if current_tier >= max_tier:
         return 0
 
     current_deck = state.get_current_deck()
-    next_deck = _get_deck_for_tier(state, current_tier + 1)
+    next_deck = state.get_deck_for_tier(current_tier + 1)
 
     if not current_deck:
         return 0
@@ -160,30 +147,10 @@ def mix_decks(state: GameState) -> int:
     return len(to_mix)
 
 
-def _get_deck_for_tier(state: GameState, tier: int) -> list[Card]:
-    """Get the deck for a specific cost tier.
-
-    Args:
-        state: Current game state.
-        tier: The cost tier (1-5).
-
-    Returns:
-        Reference to the specified tier's deck.
-    """
-    decks = {
-        1: state.cost_1_deck,
-        2: state.cost_2_deck,
-        3: state.cost_3_deck,
-        4: state.cost_4_deck,
-        5: state.cost_5_deck,
-    }
-    return decks.get(tier, state.cost_5_deck)
-
-
 def should_mix_decks(state: GameState) -> bool:
     """Check if decks should be mixed after the current turn.
 
-    Deck mixing occurs after every even turn (2, 4, 6, 8).
+    Deck mixing occurs after every even turn until deck_mix_end_turn.
 
     Args:
         state: Current game state.
@@ -191,10 +158,10 @@ def should_mix_decks(state: GameState) -> bool:
     Returns:
         True if decks should be mixed.
     """
-    return state.turn % 2 == 0 and state.turn < 10
+    return state.config.should_mix_decks(state.turn)
 
 
-def refresh_market(state: GameState, count: int = 5) -> list[Card]:
+def refresh_market(state: GameState, count: int | None = None) -> list[Card]:
     """Refresh the market for a new turn.
 
     Clears any remaining market cards (they stay unbought until mixing)
@@ -202,11 +169,14 @@ def refresh_market(state: GameState, count: int = 5) -> list[Card]:
 
     Args:
         state: Current game state.
-        count: Number of cards to reveal.
+        count: Number of cards to reveal. Uses config default if not provided.
 
     Returns:
         List of newly revealed cards.
     """
+    if count is None:
+        count = state.config.cards_per_reveal
+
     # Keep unbought cards in market until mixing
     # Only reveal up to the difference
     current_count = len(state.market_cards)

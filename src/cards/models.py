@@ -98,11 +98,18 @@ class ClassAbilities:
 
     Class abilities can be scaling (based on class count) or conditional
     (based on action points, board state, etc.).
+
+    Attributes:
+        scaling: Abilities that scale with class count.
+        conditional: Abilities that trigger on conditions.
+        passive: Always-active passive ability text.
+        imblocable_damage: Fixed imblocable damage dealt (bypasses defense).
     """
 
     scaling: list[ScalingAbility] = field(default_factory=list)
     conditional: list[ConditionalAbility] = field(default_factory=list)
     passive: str | None = None
+    imblocable_damage: int = 0  # Structured field for imblocable damage
 
 
 @dataclass
