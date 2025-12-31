@@ -4,6 +4,15 @@ This package provides the core game logic including state management,
 actions, combat resolution, and the game loop.
 """
 
+from .abilities import (
+    AbilityEffect,
+    AbilityResolutionResult,
+    AbilityTarget,
+    get_ability_summary,
+    resolve_all_abilities,
+    resolve_class_abilities,
+    resolve_family_abilities,
+)
 from .actions import (
     ActionError,
     ActionResult,
@@ -58,6 +67,14 @@ __all__ = [
     "InvalidPlayerError",
     "PlayerState",
     "create_initial_game_state",
+    # Abilities
+    "AbilityEffect",
+    "AbilityResolutionResult",
+    "AbilityTarget",
+    "get_ability_summary",
+    "resolve_all_abilities",
+    "resolve_class_abilities",
+    "resolve_family_abilities",
     # Actions
     "ActionError",
     "ActionResult",

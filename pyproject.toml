@@ -7,6 +7,9 @@ requires-python = ">=3.12"
 dependencies = [
     "fpdf2>=2.8.5",
     "gymnasium>=1.2.3",
+    "sb3-contrib>=2.7.1",
+    "stable-baselines3[extra]>=2.7.1",
+    "tensorboard>=2.20.0",
 ]
 
 [dependency-groups]
