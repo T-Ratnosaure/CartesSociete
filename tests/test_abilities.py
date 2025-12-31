@@ -147,9 +147,7 @@ class TestResolveClassAbilities:
 
     def test_defender_health_bonus(self, repo) -> None:
         """Test that Defenders get health bonus at threshold 2."""
-        defenders = [
-            c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR
-        ]
+        defenders = [c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR]
         defender = defenders[0]
 
         state = create_initial_game_state(num_players=2)
@@ -212,7 +210,6 @@ class TestCombatWithAbilities:
 
         state = create_initial_game_state(num_players=2)
         player1 = state.players[0]
-        player2 = state.players[1]
 
         initial_health = player1.health
 
@@ -232,9 +229,7 @@ class TestCombatWithAbilities:
     def test_attack_bonus_in_combat(self, repo) -> None:
         """Test that attack bonuses are applied in damage calculation."""
         mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
-        defenders = [
-            c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR
-        ]
+        defenders = [c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR]
         defender = defenders[0]
 
         state = create_initial_game_state(num_players=2)
@@ -257,9 +252,7 @@ class TestCombatWithAbilities:
     def test_health_bonus_in_combat(self, repo) -> None:
         """Test that health bonuses are applied as defense."""
         mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
-        defenders = [
-            c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR
-        ]
+        defenders = [c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR]
         defender = defenders[0]
 
         state = create_initial_game_state(num_players=2)
@@ -277,7 +270,8 @@ class TestCombatWithAbilities:
 
         # Verify defense bonus is included
         assert breakdown.defense_bonus > 0
-        assert breakdown.target_defense == breakdown.base_defense + breakdown.defense_bonus
+        expected_defense = breakdown.base_defense + breakdown.defense_bonus
+        assert breakdown.target_defense == expected_defense
 
 
 class TestResolveAllAbilities:
