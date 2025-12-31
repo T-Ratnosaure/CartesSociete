@@ -43,7 +43,7 @@ def _remove_by_identity(lst: list, item: object) -> None:
             del lst[i]
             return
 
-    raise ValueError(f"Item not found by identity or equality in list")
+    raise ValueError("Item not found by identity or equality in list")
 
 
 def _assert_never(value: NoReturn) -> NoReturn:
@@ -136,7 +136,8 @@ def buy_card(
         raise InvalidPhaseError(f"Cannot buy cards in {state.phase.value} phase")
 
     # Use identity comparison, falling back to equality for MCTS cloned states
-    if not any(c is card for c in state.market_cards) and card not in state.market_cards:
+    in_market = any(c is card for c in state.market_cards) or card in state.market_cards
+    if not in_market:
         raise InvalidCardError(f"Card {card.name} is not in the market")
 
     if card.cost is None:
