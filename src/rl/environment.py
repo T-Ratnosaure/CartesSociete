@@ -96,9 +96,7 @@ class CartesSocieteEnv(gym.Env):
     CARD_FEATURE_DIM: int = 6  # cost, attack, health, level, family, class
 
     # Family and class index mappings for encoding
-    FAMILY_TO_IDX: dict[Family, int] = {
-        family: i for i, family in enumerate(Family)
-    }
+    FAMILY_TO_IDX: dict[Family, int] = {family: i for i, family in enumerate(Family)}
     CLASS_TO_IDX: dict[CardClass, int] = {
         card_class: i for i, card_class in enumerate(CardClass)
     }
@@ -440,13 +438,15 @@ class CartesSocieteEnv(gym.Env):
         obs_parts = []
 
         # Player stats (5 values)
-        obs_parts.append([
-            player.health / 100.0,  # Normalize
-            player.po / 10.0,
-            len(player.board) / self.MAX_CARDS_BOARD,
-            len(player.hand) / self.MAX_CARDS_HAND,
-            self._state.turn / 20.0,
-        ])
+        obs_parts.append(
+            [
+                player.health / 100.0,  # Normalize
+                player.po / 10.0,
+                len(player.board) / self.MAX_CARDS_BOARD,
+                len(player.hand) / self.MAX_CARDS_HAND,
+                self._state.turn / 20.0,
+            ]
+        )
 
         # Hand cards
         obs_parts.append(self._encode_cards(player.hand, self.MAX_CARDS_HAND))
@@ -533,8 +533,10 @@ class CartesSocieteEnv(gym.Env):
         opponent = self._state.players[1]
 
         print(f"\n=== Turn {self._state.turn} - {self._state.phase.value} ===")
-        print(f"Player: HP={player.health}, PO={player.po}, "
-              f"Hand={len(player.hand)}, Board={len(player.board)}")
+        print(
+            f"Player: HP={player.health}, PO={player.po}, "
+            f"Hand={len(player.hand)}, Board={len(player.board)}"
+        )
         print(f"Opponent: HP={opponent.health}, Board={len(opponent.board)}")
         print(f"Market: {len(self._state.market_cards)} cards")
         print(f"Legal actions: {len(self._legal_actions)}")

@@ -163,9 +163,7 @@ def main() -> int:
     print()
     print("MOST EVOLVED CARDS:")
     print("-" * 50)
-    evo_sorted = sorted(
-        reports, key=lambda r: r.stats.times_evolved, reverse=True
-    )
+    evo_sorted = sorted(reports, key=lambda r: r.stats.times_evolved, reverse=True)
     for report in evo_sorted[:5]:
         if report.stats.times_evolved > 0:
             print(

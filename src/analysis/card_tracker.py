@@ -272,9 +272,7 @@ class CardTracker:
         Returns:
             List of CardReports sorted as specified.
         """
-        reports = [
-            self._create_report(stats) for stats in self._card_stats.values()
-        ]
+        reports = [self._create_report(stats) for stats in self._card_stats.values()]
 
         if sort_by == "power_score":
             reports.sort(key=lambda r: r.power_score, reverse=descending)
@@ -298,16 +296,12 @@ class CardTracker:
         """
         # Calculate rates
         pick_rate = (
-            stats.games_with_card / self._total_games
-            if self._total_games > 0
-            else 0.0
+            stats.games_with_card / self._total_games if self._total_games > 0 else 0.0
         )
 
         # Average pick rate across all cards
         avg_pick_rate = self._calculate_avg_pick_rate()
-        relative_pick_rate = (
-            pick_rate / avg_pick_rate if avg_pick_rate > 0 else 1.0
-        )
+        relative_pick_rate = pick_rate / avg_pick_rate if avg_pick_rate > 0 else 1.0
 
         # Win rate relative to baseline 50%
         relative_win_rate = stats.win_rate - 0.5
@@ -339,8 +333,7 @@ class CardTracker:
             return 0.0
 
         total_pick_rate = sum(
-            s.games_with_card / self._total_games
-            for s in self._card_stats.values()
+            s.games_with_card / self._total_games for s in self._card_stats.values()
         )
         return total_pick_rate / len(self._card_stats)
 
