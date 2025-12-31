@@ -120,6 +120,55 @@ GitHub CLI (`gh`) is installed at: `"/c/Program Files/GitHub CLI/gh.exe"`
 "/c/Program Files/GitHub CLI/gh.exe" pr merge <number> --squash --delete-branch
 ```
 
+### CI/CD Merge Workflow
+
+**This is the MANDATORY workflow for all changes:**
+
+```
+1. CREATE BRANCH
+   git checkout -b feat/description  (or fix/description)
+
+2. MAKE CHANGES
+   - Write code
+   - Add tests if needed
+
+3. RUN LOCAL CHECKS (before committing)
+   uv run isort .
+   uv run ruff format .
+   uv run ruff check .
+   uv run pytest
+
+4. COMMIT & PUSH
+   git add <files>
+   git commit -m "type(scope): description"
+   git push -u origin <branch-name>
+
+5. CREATE PR
+   gh pr create --title "type(scope): description" --body "..."
+
+6. WATCH CI PIPELINE
+   gh pr checks <number> --watch
+
+7. IF CI FAILS:
+   - Read the error logs: gh run view <run-id> --log-failed
+   - Fix the issues locally
+   - Commit and push again
+   - Go back to step 6
+
+8. IF CI PASSES:
+   gh pr merge <number> --squash --delete-branch
+
+9. SYNC LOCAL MASTER
+   git checkout master
+   git pull
+```
+
+**Key Rules:**
+- **NEVER** merge if CI fails
+- **ALWAYS** run local checks before pushing
+- **ALWAYS** use `--squash` for clean history
+- **ALWAYS** use `--delete-branch` to clean up
+
 ---
 
 ## Code Quality Standards
