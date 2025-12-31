@@ -8,6 +8,7 @@ import copy
 import logging
 import math
 import random
+import time
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -23,6 +24,9 @@ from .base import Player, PlayerInfo
 
 logger = logging.getLogger(__name__)
 
+# Constants for heuristic evaluation
+NEUTRAL_EVALUATION: float = 0.5  # Value for neutral/equal positions
+
 
 @dataclass
 class MCTSConfig:
@@ -32,20 +36,33 @@ class MCTSConfig:
         num_simulations: Number of simulations per decision (1-10000).
         exploration_constant: UCB1 exploration parameter (sqrt(2) default).
         max_rollout_depth: Maximum depth for random rollouts (1-100).
+        timeout_seconds: Maximum time for MCTS search (None = no timeout).
         use_stub: When True, falls back to random play (for testing).
+
+    Note:
+        Worst-case complexity is O(num_simulations * max_rollout_depth) game
+        state evaluations per decision. With defaults of 100 simulations and
+        depth 10, this is 1,000 evaluations. Maximum bounds allow up to
+        100,000 evaluations (constrained by MAX_COMPLEXITY).
     """
 
     num_simulations: int = 100
     exploration_constant: float = 1.414  # sqrt(2)
     max_rollout_depth: int = 10
+    timeout_seconds: float | None = None  # None = no timeout
     use_stub: bool = False
 
     # Maximum bounds to prevent DoS
     MAX_SIMULATIONS: int = field(default=10000, repr=False, init=False)
     MAX_ROLLOUT_DEPTH: int = field(default=100, repr=False, init=False)
+    MAX_COMPLEXITY: int = field(default=100000, repr=False, init=False)  # sims * depth
 
     def __post_init__(self) -> None:
-        """Validate configuration bounds."""
+        """Validate configuration bounds.
+
+        Raises:
+            ValueError: If any configuration parameter is out of valid range.
+        """
         if not 1 <= self.num_simulations <= self.MAX_SIMULATIONS:
             raise ValueError(
                 f"num_simulations must be between 1 and {self.MAX_SIMULATIONS}, "
@@ -60,6 +77,18 @@ class MCTSConfig:
             raise ValueError(
                 f"exploration_constant must be non-negative, "
                 f"got {self.exploration_constant}"
+            )
+        if self.timeout_seconds is not None and self.timeout_seconds <= 0:
+            raise ValueError(
+                f"timeout_seconds must be positive if set, got {self.timeout_seconds}"
+            )
+        # Check combined complexity bounds
+        complexity = self.num_simulations * self.max_rollout_depth
+        if complexity > self.MAX_COMPLEXITY:
+            raise ValueError(
+                f"Combined complexity (simulations * depth = {complexity}) "
+                f"exceeds maximum {self.MAX_COMPLEXITY}. Reduce num_simulations "
+                f"or max_rollout_depth."
             )
 
 
@@ -187,6 +216,9 @@ class MCTSPlayer(Player):
             name: Optional display name.
             config: MCTS configuration.
             seed: Random seed for reproducibility.
+
+        Raises:
+            ValueError: If config validation fails (invalid bounds).
         """
         super().__init__(player_id, name)
         self.config = config or MCTSConfig()
@@ -274,6 +306,10 @@ class MCTSPlayer(Player):
 
         Returns:
             The best action found by MCTS.
+
+        Note:
+            If timeout_seconds is configured, the search will terminate early
+            when the timeout is reached, returning the best action found so far.
         """
         if not legal_actions:
             return Action.end_phase()
@@ -282,8 +318,23 @@ class MCTSPlayer(Player):
         root = MCTSNode(action=None)
         root.untried_actions = list(legal_actions)
 
+        # Track start time for timeout
+        start_time = time.monotonic()
+        timeout = self.config.timeout_seconds
+        simulations_run = 0
+
         # Run simulations
         for _ in range(self.config.num_simulations):
+            # Check timeout if configured
+            if timeout is not None:
+                elapsed = time.monotonic() - start_time
+                if elapsed >= timeout:
+                    logger.debug(
+                        f"MCTS timeout after {simulations_run} simulations "
+                        f"({elapsed:.3f}s)"
+                    )
+                    break
+
             # Clone state for this simulation
             sim_state = self._clone_state(state)
             sim_player = self._get_player_state(sim_state, self.player_id)
@@ -300,6 +351,7 @@ class MCTSPlayer(Player):
 
             # Backpropagation
             self._backpropagate(node, value)
+            simulations_run += 1
 
         # Return action with most visits
         if not root.children:
@@ -454,7 +506,7 @@ class MCTSPlayer(Player):
             our_attack + our_health + our_life + opp_attack + opp_health + opp_life
         )
         if total_strength == 0:
-            return 0.5
+            return NEUTRAL_EVALUATION  # Equal position when no strength on either side
 
         our_strength = our_attack + our_health + our_life
         return our_strength / total_strength

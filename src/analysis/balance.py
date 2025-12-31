@@ -187,9 +187,48 @@ class BalanceAnalyzer:
 
         Returns:
             BalanceReport with analysis results.
+
+        Raises:
+            ValueError: If player_factories is invalid (too few, contains None,
+                or factories don't produce valid Player objects).
+            TypeError: If player_factories is not a list or contains non-callables.
         """
+        # Validate input type
+        if not isinstance(player_factories, list):
+            factory_type = type(player_factories).__name__
+            raise TypeError(f"player_factories must be a list, got {factory_type}")
+
         if len(player_factories) < 2:
             raise ValueError("Need at least 2 player factories for analysis")
+
+        # Validate each factory
+        for i, factory in enumerate(player_factories):
+            if factory is None:
+                raise ValueError(f"player_factories[{i}] is None")
+            if not callable(factory):
+                raise TypeError(
+                    f"player_factories[{i}] must be callable, "
+                    f"got {type(factory).__name__}"
+                )
+
+            # Try to create a player to validate the factory works
+            try:
+                test_player = factory(0)
+                if test_player is None:
+                    raise ValueError(
+                        f"player_factories[{i}] returned None instead of a Player"
+                    )
+                # Check it has the expected interface
+                if not hasattr(test_player, "info"):
+                    raise ValueError(
+                        f"player_factories[{i}] returned object without 'info'"
+                    )
+            except Exception as e:
+                if isinstance(e, (ValueError, TypeError)):
+                    raise
+                raise ValueError(
+                    f"player_factories[{i}] failed to create player: {e}"
+                ) from e
 
         # Run round-robin tournament
         results = self._runner.run_round_robin(
