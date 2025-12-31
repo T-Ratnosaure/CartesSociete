@@ -1,7 +1,7 @@
 """Analysis tools for game balance and statistics.
 
 This module provides tools for analyzing game balance, player performance,
-and matchup statistics through simulation.
+card statistics, and matchup statistics through simulation.
 """
 
 from .balance import (
@@ -10,6 +10,11 @@ from .balance import (
     BalanceReport,
     MatchupStats,
     quick_balance_check,
+)
+from .card_tracker import (
+    CardReport,
+    CardStats,
+    CardTracker,
 )
 from .matchup import (
     CHI_SQUARE_CRITICAL,
@@ -31,6 +36,10 @@ __all__ = [
     "BalanceReport",
     "MatchupStats",
     "quick_balance_check",
+    # Card tracking
+    "CardReport",
+    "CardStats",
+    "CardTracker",
     # Matchup analysis
     "CHI_SQUARE_CRITICAL",
     "Z_SCORES",
