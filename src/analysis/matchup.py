@@ -13,6 +13,25 @@ if TYPE_CHECKING:
 
 from .balance import MatchupStats
 
+# Z-scores for common confidence levels (from standard normal distribution)
+# These are the critical values for two-tailed tests
+Z_SCORES: dict[float, float] = {
+    0.80: 1.282,
+    0.85: 1.440,
+    0.90: 1.645,
+    0.95: 1.960,
+    0.99: 2.576,
+}
+
+# Chi-square critical values for df=1 at common alpha levels
+# Used for testing independence in 2x2 contingency tables
+CHI_SQUARE_CRITICAL: dict[float, float] = {
+    0.10: 2.706,  # alpha = 0.10
+    0.05: 3.841,  # alpha = 0.05
+    0.01: 6.635,  # alpha = 0.01
+    0.001: 10.828,  # alpha = 0.001
+}
+
 
 @dataclass
 class StatisticalMatchup:
@@ -97,16 +116,25 @@ def wilson_score_interval(
     Args:
         successes: Number of successes.
         trials: Total number of trials.
-        confidence: Confidence level (default 0.95).
+        confidence: Confidence level (default 0.95). Supported values:
+            0.80, 0.85, 0.90, 0.95, 0.99.
 
     Returns:
         (lower_bound, upper_bound) tuple.
+
+    Raises:
+        ValueError: If confidence level is not supported.
     """
     if trials == 0:
         return (0.0, 1.0)
 
-    # Z-score for confidence level (using 1.96 for 95%)
-    z = 1.96 if confidence == 0.95 else 2.576  # 99%
+    # Look up z-score for confidence level
+    if confidence not in Z_SCORES:
+        supported = ", ".join(str(c) for c in sorted(Z_SCORES.keys()))
+        raise ValueError(
+            f"Unsupported confidence level {confidence}. Supported values: {supported}"
+        )
+    z = Z_SCORES[confidence]
 
     p_hat = successes / trials
     denominator = 1 + z * z / trials
@@ -149,6 +177,7 @@ def chi_square_test(
     wins_1: int,
     wins_2: int,
     draws: int,
+    alpha: float = 0.05,
 ) -> tuple[float, bool]:
     """Perform chi-square test for independence.
 
@@ -158,10 +187,21 @@ def chi_square_test(
         wins_1: Wins for player type 1.
         wins_2: Wins for player type 2.
         draws: Number of draws.
+        alpha: Significance level (default 0.05). Supported: 0.10, 0.05, 0.01, 0.001.
 
     Returns:
-        (chi_square_statistic, is_significant at p<0.05)
+        (chi_square_statistic, is_significant at specified alpha)
+
+    Raises:
+        ValueError: If alpha is not a supported significance level.
     """
+    # Validate alpha
+    if alpha not in CHI_SQUARE_CRITICAL:
+        supported = ", ".join(str(a) for a in sorted(CHI_SQUARE_CRITICAL.keys()))
+        raise ValueError(
+            f"Unsupported alpha level {alpha}. Supported values: {supported}"
+        )
+
     total = wins_1 + wins_2 + draws
     if total == 0:
         return (0.0, False)
@@ -173,11 +213,17 @@ def chi_square_test(
 
     expected = decided_games / 2
 
+    # Explicit guard for division by zero
+    # (defensive, since decided_games > 0 implies expected > 0)
+    if expected == 0:
+        return (0.0, False)
+
     # Chi-square statistic
     chi_sq = ((wins_1 - expected) ** 2 + (wins_2 - expected) ** 2) / expected
 
-    # Critical value for df=1, alpha=0.05 is 3.84
-    is_significant = chi_sq > 3.84
+    # Compare against critical value from lookup table
+    critical_value = CHI_SQUARE_CRITICAL[alpha]
+    is_significant = chi_sq > critical_value
 
     return (chi_sq, is_significant)
 
