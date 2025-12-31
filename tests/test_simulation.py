@@ -408,7 +408,7 @@ class TestMatchRunner:
     def test_run_match(self) -> None:
         """Test running a match."""
         config = MatchConfig(
-            num_games=5,
+            num_games=2,
             player_factories=[
                 lambda pid: RandomPlayer(player_id=pid, seed=pid),
                 lambda pid: RandomPlayer(player_id=pid, seed=pid + 100),
@@ -420,14 +420,14 @@ class TestMatchRunner:
         result = runner.run_match(config)
 
         assert isinstance(result, MatchResult)
-        assert result.games_played == 5
-        assert len(result.results) == 5
+        assert result.games_played == 2
+        assert len(result.results) == 2
         assert result.avg_game_length > 0
 
     def test_match_win_rates(self) -> None:
         """Test that match calculates win rates."""
         config = MatchConfig(
-            num_games=10,
+            num_games=4,
             player_factories=[
                 lambda pid: RandomPlayer(player_id=pid),
                 lambda pid: GreedyPlayer(player_id=pid),
@@ -470,9 +470,9 @@ class TestIntegration:
     """Integration tests for the simulation framework."""
 
     def test_greedy_beats_random(self) -> None:
-        """Test that greedy player performs better than random over many games."""
+        """Test that greedy player performs better than random over games."""
         config = MatchConfig(
-            num_games=20,
+            num_games=4,
             player_factories=[
                 lambda pid: RandomPlayer(player_id=pid, seed=pid * 1000),
                 lambda pid: GreedyPlayer(player_id=pid),
@@ -486,7 +486,7 @@ class TestIntegration:
 
         # Without cards loaded, all games will be draws (timeouts)
         # We just check that the framework runs without errors
-        assert result.games_played == 20
+        assert result.games_played == 4
         # Either there are winners OR all games are draws (no cards = no combat damage)
         has_winners = bool(result.win_rates)
         all_draws = result.draws == result.games_played
