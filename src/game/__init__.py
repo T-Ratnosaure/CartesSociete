@@ -8,10 +8,13 @@ from .abilities import (
     AbilityEffect,
     AbilityResolutionResult,
     AbilityTarget,
+    PerTurnEffectResult,
+    apply_per_turn_effects,
     get_ability_summary,
     resolve_all_abilities,
     resolve_class_abilities,
     resolve_family_abilities,
+    resolve_per_turn_effects,
 )
 from .actions import (
     ActionError,
@@ -71,10 +74,13 @@ __all__ = [
     "AbilityEffect",
     "AbilityResolutionResult",
     "AbilityTarget",
+    "PerTurnEffectResult",
+    "apply_per_turn_effects",
     "get_ability_summary",
     "resolve_all_abilities",
     "resolve_class_abilities",
     "resolve_family_abilities",
+    "resolve_per_turn_effects",
     # Actions
     "ActionError",
     "ActionResult",

@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 
 from src.cards.models import Card
 
+from .abilities import apply_per_turn_effects
 from .actions import end_turn
 from .combat import CombatResult, resolve_combat
 from .market import mix_decks, refresh_market, setup_decks, should_mix_decks
@@ -21,6 +22,7 @@ class TurnResult:
     Attributes:
         turn_number: The turn that was executed.
         combat_result: Result of combat resolution.
+        per_turn_damage: Per-turn self-damage applied (e.g., from Mutanus).
         eliminated_players: Players eliminated this turn.
         game_over: Whether the game ended this turn.
         winner: The winning player if game is over.
@@ -28,6 +30,7 @@ class TurnResult:
 
     turn_number: int
     combat_result: CombatResult | None = None
+    per_turn_damage: dict[int, int] = field(default_factory=dict)
     eliminated_players: list[PlayerState] = field(default_factory=list)
     game_over: bool = False
     winner: PlayerState | None = None
@@ -111,7 +114,8 @@ class GameEngine:
     def end_turn(self) -> TurnResult:
         """Complete the current turn and prepare for the next.
 
-        Handles combat resolution, deck mixing, and turn transition.
+        Handles combat resolution, per-turn effects, deck mixing, and turn
+        transition.
 
         Returns:
             TurnResult with turn outcome.
@@ -126,12 +130,29 @@ class GameEngine:
         # Move to end phase
         self.state.phase = GamePhase.END
 
+        # Apply per-turn effects (e.g., Mutanus "Vous perdez X PV par tour")
+        per_turn_damage: dict[int, int] = {}
+        all_eliminations: list[PlayerState] = []
+
+        if combat_result:
+            all_eliminations = list(combat_result.eliminations)
+
+        for player in self.state.get_alive_players():
+            damage = apply_per_turn_effects(player)
+            if damage > 0:
+                per_turn_damage[player.player_id] = damage
+                # Check for elimination from per-turn damage
+                if player.health <= 0 and not player.eliminated:
+                    player.eliminated = True
+                    all_eliminations.append(player)
+
         # Check for game over
         if self.state.is_game_over():
             return TurnResult(
                 turn_number=turn_number,
                 combat_result=combat_result,
-                eliminated_players=combat_result.eliminations if combat_result else [],
+                per_turn_damage=per_turn_damage,
+                eliminated_players=all_eliminations,
                 game_over=True,
                 winner=self.state.get_winner(),
             )
@@ -147,7 +168,8 @@ class GameEngine:
         return TurnResult(
             turn_number=turn_number,
             combat_result=combat_result,
-            eliminated_players=combat_result.eliminations if combat_result else [],
+            per_turn_damage=per_turn_damage,
+            eliminated_players=all_eliminations,
             game_over=False,
         )
 

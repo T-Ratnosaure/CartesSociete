@@ -430,3 +430,63 @@ def get_ability_summary(player: PlayerState) -> str:
         lines.append(f"  Imblocable: +{result.total_imblocable_bonus}")
 
     return "\n".join(lines)
+
+
+@dataclass
+class PerTurnEffectResult:
+    """Result of resolving per-turn effects for a player.
+
+    Attributes:
+        total_self_damage: Total self-damage from per-turn effects.
+        cards_with_effects: List of cards that have per-turn effects.
+    """
+
+    total_self_damage: int = 0
+    cards_with_effects: list[str] = field(default_factory=list)
+
+
+def resolve_per_turn_effects(player: PlayerState) -> PerTurnEffectResult:
+    """Resolve per-turn effects for a player.
+
+    Per-turn effects are effects that apply each turn, such as
+    "Vous perdez X PV par tour" (you lose X HP per turn).
+
+    These are separate from:
+    - Combat self-damage (e.g., Berserker's -2 PV from class ability)
+    - One-time effects
+
+    Args:
+        player: The player whose per-turn effects to resolve.
+
+    Returns:
+        PerTurnEffectResult with total damage and affected cards.
+    """
+    result = PerTurnEffectResult()
+
+    for card in player.board:
+        per_turn_dmg = card.class_abilities.per_turn_self_damage
+        if per_turn_dmg > 0:
+            result.total_self_damage += per_turn_dmg
+            result.cards_with_effects.append(card.name)
+
+    return result
+
+
+def apply_per_turn_effects(player: PlayerState) -> int:
+    """Apply per-turn effects to a player and return damage dealt.
+
+    This function both calculates and applies per-turn damage.
+    Call this during the end-of-turn phase.
+
+    Args:
+        player: The player to apply per-turn effects to.
+
+    Returns:
+        Total self-damage dealt to the player.
+    """
+    effects = resolve_per_turn_effects(player)
+
+    if effects.total_self_damage > 0:
+        player.health -= effects.total_self_damage
+
+    return effects.total_self_damage

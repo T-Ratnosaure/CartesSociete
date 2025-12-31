@@ -8,10 +8,12 @@ from src.cards.models import CardClass
 from src.cards.repository import get_repository
 from src.game.abilities import (
     AbilityTarget,
+    apply_per_turn_effects,
     get_active_scaling_ability,
     parse_ability_effect,
     resolve_all_abilities,
     resolve_class_abilities,
+    resolve_per_turn_effects,
 )
 from src.game.combat import calculate_damage, resolve_combat
 from src.game.state import create_initial_game_state
@@ -295,3 +297,101 @@ class TestResolveAllAbilities:
 
             # Should have processed both class and family abilities
             assert result.class_counts is not None
+
+
+class TestPerTurnEffects:
+    """Tests for per-turn effect resolution."""
+
+    def test_mutanus_per_turn_self_damage_parsed(self, repo) -> None:
+        """Test that Mutanus empoisonné has per-turn self-damage parsed."""
+        mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
+        assert mutanus is not None
+        # Mutanus has "Vous perdez 2 PV imblocables par tour"
+        assert mutanus.class_abilities.per_turn_self_damage == 2
+
+    def test_mutanus_level2_per_turn_self_damage(self, repo) -> None:
+        """Test that Mutanus empoisonné Level 2 has correct per-turn damage."""
+        mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=2)
+        assert mutanus is not None
+        # Level 2 Mutanus has "Vous perdez 2 PV imblocables par tour, +3 ATQ"
+        assert mutanus.class_abilities.per_turn_self_damage == 2
+
+    def test_card_without_per_turn_effect(self, repo) -> None:
+        """Test that cards without per-turn effects have 0 damage."""
+        defenders = [c for c in repo.get_all() if c.card_class == CardClass.DEFENSEUR]
+        defender = defenders[0]
+        assert defender.class_abilities.per_turn_self_damage == 0
+
+    def test_resolve_per_turn_effects_no_cards(self) -> None:
+        """Test per-turn resolution with no cards on board."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        result = resolve_per_turn_effects(player)
+        assert result.total_self_damage == 0
+        assert result.cards_with_effects == []
+
+    def test_resolve_per_turn_effects_with_mutanus(self, repo) -> None:
+        """Test per-turn resolution with Mutanus on board."""
+        mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        player.board.append(deepcopy(mutanus))
+
+        result = resolve_per_turn_effects(player)
+        assert result.total_self_damage == 2
+        assert "Mutanus empoisonné" in result.cards_with_effects
+
+    def test_resolve_per_turn_effects_multiple_cards(self, repo) -> None:
+        """Test per-turn resolution with multiple Mutanus cards."""
+        mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 2 Mutanus
+        player.board.append(deepcopy(mutanus))
+        player.board.append(deepcopy(mutanus))
+
+        result = resolve_per_turn_effects(player)
+        # Each Mutanus deals 2 per-turn damage
+        assert result.total_self_damage == 4
+        assert len(result.cards_with_effects) == 2
+
+    def test_apply_per_turn_effects_reduces_health(self, repo) -> None:
+        """Test that applying per-turn effects reduces player health."""
+        mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        initial_health = player.health
+        player.board.append(deepcopy(mutanus))
+
+        damage = apply_per_turn_effects(player)
+
+        assert damage == 2
+        assert player.health == initial_health - 2
+
+    def test_per_turn_damage_separate_from_berserker_damage(self, repo) -> None:
+        """Test that per-turn damage is separate from Berserker class damage."""
+        mutanus = repo.get_by_name_and_level("Mutanus empoisonné", level=1)
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 2 Mutanus (triggers Berserker threshold 2: +5 ATK / -2 PV)
+        player.board.append(deepcopy(mutanus))
+        player.board.append(deepcopy(mutanus))
+
+        # Class abilities (Berserker self-damage from threshold)
+        class_result = resolve_class_abilities(player)
+        assert class_result.total_self_damage == 2  # Berserker threshold damage
+
+        # Per-turn effects (from bonus_text "Vous perdez 2 PV par tour")
+        per_turn_result = resolve_per_turn_effects(player)
+        assert per_turn_result.total_self_damage == 4  # 2 x 2 PV per turn
+
+        # Total expected damage per turn: 2 (Berserker) + 4 (per-turn) = 6
