@@ -14,6 +14,38 @@ from src.cards.repository import CardRepository, get_repository
 from .state import GamePhase, GameState, PlayerState
 
 
+def _remove_by_identity(lst: list, item: object) -> None:
+    """Remove an item from a list using identity comparison (is), not equality (==).
+
+    This is necessary because Card objects compare equal by value (same name/stats),
+    but we need to remove specific card instances when the same card exists as
+    multiple copies.
+
+    Falls back to equality comparison if identity match fails. This handles the case
+    where MCTS simulations use cloned states with different card objects.
+
+    Args:
+        lst: The list to remove from.
+        item: The item to remove (by identity, or by equality as fallback).
+
+    Raises:
+        ValueError: If the item is not found by identity or equality.
+    """
+    # First try identity match
+    for i, elem in enumerate(lst):
+        if elem is item:
+            del lst[i]
+            return
+
+    # Fall back to equality match (for MCTS cloned states)
+    for i, elem in enumerate(lst):
+        if elem == item:
+            del lst[i]
+            return
+
+    raise ValueError("Item not found by identity or equality in list")
+
+
 def _assert_never(value: NoReturn) -> NoReturn:
     """Assert that a value is never reached (for exhaustive matching)."""
     raise AssertionError(f"Unhandled value: {value!r}")
@@ -103,7 +135,9 @@ def buy_card(
     if state.phase != GamePhase.MARKET:
         raise InvalidPhaseError(f"Cannot buy cards in {state.phase.value} phase")
 
-    if card not in state.market_cards:
+    # Use identity comparison, falling back to equality for MCTS cloned states
+    in_market = any(c is card for c in state.market_cards) or card in state.market_cards
+    if not in_market:
         raise InvalidCardError(f"Card {card.name} is not in the market")
 
     if card.cost is None:
@@ -116,7 +150,8 @@ def buy_card(
 
     # Execute the purchase
     player.po -= card.cost
-    state.market_cards.remove(card)
+    # Use identity-based removal since cards compare equal by value
+    _remove_by_identity(state.market_cards, card)
     player.hand.append(card)
 
     return ActionResult(
@@ -149,7 +184,8 @@ def play_card(
     if state.phase != GamePhase.PLAY:
         raise InvalidPhaseError(f"Cannot play cards in {state.phase.value} phase")
 
-    if card not in player.hand:
+    # Use identity comparison, falling back to equality for MCTS cloned states
+    if not any(c is card for c in player.hand) and card not in player.hand:
         raise InvalidCardError(f"Card {card.name} is not in hand")
 
     # Check board limit (Lapin family can exceed limit)
@@ -165,7 +201,8 @@ def play_card(
         )
 
     # Execute the play
-    player.hand.remove(card)
+    # Use identity-based removal since cards compare equal by value
+    _remove_by_identity(player.hand, card)
     player.board.append(card)
 
     return ActionResult(
@@ -199,15 +236,17 @@ def replace_card(
     if state.phase != GamePhase.PLAY:
         raise InvalidPhaseError(f"Cannot replace cards in {state.phase.value} phase")
 
-    if new_card not in player.hand:
+    # Use identity comparison, falling back to equality for MCTS cloned states
+    if not any(c is new_card for c in player.hand) and new_card not in player.hand:
         raise InvalidCardError(f"Card {new_card.name} is not in hand")
 
-    if old_card not in player.board:
+    if not any(c is old_card for c in player.board) and old_card not in player.board:
         raise InvalidCardError(f"Card {old_card.name} is not on board")
 
     # Execute the replacement
-    player.hand.remove(new_card)
-    player.board.remove(old_card)
+    # Use identity-based removal since cards compare equal by value
+    _remove_by_identity(player.hand, new_card)
+    _remove_by_identity(player.board, old_card)
     player.board.append(new_card)
     player.hand.append(old_card)  # Old card goes to hand
 
@@ -266,8 +305,11 @@ def evolve_cards(
         raise EvolutionError("All cards must be Level 1 to evolve")
 
     # Cards must be from hand or board - check each card individually
+    # Use identity comparison, falling back to equality for MCTS cloned states
     for card in cards:
-        if card not in player.hand and card not in player.board:
+        in_hand = any(c is card for c in player.hand) or card in player.hand
+        in_board = any(c is card for c in player.board) or card in player.board
+        if not in_hand and not in_board:
             raise EvolutionError(f"Card {card.name} not found in hand or board")
 
     # Get the card repository for Level 2 lookup
@@ -284,11 +326,14 @@ def evolve_cards(
         )
 
     # Remove all 3 cards from hand/board
+    # Use identity-based removal, falling back to equality for MCTS cloned states
     for card in cards:
-        if card in player.hand:
-            player.hand.remove(card)
-        elif card in player.board:
-            player.board.remove(card)
+        in_hand_identity = any(c is card for c in player.hand)
+        in_hand_equality = card in player.hand
+        if in_hand_identity or in_hand_equality:
+            _remove_by_identity(player.hand, card)
+        elif any(c is card for c in player.board) or card in player.board:
+            _remove_by_identity(player.board, card)
 
     # Add the evolved Level 2 card to board
     player.board.append(evolved_card)

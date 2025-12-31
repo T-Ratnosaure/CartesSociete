@@ -4,6 +4,7 @@ This module handles the card market including deck management,
 card revealing, deck mixing, and market refreshing.
 """
 
+import copy
 import random
 
 from src.cards.models import Card, CardType, CreatureCard, DemonCard, WeaponCard
@@ -42,17 +43,19 @@ def setup_decks(
     for card in all_cards:
         # Create copies of each card
         for _ in range(copies_per_card):
-            if card.card_type == CardType.WEAPON:
-                if isinstance(card, WeaponCard):
-                    weapons.append(card)
-            elif card.card_type == CardType.DEMON:
-                if isinstance(card, DemonCard):
-                    demons.append(card)
-            elif card.card_type == CardType.CREATURE:
-                if isinstance(card, CreatureCard) and card.cost is not None:
+            # Deep copy to ensure each card is a unique instance
+            card_copy = copy.deepcopy(card)
+            if card_copy.card_type == CardType.WEAPON:
+                if isinstance(card_copy, WeaponCard):
+                    weapons.append(card_copy)
+            elif card_copy.card_type == CardType.DEMON:
+                if isinstance(card_copy, DemonCard):
+                    demons.append(card_copy)
+            elif card_copy.card_type == CardType.CREATURE:
+                if isinstance(card_copy, CreatureCard) and card_copy.cost is not None:
                     # Only add Level 1 cards to decks (Level 2 comes from evolution)
-                    if card.level == 1:
-                        cost_decks[card.cost].append(card)
+                    if card_copy.level == 1:
+                        cost_decks[card_copy.cost].append(card_copy)
 
     # Shuffle all decks
     for deck in cost_decks.values():

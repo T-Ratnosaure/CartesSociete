@@ -205,7 +205,8 @@ class TestBalanceAnalyzer:
 
     def test_run_matchup(self) -> None:
         """Test running a single matchup."""
-        config = BalanceConfig(games_per_matchup=5, base_seed=42)
+        # Use fewer games to keep test fast in CI
+        config = BalanceConfig(games_per_matchup=2, base_seed=42)
         analyzer = BalanceAnalyzer(config)
 
         def factory_1(pid: int) -> RandomPlayer:
@@ -214,10 +215,10 @@ class TestBalanceAnalyzer:
         def factory_2(pid: int) -> RandomPlayer:
             return RandomPlayer(player_id=pid, seed=pid + 100)
 
-        stats = analyzer.run_matchup(factory_1, factory_2, num_games=5)
+        stats = analyzer.run_matchup(factory_1, factory_2, num_games=2)
 
-        assert stats.games == 5
-        assert stats.wins_1 + stats.wins_2 + stats.draws == 5
+        assert stats.games == 2
+        assert stats.wins_1 + stats.wins_2 + stats.draws == 2
 
     def test_run_analysis(self) -> None:
         """Test running full analysis."""

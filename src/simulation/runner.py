@@ -9,9 +9,10 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from configs import DEFAULT_CONFIG, GameConfig
+from src.cards.repository import CardRepository
 from src.game.combat import CombatResult, resolve_combat
 from src.game.executor import execute_action, get_legal_actions_for_player
-from src.game.market import mix_decks, refresh_market, should_mix_decks
+from src.game.market import mix_decks, refresh_market, setup_decks, should_mix_decks
 from src.game.state import GamePhase, GameState, create_initial_game_state
 from src.players.action import ActionType
 
@@ -117,6 +118,31 @@ class GameRunner:
             player_names=player_names,
             config=self.config,
         )
+
+        # Load cards and setup decks
+        repo = CardRepository()
+        all_cards = repo.get_all()
+        if all_cards:
+            decks = setup_decks(all_cards, copies_per_card=3)
+            state.cost_1_deck = list(decks[0])
+            state.cost_2_deck = list(decks[1])
+            state.cost_3_deck = list(decks[2])
+            state.cost_4_deck = list(decks[3])
+            state.cost_5_deck = list(decks[4])
+            state.weapon_deck = list(decks[5])
+            state.demon_deck = list(decks[6])
+
+            # Shuffle with our RNG for reproducibility
+            self._rng.shuffle(state.cost_1_deck)
+            self._rng.shuffle(state.cost_2_deck)
+            self._rng.shuffle(state.cost_3_deck)
+            self._rng.shuffle(state.cost_4_deck)
+            self._rng.shuffle(state.cost_5_deck)
+            self._rng.shuffle(state.weapon_deck)
+            self._rng.shuffle(state.demon_deck)
+
+            # Reveal initial market cards
+            refresh_market(state)
 
         # Initialize stats for each player
         for player in self.players:

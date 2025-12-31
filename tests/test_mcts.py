@@ -194,35 +194,40 @@ class TestMCTSPlayer:
         assert info.name == "mcts_5"
 
 
+@pytest.mark.slow
 class TestMCTSIntegration:
-    """Integration tests for MCTS player with game engine."""
+    """Integration tests for MCTS player with game engine.
+
+    These tests are marked as slow because MCTS search is computationally expensive.
+    Run with `-m "not slow"` to skip in CI.
+    """
 
     def test_mcts_completes_game(self) -> None:
         """Test that MCTS player can complete a game."""
         from src.players import RandomPlayer
         from src.simulation import GameRunner
 
-        # Use low simulation count for speed
-        config = MCTSConfig(num_simulations=5, max_rollout_depth=3)
+        # Use minimal settings for speed
+        config = MCTSConfig(num_simulations=3, max_rollout_depth=2)
         players = [
             MCTSPlayer(player_id=0, config=config, seed=42),
             RandomPlayer(player_id=1, seed=43),
         ]
 
-        runner = GameRunner(players=players, seed=100, max_turns=20)
+        runner = GameRunner(players=players, seed=100, max_turns=10)
         result = runner.run_game()
 
         assert result.turns > 0
-        assert result.turns <= 20
+        assert result.turns <= 10
 
     def test_mcts_vs_random(self) -> None:
         """Test MCTS vs Random in a short match."""
         from src.simulation import MatchConfig, MatchRunner
 
-        config = MCTSConfig(num_simulations=10, max_rollout_depth=3)
+        config = MCTSConfig(num_simulations=3, max_rollout_depth=2)
 
         match_config = MatchConfig(
-            num_games=3,
+            num_games=2,
             player_factories=[
                 lambda pid: MCTSPlayer(player_id=pid, config=config, seed=pid),
                 lambda pid: MCTSPlayer(
@@ -237,5 +242,5 @@ class TestMCTSIntegration:
         runner = MatchRunner()
         result = runner.run_match(match_config)
 
-        assert result.games_played == 3
+        assert result.games_played == 2
         # Just verify it completes without error

@@ -277,15 +277,81 @@ class BalanceAnalyzer:
         type_1 = p1.info.agent_type
         type_2 = p2.info.agent_type
 
+        # When both players have the same type, we need to count wins by
+        # factory/position instead of by type, since result.wins aggregates
+        # by type (which would double-count when types match).
+        if type_1 == type_2:
+            wins_1, wins_2, draws = self._count_wins_by_factory(
+                result.results, rotate_positions=config.rotate_positions
+            )
+        else:
+            wins_1 = result.wins.get(type_1, 0)
+            wins_2 = result.wins.get(type_2, 0)
+            draws = result.draws
+
         return MatchupStats(
             type_1=type_1,
             type_2=type_2,
             games=result.games_played,
-            wins_1=result.wins.get(type_1, 0),
-            wins_2=result.wins.get(type_2, 0),
-            draws=result.draws,
+            wins_1=wins_1,
+            wins_2=wins_2,
+            draws=draws,
             avg_length=result.avg_game_length,
         )
+
+    def _count_wins_by_factory(
+        self,
+        results: list,
+        rotate_positions: bool,
+    ) -> tuple[int, int, int]:
+        """Count wins by factory index when both players have the same type.
+
+        With position rotation:
+        - In even-indexed games: factory 0 is position 0, factory 1 is position 1
+        - In odd-indexed games: factory 1 is position 0, factory 0 is position 1
+
+        Args:
+            results: List of GameResult objects.
+            rotate_positions: Whether position rotation was enabled.
+
+        Returns:
+            Tuple of (wins_factory_0, wins_factory_1, draws).
+        """
+        wins_0 = 0
+        wins_1 = 0
+        draws = 0
+
+        for game_index, game_result in enumerate(results):
+            if game_result.winner_id is None:
+                draws += 1
+                continue
+
+            if rotate_positions:
+                # Determine which factory was at which position for this game
+                # rotation = game_index % 2 for 2 players
+                # factory_order = [rotation:] + [:rotation]
+                # Even games: [0, 1] -> factory 0 at position 0
+                # Odd games: [1, 0] -> factory 1 at position 0
+                if game_index % 2 == 0:
+                    # Factory 0 at position 0, Factory 1 at position 1
+                    if game_result.winner_id == 0:
+                        wins_0 += 1
+                    else:
+                        wins_1 += 1
+                else:
+                    # Factory 1 at position 0, Factory 0 at position 1
+                    if game_result.winner_id == 0:
+                        wins_1 += 1
+                    else:
+                        wins_0 += 1
+            else:
+                # No rotation: factory index == position
+                if game_result.winner_id == 0:
+                    wins_0 += 1
+                else:
+                    wins_1 += 1
+
+        return wins_0, wins_1, draws
 
     def _create_report(
         self,
