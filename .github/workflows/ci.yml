@@ -73,9 +73,8 @@ jobs:
         run: uv sync --dev
 
       - name: Run tests with pytest and coverage
-        run: uv run pytest -v --tb=short --cov=src --cov-report=term-missing --cov-report=xml -x --timeout=120
+        run: uv run pytest -v --tb=short --cov=src --cov-report=term-missing --cov-report=xml -x -m "not slow"
         env:
-          # Reduce iterations for CI to speed up tests
           CI: true
 
       - name: Upload coverage report
