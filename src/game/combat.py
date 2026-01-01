@@ -127,8 +127,26 @@ def calculate_damage(
 
     # Calculate attack with all bonuses
     base_attack = attacker.get_total_attack()
+
+    # Apply minimum ATK floor if applicable (e.g., "Les lapins ont minimum 4 ATQ")
+    if attacker_bonus_text.min_atk_floor > 0 and attacker_bonus_text.min_atk_family:
+        from src.cards.models import Family
+
+        target_family = Family(attacker_bonus_text.min_atk_family)
+        # Add attack bonus to bring cards below floor up to minimum
+        min_atk_bonus = 0
+        for card in attacker.board:
+            if (
+                card.family == target_family
+                and card.attack < attacker_bonus_text.min_atk_floor
+            ):
+                min_atk_bonus += attacker_bonus_text.min_atk_floor - card.attack
+        base_attack += min_atk_bonus
+
     attack_bonus = attacker_abilities.total_attack_bonus
     bonus_text_attack = attacker_bonus_text.attack_bonus
+    # Add deck reveal ATK bonus (from Lapindomptable)
+    deck_reveal_atk = attacker_bonus_text.deck_reveal_atk
     # Apply attack penalty from defender's bonus_text (e.g., "-1 ATQ pour les cyborgs")
     attack_penalty = attacker_bonus_text.attack_penalty
     conditional_attack_bonus = conditional_result.total_attack_bonus
@@ -141,6 +159,7 @@ def calculate_damage(
         (base_attack * attack_multiplier)
         + attack_bonus
         + bonus_text_attack
+        + deck_reveal_atk
         + conditional_attack_bonus
         - attack_penalty,
     )

@@ -370,9 +370,9 @@ class TestPerTurnEffects:
         initial_health = player.health
         player.board.append(deepcopy(mutanus))
 
-        damage = apply_per_turn_effects(player)
+        result = apply_per_turn_effects(player)
 
-        assert damage == 2
+        assert result.total_self_damage == 2
         assert player.health == initial_health - 2
 
     def test_per_turn_damage_separate_from_berserker_damage(self, repo) -> None:

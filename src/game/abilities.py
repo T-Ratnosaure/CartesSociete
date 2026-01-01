@@ -132,8 +132,13 @@ class BonusTextResult:
         attack_penalty: Total attack penalty (negative modifier) from bonus_text.
         on_attacked_damage: Damage dealt when this player is attacked.
         per_turn_imblocable: Per-turn imblocable damage from bonus_text.
+        per_turn_pv_heal: Per-turn PV healing from bonus_text.
+        per_turn_po: Per-turn PO generation from bonus_text.
         spell_damage_block: Amount of spell damage blocked.
-        extra_po: Extra PO generated from bonus_text effects.
+        extra_po: Extra PO generated from bonus_text effects (one-time).
+        deck_reveal_atk: ATK bonus from deck reveal mechanic.
+        min_atk_floor: Minimum ATK floor for family cards.
+        min_atk_family: Which family the ATK floor applies to.
         effects: Description of active bonus_text effects.
     """
 
@@ -142,8 +147,13 @@ class BonusTextResult:
     attack_penalty: int = 0
     on_attacked_damage: int = 0
     per_turn_imblocable: int = 0
+    per_turn_pv_heal: int = 0
+    per_turn_po: int = 0
     spell_damage_block: int = 0
     extra_po: int = 0
+    deck_reveal_atk: int = 0
+    min_atk_floor: int = 0
+    min_atk_family: str = ""
     effects: list[str] = field(default_factory=list)
 
 
@@ -304,6 +314,47 @@ _BOARD_EXPANSION_PATTERN = re.compile(
 
 # Pattern for "pour tous les [family]" effects (e.g., "+2 ATQ pour tous les lapins")
 _FOR_ALL_FAMILY_PATTERN = re.compile(r"pour\s+tous\s+les\s+(\w+)", re.IGNORECASE)
+
+# Patterns for Lapin-specific bonus_text effects
+# "+X PV /tour si lapin Y" - PV per turn if lapin threshold
+_PV_PER_TURN_IF_PATTERN = re.compile(
+    r"\+(\d+)\s+PV\s*/?\s*tour\s+si\s+(\w+)\s+(\d+)", re.IGNORECASE
+)
+
+# "+X PO si Lapin Y / +Z PO si Lapin W" - Multi-threshold PO bonus
+_MULTI_PO_IF_PATTERN = re.compile(
+    r"\+(\d+)\s+PO\s+si\s+[Ll]apin\s+(\d+)\s*/\s*\+(\d+)\s+PO\s+si\s+[Ll]apin\s+(\d+)",
+    re.IGNORECASE,
+)
+
+# "-X ATQ si [CardName]" - Card-conditional ATK penalty
+_ATK_PENALTY_IF_CARD_PATTERN = re.compile(
+    r"-(\d+)\s+ATQ\s+si\s+(.+?)(?:\s+est\s+(?:en\s+jeu|sur\s+le\s+plateau))?$",
+    re.IGNORECASE,
+)
+
+# "Les [family] ont minimum X ATQ" - Minimum ATK floor
+_MIN_ATK_FLOOR_PATTERN = re.compile(
+    r"[Ll]es\s+(\w+)\s+ont\s+minimum\s+(\d+)\s+ATQ", re.IGNORECASE
+)
+
+# "retourner une carte de la pile, gagne son ATQ" - Deck reveal ATK bonus
+_DECK_REVEAL_ATK_PATTERN: re.Pattern[str] = re.compile(
+    r"retourner\s+une\s+carte\s+de\s+la\s+pile.*gagne\s+son\s+ATQ", re.IGNORECASE
+)
+
+# === FUTURE WORK: Weapon/Spell Systems ===
+# These patterns are recognized but require new game systems to implement:
+#
+# "+X ATQ si équipé de la Hallebarde antique" - Weapon equipment system
+# Requires: Weapon cards, equipment slots, weapon attachment mechanics
+# Cards: Lapiculteur (Lv1/Lv2)
+#
+# "Magie de carottes X DGT des sorts" - Spell damage system
+# Requires: Spell cards, spell casting mechanics, spell damage resolution
+# Cards: Lapivoque (Lv1/Lv2)
+#
+# These effects are NOT currently parsed or implemented.
 
 
 def count_cards_by_class(player: PlayerState) -> Counter[CardClass]:
@@ -1255,7 +1306,7 @@ def resolve_bonus_text_effects(
             result.effects.append(f"{card.name}: {bonus}")
 
         # === PO GENERATION ===
-        # "+X PO / tour si [family] Y"
+        # "+X PO / tour si [family] Y" - Per-turn PO if threshold met
         po_turn_match = _PO_PER_TURN_IF_PATTERN.search(bonus)
         if po_turn_match:
             po_bonus = int(po_turn_match.group(1))
@@ -1265,12 +1316,12 @@ def resolve_bonus_text_effects(
             if target_name in family_map:
                 target_family = family_map[target_name]
                 if family_counts.get(target_family, 0) >= threshold:
-                    result.extra_po += po_bonus
+                    result.per_turn_po += po_bonus
                     result.effects.append(f"{card.name}: {bonus}")
             elif target_name in class_map_lower:
                 target_class = class_map_lower[target_name]
                 if class_counts.get(target_class, 0) >= threshold:
-                    result.extra_po += po_bonus
+                    result.per_turn_po += po_bonus
                     result.effects.append(f"{card.name}: {bonus}")
 
         # "+X PO par tranche de Y ratons"
@@ -1404,6 +1455,70 @@ def resolve_bonus_text_effects(
                     result.attack_bonus += atk_bonus * matching
                     result.effects.append(f"{card.name}: {bonus} ({matching} cards)")
 
+        # === LAPIN-SPECIFIC PATTERNS ===
+
+        # "+X PV /tour si [family] Y" - PV healing per turn if threshold met
+        pv_turn_match = _PV_PER_TURN_IF_PATTERN.search(bonus)
+        if pv_turn_match:
+            pv_bonus = int(pv_turn_match.group(1))
+            target_name = pv_turn_match.group(2).lower()
+            threshold = int(pv_turn_match.group(3))
+            # Check family threshold
+            if target_name in family_map:
+                target_family = family_map[target_name]
+                if family_counts.get(target_family, 0) >= threshold:
+                    result.per_turn_pv_heal += pv_bonus
+                    result.effects.append(f"{card.name}: {bonus}")
+
+        # "+X PO si Lapin Y / +Z PO si Lapin W" - Multi-threshold PO
+        multi_po_match = _MULTI_PO_IF_PATTERN.search(bonus)
+        if multi_po_match:
+            po1 = int(multi_po_match.group(1))
+            threshold1 = int(multi_po_match.group(2))
+            po2 = int(multi_po_match.group(3))
+            threshold2 = int(multi_po_match.group(4))
+            lapin_count = family_counts.get(Family.LAPIN, 0)
+            # Apply highest matching threshold (not cumulative)
+            if lapin_count >= threshold2:
+                result.per_turn_po += po2
+                result.effects.append(f"{card.name}: +{po2} PO (Lapin {threshold2})")
+            elif lapin_count >= threshold1:
+                result.per_turn_po += po1
+                result.effects.append(f"{card.name}: +{po1} PO (Lapin {threshold1})")
+
+        # "-X ATQ si [CardName]" - Card-conditional ATK penalty
+        atk_penalty_match = _ATK_PENALTY_IF_CARD_PATTERN.search(bonus)
+        if atk_penalty_match:
+            penalty = int(atk_penalty_match.group(1))
+            card_name = atk_penalty_match.group(2).strip().lower()
+            # Check if the specified card is on player's board
+            if card_on_player_board(card_name):
+                result.attack_penalty += penalty
+                result.effects.append(f"{card.name}: -{penalty} ATQ ({card_name})")
+
+        # "Les [family] ont minimum X ATQ" - Minimum ATK floor
+        min_atk_match = _MIN_ATK_FLOOR_PATTERN.search(bonus)
+        if min_atk_match:
+            target_name = min_atk_match.group(1).lower()
+            min_atk = int(min_atk_match.group(2))
+            if target_name in family_map:
+                target_family = family_map[target_name]
+                # Store the floor - it will be applied during damage calculation
+                if min_atk > result.min_atk_floor:
+                    result.min_atk_floor = min_atk
+                    result.min_atk_family = target_family.value
+                    result.effects.append(f"{card.name}: {bonus}")
+
+        # "retourner une carte de la pile, gagne son ATQ" - Deck reveal ATK
+        deck_reveal_match = _DECK_REVEAL_ATK_PATTERN.search(bonus)
+        if deck_reveal_match:
+            # This effect reveals a card from deck and adds its ATK
+            # For now, we'll use an average ATK value (3) as placeholder
+            # In a full implementation, this would interact with the deck
+            avg_atk = 3  # Average card ATK as approximation
+            result.deck_reveal_atk += avg_atk
+            result.effects.append(f"{card.name}: {bonus} (~{avg_atk} ATK)")
+
     return result
 
 
@@ -1462,18 +1577,24 @@ class PerTurnEffectResult:
 
     Attributes:
         total_self_damage: Total self-damage from per-turn effects.
+        total_pv_heal: Total PV healing from bonus_text effects.
+        total_po_bonus: Total PO bonus from bonus_text effects.
         cards_with_effects: List of cards that have per-turn effects.
     """
 
     total_self_damage: int = 0
+    total_pv_heal: int = 0
+    total_po_bonus: int = 0
     cards_with_effects: list[str] = field(default_factory=list)
 
 
 def resolve_per_turn_effects(player: PlayerState) -> PerTurnEffectResult:
     """Resolve per-turn effects for a player.
 
-    Per-turn effects are effects that apply each turn, such as
-    "Vous perdez X PV par tour" (you lose X HP per turn).
+    Per-turn effects are effects that apply each turn, such as:
+    - "Vous perdez X PV par tour" (you lose X HP per turn)
+    - "+X PV /tour si lapin Y" (heal X HP per turn if lapin threshold)
+    - "+X PO /tour si lapin Y" (gain X PO per turn if lapin threshold)
 
     These are separate from:
     - Combat self-damage (e.g., Berserker's -2 PV from class ability)
@@ -1483,34 +1604,54 @@ def resolve_per_turn_effects(player: PlayerState) -> PerTurnEffectResult:
         player: The player whose per-turn effects to resolve.
 
     Returns:
-        PerTurnEffectResult with total damage and affected cards.
+        PerTurnEffectResult with total damage, healing, PO and affected cards.
     """
     result = PerTurnEffectResult()
 
+    # Handle per-turn self-damage from class abilities (e.g., Mutanus)
     for card in player.board:
         per_turn_dmg = card.class_abilities.per_turn_self_damage
         if per_turn_dmg > 0:
             result.total_self_damage += per_turn_dmg
             result.cards_with_effects.append(card.name)
 
+    # Handle per-turn bonus_text effects (healing and PO)
+    bonus_text_result = resolve_bonus_text_effects(player, None)
+    if bonus_text_result.per_turn_pv_heal > 0:
+        result.total_pv_heal += bonus_text_result.per_turn_pv_heal
+    if bonus_text_result.per_turn_po > 0:
+        result.total_po_bonus += bonus_text_result.per_turn_po
+
     return result
 
 
-def apply_per_turn_effects(player: PlayerState) -> int:
-    """Apply per-turn effects to a player and return damage dealt.
+def apply_per_turn_effects(player: PlayerState) -> PerTurnEffectResult:
+    """Apply per-turn effects to a player and return the result.
 
-    This function both calculates and applies per-turn damage.
+    This function both calculates and applies per-turn effects:
+    - Self-damage (e.g., from Mutanus "Vous perdez X PV par tour")
+    - PV healing (e.g., from "+X PV /tour si lapin Y")
+    - PO bonus is calculated but NOT applied here (applied at turn start)
+
     Call this during the end-of-turn phase.
 
     Args:
         player: The player to apply per-turn effects to.
 
     Returns:
-        Total self-damage dealt to the player.
+        PerTurnEffectResult with damage, healing, and PO bonus.
     """
     effects = resolve_per_turn_effects(player)
 
+    # Apply self-damage
     if effects.total_self_damage > 0:
         player.health -= effects.total_self_damage
 
-    return effects.total_self_damage
+    # Apply healing (capped at maximum health if you have one, otherwise unlimited)
+    if effects.total_pv_heal > 0:
+        player.health += effects.total_pv_heal
+
+    # Note: PO bonus is not applied here - it should be applied at turn start
+    # via _start_turn() in the engine
+
+    return effects
