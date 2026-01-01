@@ -1383,3 +1383,59 @@ class TestLapinBoardLimits:
 
         # Can't play more - at limit
         assert can_play_lapin_card(player, base_limit=8) is False
+
+    def test_lapin_threshold_8_atk_bonus_multiplied(self, repo) -> None:
+        """Test threshold 8 ATK bonus multiplies by lapin count."""
+        from src.cards.models import Family
+        from src.game.abilities import resolve_family_abilities
+
+        # Get non-Lapincruste Lapins
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 8:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 8 Lapins to trigger threshold 8
+        for lapin in lapins[:8]:
+            player.board.append(deepcopy(lapin))
+
+        result = resolve_family_abilities(player)
+
+        # Threshold 8: "+2 ATQ pour tous les lapins"
+        # Should be +2 per Lapin = +16 total (not just +2)
+        assert result.total_attack_bonus == 16  # 2 * 8 = 16
+
+    def test_lapin_threshold_8_scales_with_count(self, repo) -> None:
+        """Test that threshold 8 bonus scales correctly with different lapin counts."""
+        from src.cards.models import Family
+        from src.game.abilities import resolve_family_abilities
+
+        # Get non-Lapincruste Lapins
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 10:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 10 Lapins
+        for lapin in lapins[:10]:
+            player.board.append(deepcopy(lapin))
+
+        result = resolve_family_abilities(player)
+
+        # Threshold 8: "+2 ATQ pour tous les lapins"
+        # With 10 Lapins: +2 * 10 = +20 ATK
+        assert result.total_attack_bonus == 20

@@ -302,6 +302,9 @@ _BOARD_EXPANSION_PATTERN = re.compile(
     r"\+(\d+)\s+cartes?\s+sur\s+le\s+plateau", re.IGNORECASE
 )
 
+# Pattern for "pour tous les [family]" effects (e.g., "+2 ATQ pour tous les lapins")
+_FOR_ALL_FAMILY_PATTERN = re.compile(r"pour\s+tous\s+les\s+(\w+)", re.IGNORECASE)
+
 
 def count_cards_by_class(player: PlayerState) -> Counter[CardClass]:
     """Count cards on board by class.
@@ -507,6 +510,7 @@ def resolve_family_abilities(player: PlayerState) -> AbilityResolutionResult:
     """Resolve all family abilities for a player.
 
     Family abilities scale with the number of same-family cards.
+    Effects like "+2 ATQ pour tous les lapins" multiply by family count.
 
     Args:
         player: The player whose abilities to resolve.
@@ -516,6 +520,22 @@ def resolve_family_abilities(player: PlayerState) -> AbilityResolutionResult:
     """
     result = AbilityResolutionResult()
     family_counts = count_cards_by_family(player)
+
+    # Map French family names to Family enum
+    family_name_map: dict[str, Family] = {
+        "lapins": Family.LAPIN,
+        "lapin": Family.LAPIN,
+        "cyborgs": Family.CYBORG,
+        "cyborg": Family.CYBORG,
+        "atlantides": Family.ATLANTIDE,
+        "atlantide": Family.ATLANTIDE,
+        "natures": Family.NATURE,
+        "nature": Family.NATURE,
+        "neiges": Family.NEIGE,
+        "neige": Family.NEIGE,
+        "ratons": Family.RATON,
+        "raton": Family.RATON,
+    }
 
     # Track processed effects
     processed_effects: set[str] = set()
@@ -537,10 +557,35 @@ def resolve_family_abilities(player: PlayerState) -> AbilityResolutionResult:
                     processed_effects.add(effect_key)
                     effect = parse_ability_effect(active.effect)
 
-                    # Family abilities typically apply once
-                    result.total_attack_bonus += effect.attack_bonus
-                    result.total_health_bonus += effect.health_bonus
-                    result.total_imblocable_bonus += effect.imblocable_damage
+                    # Check if effect targets "tous les [family]"
+                    # e.g., "+2 ATQ pour tous les lapins" multiplies by count
+                    for_all_match = _FOR_ALL_FAMILY_PATTERN.search(active.effect)
+                    if for_all_match:
+                        target_family_name = for_all_match.group(1).lower()
+                        target_family = family_name_map.get(target_family_name)
+
+                        if target_family and target_family in family_counts:
+                            # Multiply bonus by number of target family cards
+                            target_count = family_counts[target_family]
+                            result.total_attack_bonus += (
+                                effect.attack_bonus * target_count
+                            )
+                            result.total_health_bonus += (
+                                effect.health_bonus * target_count
+                            )
+                            result.total_imblocable_bonus += (
+                                effect.imblocable_damage * target_count
+                            )
+                        else:
+                            # Unknown family, apply once
+                            result.total_attack_bonus += effect.attack_bonus
+                            result.total_health_bonus += effect.health_bonus
+                            result.total_imblocable_bonus += effect.imblocable_damage
+                    else:
+                        # No "pour tous les X" - apply once
+                        result.total_attack_bonus += effect.attack_bonus
+                        result.total_health_bonus += effect.health_bonus
+                        result.total_imblocable_bonus += effect.imblocable_damage
 
                     result.effects.append(effect)
 
