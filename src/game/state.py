@@ -38,6 +38,10 @@ class PlayerState:
         board: Cards on the player's board (max 8 for non-Lapin).
         po: Current gold/PO available this turn.
         eliminated: Whether the player has been eliminated.
+        equipped_weapons: Dict mapping board card ID to equipped weapon.
+        spells_cast_this_turn: Number of spells cast this turn.
+        spell_damage_dealt: Total spell damage dealt this turn.
+        sacrificed_this_turn: Cards sacrificed this turn.
     """
 
     player_id: int
@@ -47,6 +51,13 @@ class PlayerState:
     board: list[Card] = field(default_factory=list)
     po: int = 0
     eliminated: bool = False
+    # Weapon equipment: maps board card_id -> equipped weapon card
+    equipped_weapons: dict[str, Card] = field(default_factory=dict)
+    # Spell tracking
+    spells_cast_this_turn: int = 0
+    spell_damage_dealt: int = 0
+    # Sacrifice tracking
+    sacrificed_this_turn: list[Card] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate player state after initialization."""
@@ -107,6 +118,126 @@ class PlayerState:
             True if player health > 0 and not eliminated.
         """
         return self.health > 0 and not self.eliminated
+
+    # === Weapon Equipment Methods ===
+
+    def equip_weapon(self, card_id: str, weapon: Card) -> bool:
+        """Equip a weapon to a card on the board.
+
+        Args:
+            card_id: ID of the board card to equip to.
+            weapon: The weapon card to equip.
+
+        Returns:
+            True if weapon was equipped successfully.
+        """
+        # Check if card exists on board
+        card_on_board = any(c.id == card_id for c in self.board)
+        if not card_on_board:
+            return False
+
+        # Check if card already has a weapon
+        if card_id in self.equipped_weapons:
+            return False
+
+        self.equipped_weapons[card_id] = weapon
+        return True
+
+    def unequip_weapon(self, card_id: str) -> Card | None:
+        """Unequip a weapon from a card.
+
+        Args:
+            card_id: ID of the board card to unequip from.
+
+        Returns:
+            The unequipped weapon, or None if no weapon was equipped.
+        """
+        return self.equipped_weapons.pop(card_id, None)
+
+    def get_weapon_for_card(self, card_id: str) -> Card | None:
+        """Get the weapon equipped to a specific card.
+
+        Args:
+            card_id: ID of the board card.
+
+        Returns:
+            The equipped weapon, or None if no weapon is equipped.
+        """
+        return self.equipped_weapons.get(card_id)
+
+    def get_total_weapon_attack(self) -> int:
+        """Get total ATK bonus from all equipped weapons.
+
+        Returns:
+            Sum of attack values from all equipped weapons.
+        """
+        return sum(w.attack for w in self.equipped_weapons.values())
+
+    def get_total_weapon_health(self) -> int:
+        """Get total HP bonus from all equipped weapons.
+
+        Returns:
+            Sum of health values from all equipped weapons.
+        """
+        return sum(w.health for w in self.equipped_weapons.values())
+
+    # === Spell Methods ===
+
+    def cast_spell(self, damage: int) -> None:
+        """Record a spell being cast.
+
+        Args:
+            damage: The damage dealt by the spell.
+        """
+        self.spells_cast_this_turn += 1
+        self.spell_damage_dealt += damage
+
+    def reset_spell_tracking(self) -> None:
+        """Reset spell tracking for a new turn."""
+        self.spells_cast_this_turn = 0
+        self.spell_damage_dealt = 0
+
+    # === Sacrifice Methods ===
+
+    def sacrifice_card(self, card: Card) -> bool:
+        """Sacrifice a card from the board.
+
+        Args:
+            card: The card to sacrifice.
+
+        Returns:
+            True if the card was sacrificed successfully.
+        """
+        if card not in self.board:
+            return False
+
+        self.board.remove(card)
+        self.sacrificed_this_turn.append(card)
+
+        # Remove any equipped weapon
+        if card.id in self.equipped_weapons:
+            self.equipped_weapons.pop(card.id)
+
+        return True
+
+    def get_sacrifice_count(self) -> int:
+        """Get the number of cards sacrificed this turn.
+
+        Returns:
+            Number of cards sacrificed this turn.
+        """
+        return len(self.sacrificed_this_turn)
+
+    def reset_sacrifice_tracking(self) -> None:
+        """Reset sacrifice tracking for a new turn."""
+        self.sacrificed_this_turn.clear()
+
+    # === Turn Reset ===
+
+    def reset_turn_tracking(self) -> None:
+        """Reset all per-turn tracking (spells, sacrifices)."""
+        self.reset_spell_tracking()
+        self.reset_sacrifice_tracking()
 
 
 class InvalidGameStateError(Exception):
@@ -255,6 +386,88 @@ class GameState:
             Reference to the current cost tier's deck.
         """
         return self.get_deck_for_tier(self.get_current_cost_tier())
+
+    # === Deck Interaction Methods ===
+
+    def peek_deck(self, tier: int, count: int = 1) -> list[Card]:
+        """View the top N cards of a deck without removing them.
+
+        Args:
+            tier: The cost tier (1-5) to peek.
+            count: Number of cards to peek (default 1).
+
+        Returns:
+            List of cards from the top of the deck (may be fewer if deck is smaller).
+        """
+        deck = self.get_deck_for_tier(tier)
+        return deck[:count]
+
+    def peek_current_deck(self, count: int = 1) -> list[Card]:
+        """View the top N cards of the current tier's deck.
+
+        Args:
+            count: Number of cards to peek (default 1).
+
+        Returns:
+            List of cards from the top of the deck.
+        """
+        return self.peek_deck(self.get_current_cost_tier(), count)
+
+    def reveal_top_card(self, tier: int) -> Card | None:
+        """Reveal (but don't remove) the top card of a deck.
+
+        This is typically used for bonus_text effects that grant bonuses
+        based on the revealed card's properties.
+
+        Args:
+            tier: The cost tier (1-5) to reveal from.
+
+        Returns:
+            The top card, or None if deck is empty.
+        """
+        deck = self.get_deck_for_tier(tier)
+        return deck[0] if deck else None
+
+    def draw_from_deck(self, tier: int) -> Card | None:
+        """Draw (remove and return) the top card from a deck.
+
+        Args:
+            tier: The cost tier (1-5) to draw from.
+
+        Returns:
+            The drawn card, or None if deck is empty.
+        """
+        deck = self.get_deck_for_tier(tier)
+        if not deck:
+            return None
+        return deck.pop(0)
+
+    def search_deck(self, tier: int, family: str | None = None) -> list[Card]:
+        """Search a deck for cards matching criteria.
+
+        Args:
+            tier: The cost tier (1-5) to search.
+            family: Optional family name to filter by.
+
+        Returns:
+            List of matching cards (deck is not modified).
+        """
+        from src.cards.models import Family
+
+        deck = self.get_deck_for_tier(tier)
+        if family is None:
+            return list(deck)
+
+        try:
+            target_family = Family(family)
+            return [c for c in deck if c.family == target_family]
+        except ValueError:
+            return []
+
+    def reset_turn_tracking_all_players(self) -> None:
+        """Reset per-turn tracking for all players."""
+        for player in self.players:
+            player.reset_turn_tracking()
 
 
 def create_initial_game_state(

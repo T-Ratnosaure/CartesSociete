@@ -1439,3 +1439,389 @@ class TestLapinBoardLimits:
         # Threshold 8: "+2 ATQ pour tous les lapins"
         # With 10 Lapins: +2 * 10 = +20 ATK
         assert result.total_attack_bonus == 20
+
+
+class TestWeaponEquipment:
+    """Tests for weapon equipment system."""
+
+    def test_equip_weapon_to_board_card(self, repo) -> None:
+        """Test equipping a weapon to a card on the board."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get a creature and a weapon
+        creature = None
+        weapon = None
+        for card in repo.get_all():
+            if creature is None and card.card_type == CardType.CREATURE:
+                creature = deepcopy(card)
+            if weapon is None and card.card_type == CardType.WEAPON:
+                weapon = deepcopy(card)
+            if creature and weapon:
+                break
+
+        if not creature or not weapon:
+            pytest.skip("No creature or weapon cards found")
+
+        # Add creature to board
+        player.board.append(creature)
+
+        # Equip weapon
+        success = player.equip_weapon(creature.id, weapon)
+        assert success is True
+        assert player.equipped_weapons[creature.id] == weapon
+
+    def test_cannot_equip_to_nonexistent_card(self, repo) -> None:
+        """Test that equipping to a non-existent card fails."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        weapon = None
+        for card in repo.get_all():
+            if card.card_type == CardType.WEAPON:
+                weapon = deepcopy(card)
+                break
+
+        if not weapon:
+            pytest.skip("No weapon cards found")
+
+        # Try to equip to non-existent card
+        success = player.equip_weapon("nonexistent_id", weapon)
+        assert success is False
+
+    def test_cannot_double_equip(self, repo) -> None:
+        """Test that a card can only have one weapon equipped."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creature = None
+        weapons = []
+        for card in repo.get_all():
+            if creature is None and card.card_type == CardType.CREATURE:
+                creature = deepcopy(card)
+            if card.card_type == CardType.WEAPON and len(weapons) < 2:
+                weapons.append(deepcopy(card))
+            if creature and len(weapons) >= 2:
+                break
+
+        if not creature or len(weapons) < 2:
+            pytest.skip("Not enough cards found")
+
+        player.board.append(creature)
+
+        # First equip should succeed
+        success1 = player.equip_weapon(creature.id, weapons[0])
+        assert success1 is True
+
+        # Second equip should fail
+        success2 = player.equip_weapon(creature.id, weapons[1])
+        assert success2 is False
+
+    def test_unequip_weapon(self, repo) -> None:
+        """Test unequipping a weapon."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creature = None
+        weapon = None
+        for card in repo.get_all():
+            if creature is None and card.card_type == CardType.CREATURE:
+                creature = deepcopy(card)
+            if weapon is None and card.card_type == CardType.WEAPON:
+                weapon = deepcopy(card)
+            if creature and weapon:
+                break
+
+        if not creature or not weapon:
+            pytest.skip("No cards found")
+
+        player.board.append(creature)
+        player.equip_weapon(creature.id, weapon)
+
+        # Unequip
+        unequipped = player.unequip_weapon(creature.id)
+        assert unequipped == weapon
+        assert creature.id not in player.equipped_weapons
+
+    def test_total_weapon_attack(self, repo) -> None:
+        """Test calculating total weapon attack bonus."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creatures = []
+        weapons = []
+        for card in repo.get_all():
+            if card.card_type == CardType.CREATURE and len(creatures) < 2:
+                creatures.append(deepcopy(card))
+            if card.card_type == CardType.WEAPON and len(weapons) < 2:
+                weapons.append(deepcopy(card))
+
+        if len(creatures) < 2 or len(weapons) < 2:
+            pytest.skip("Not enough cards")
+
+        # Add creatures and equip weapons
+        for creature, weapon in zip(creatures, weapons):
+            player.board.append(creature)
+            player.equip_weapon(creature.id, weapon)
+
+        total_atk = player.get_total_weapon_attack()
+        expected_atk = sum(w.attack for w in weapons)
+        assert total_atk == expected_atk
+
+
+class TestSpellTracking:
+    """Tests for spell casting and tracking system."""
+
+    def test_cast_spell_increments_counter(self) -> None:
+        """Test that casting a spell increments the counter."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        assert player.spells_cast_this_turn == 0
+        assert player.spell_damage_dealt == 0
+
+        player.cast_spell(5)
+
+        assert player.spells_cast_this_turn == 1
+        assert player.spell_damage_dealt == 5
+
+    def test_multiple_spells_accumulate(self) -> None:
+        """Test that multiple spell casts accumulate."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        player.cast_spell(3)
+        player.cast_spell(7)
+        player.cast_spell(2)
+
+        assert player.spells_cast_this_turn == 3
+        assert player.spell_damage_dealt == 12
+
+    def test_reset_spell_tracking(self) -> None:
+        """Test resetting spell tracking for new turn."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        player.cast_spell(10)
+        assert player.spells_cast_this_turn == 1
+
+        player.reset_spell_tracking()
+
+        assert player.spells_cast_this_turn == 0
+        assert player.spell_damage_dealt == 0
+
+
+class TestSacrificeMechanics:
+    """Tests for card sacrifice mechanics."""
+
+    def test_sacrifice_card_from_board(self, repo) -> None:
+        """Test sacrificing a card removes it from board."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creature = None
+        for card in repo.get_all():
+            if card.card_type == CardType.CREATURE:
+                creature = deepcopy(card)
+                break
+
+        if not creature:
+            pytest.skip("No creature cards found")
+
+        player.board.append(creature)
+        assert len(player.board) == 1
+
+        success = player.sacrifice_card(creature)
+        assert success is True
+        assert len(player.board) == 0
+        assert len(player.sacrificed_this_turn) == 1
+        assert player.sacrificed_this_turn[0] == creature
+
+    def test_sacrifice_removes_equipped_weapon(self, repo) -> None:
+        """Test that sacrificing a card also removes its weapon."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creature = None
+        weapon = None
+        for card in repo.get_all():
+            if creature is None and card.card_type == CardType.CREATURE:
+                creature = deepcopy(card)
+            if weapon is None and card.card_type == CardType.WEAPON:
+                weapon = deepcopy(card)
+            if creature and weapon:
+                break
+
+        if not creature or not weapon:
+            pytest.skip("No cards found")
+
+        player.board.append(creature)
+        player.equip_weapon(creature.id, weapon)
+        assert creature.id in player.equipped_weapons
+
+        player.sacrifice_card(creature)
+        assert creature.id not in player.equipped_weapons
+
+    def test_sacrifice_count(self, repo) -> None:
+        """Test getting sacrifice count."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creatures = []
+        for card in repo.get_all():
+            if card.card_type == CardType.CREATURE:
+                creatures.append(deepcopy(card))
+                if len(creatures) >= 3:
+                    break
+
+        if len(creatures) < 3:
+            pytest.skip("Not enough creatures")
+
+        for c in creatures:
+            player.board.append(c)
+
+        player.sacrifice_card(creatures[0])
+        player.sacrifice_card(creatures[1])
+
+        assert player.get_sacrifice_count() == 2
+
+    def test_reset_sacrifice_tracking(self, repo) -> None:
+        """Test resetting sacrifice tracking."""
+        from src.cards.models import CardType
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        creature = None
+        for card in repo.get_all():
+            if card.card_type == CardType.CREATURE:
+                creature = deepcopy(card)
+                break
+
+        if not creature:
+            pytest.skip("No creature found")
+
+        player.board.append(creature)
+        player.sacrifice_card(creature)
+        assert player.get_sacrifice_count() == 1
+
+        player.reset_sacrifice_tracking()
+        assert player.get_sacrifice_count() == 0
+
+
+class TestDeckInteractions:
+    """Tests for deck interaction methods."""
+
+    def test_peek_deck(self, repo) -> None:
+        """Test peeking at deck without removing cards."""
+        state = create_initial_game_state(num_players=2)
+
+        # Add some cards to cost_1_deck
+        cards = [c for c in repo.get_all() if c.cost == 1][:5]
+        if len(cards) < 3:
+            pytest.skip("Not enough cost-1 cards")
+
+        state.cost_1_deck = list(cards)
+        original_len = len(state.cost_1_deck)
+
+        peeked = state.peek_deck(1, 3)
+
+        assert len(peeked) == 3
+        assert len(state.cost_1_deck) == original_len  # Deck unchanged
+        assert peeked == state.cost_1_deck[:3]
+
+    def test_reveal_top_card(self, repo) -> None:
+        """Test revealing top card of deck."""
+        state = create_initial_game_state(num_players=2)
+
+        cards = [c for c in repo.get_all() if c.cost == 2][:3]
+        if not cards:
+            pytest.skip("No cost-2 cards")
+
+        state.cost_2_deck = list(cards)
+
+        revealed = state.reveal_top_card(2)
+
+        assert revealed == cards[0]
+        assert len(state.cost_2_deck) == len(cards)  # Not removed
+
+    def test_reveal_empty_deck(self) -> None:
+        """Test revealing from empty deck returns None."""
+        state = create_initial_game_state(num_players=2)
+        state.cost_3_deck = []
+
+        revealed = state.reveal_top_card(3)
+        assert revealed is None
+
+    def test_draw_from_deck(self, repo) -> None:
+        """Test drawing removes card from deck."""
+        state = create_initial_game_state(num_players=2)
+
+        cards = [c for c in repo.get_all() if c.cost == 4][:3]
+        if not cards:
+            pytest.skip("No cost-4 cards")
+
+        state.cost_4_deck = list(cards)
+        original_len = len(state.cost_4_deck)
+        top_card = state.cost_4_deck[0]
+
+        drawn = state.draw_from_deck(4)
+
+        assert drawn == top_card
+        assert len(state.cost_4_deck) == original_len - 1
+
+    def test_search_deck_by_family(self, repo) -> None:
+        """Test searching deck by family."""
+        from src.cards.models import Family
+
+        state = create_initial_game_state(num_players=2)
+
+        # Mix cards from different families
+        all_cards = repo.get_all()
+        mixed_deck = []
+        for card in all_cards:
+            if card.cost == 1:
+                mixed_deck.append(deepcopy(card))
+                if len(mixed_deck) >= 10:
+                    break
+
+        if len(mixed_deck) < 5:
+            pytest.skip("Not enough cards")
+
+        state.cost_1_deck = mixed_deck
+
+        # Count how many Lapins are in deck
+        lapin_count = sum(1 for c in mixed_deck if c.family == Family.LAPIN)
+
+        results = state.search_deck(1, "Lapin")
+        assert len(results) == lapin_count
+
+    def test_reset_turn_tracking_all_players(self) -> None:
+        """Test resetting turn tracking for all players."""
+        state = create_initial_game_state(num_players=3)
+
+        # Set some tracking values
+        for player in state.players:
+            player.cast_spell(5)
+
+        state.reset_turn_tracking_all_players()
+
+        for player in state.players:
+            assert player.spells_cast_this_turn == 0
+            assert player.spell_damage_dealt == 0
