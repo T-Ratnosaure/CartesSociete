@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.players.action import Action
 
+from src.cards.models import CardType, Family
+
+from .abilities import can_play_lapin_card
 from .actions import (
     ActionResult,
     buy_card,
@@ -116,7 +119,15 @@ def get_legal_actions_for_player(
 
         # Can play cards from hand if board not full
         for card in player.hand:
-            if player.can_play_card(max_board):
+            # Demons bypass board limit
+            if card.card_type == CardType.DEMON:
+                actions.append(Action.play(card))
+            # Lapins have special board limit rules
+            elif card.family == Family.LAPIN:
+                if can_play_lapin_card(player, max_board):
+                    actions.append(Action.play(card))
+            # Normal cards use standard limit
+            elif player.can_play_card(max_board):
                 actions.append(Action.play(card))
 
         # Can replace cards on board

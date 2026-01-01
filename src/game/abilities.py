@@ -291,6 +291,17 @@ _ATK_PV_FOR_DEMON_PATTERN = re.compile(
     r"\+(\d+)\s+ATQ\s*/\s*-(\d+)\s+PV\s+pour\s+le\s+d[ée]mon", re.IGNORECASE
 )
 
+# Patterns for Lapincruste board limit expansion
+_LAPIN_BOARD_EXPANSION_PATTERN = re.compile(
+    r"(?:peut\s+poser|poser)\s+(\d+)\s+lapins?\s+suppl[ée]mentaires?\s+en\s+jeu",
+    re.IGNORECASE,
+)
+
+# Patterns for family board expansion ("+N cartes sur le plateau")
+_BOARD_EXPANSION_PATTERN = re.compile(
+    r"\+(\d+)\s+cartes?\s+sur\s+le\s+plateau", re.IGNORECASE
+)
+
 
 def count_cards_by_class(player: PlayerState) -> Counter[CardClass]:
     """Count cards on board by class.
@@ -961,6 +972,106 @@ def count_board_monsters(player: PlayerState) -> int:
         count += 1
 
     return count
+
+
+@dataclass
+class LapinBoardLimitResult:
+    """Result of calculating Lapin board limit.
+
+    Attributes:
+        base_limit: The base board limit (typically 8).
+        lapincruste_bonus: Extra slots from Lapincruste cards on board.
+        family_threshold_bonus: Extra slots from Lapin family thresholds.
+        total_limit: Total board limit for Lapin cards.
+    """
+
+    base_limit: int = 8
+    lapincruste_bonus: int = 0
+    family_threshold_bonus: int = 0
+
+    @property
+    def total_limit(self) -> int:
+        """Calculate total board limit for Lapins."""
+        return self.base_limit + self.lapincruste_bonus + self.family_threshold_bonus
+
+
+def calculate_lapin_board_limit(
+    player: PlayerState,
+    base_limit: int = 8,
+) -> LapinBoardLimitResult:
+    """Calculate the board limit for Lapin cards.
+
+    Lapin cards can exceed the normal board limit through:
+    1. Lapincruste Level 1: "Le joueur peut poser 2 lapins supplémentaires en jeu" (+2)
+    2. Lapincruste Level 2: "Le joueur peut poser 4 lapins supplémentaires en jeu" (+4)
+    3. Family threshold 3: "+1 cartes sur le plateau" (+1)
+    4. Family threshold 5: "+2 cartes sur le plateau" (+2)
+
+    Note: Family threshold bonuses are cumulative (threshold 5 includes threshold 3).
+    Lapincruste bonuses stack if multiple Lapincruste cards are on board.
+
+    Args:
+        player: The player whose Lapin board limit to calculate.
+        base_limit: The base board limit (default 8).
+
+    Returns:
+        LapinBoardLimitResult with breakdown of limit calculation.
+    """
+    result = LapinBoardLimitResult(base_limit=base_limit)
+
+    # Count Lapin cards on board for family threshold
+    lapin_count = sum(1 for card in player.board if card.family == Family.LAPIN)
+
+    # Calculate family threshold bonus
+    # These are cumulative: at 5 Lapins, you get both +1 (from 3) and +2 (from 5) = +3
+    # But looking at the data, the thresholds seem to be highest-wins, not cumulative
+    # Let's check: threshold 3 = "+1 cartes", threshold 5 = "+2 cartes"
+    # The "+2" at threshold 5 is likely the total bonus, not additional
+    # So at 5 Lapins: +2 total, at 3-4 Lapins: +1 total
+    if lapin_count >= 5:
+        result.family_threshold_bonus = 2
+    elif lapin_count >= 3:
+        result.family_threshold_bonus = 1
+
+    # Calculate Lapincruste bonus from cards on board
+    for card in player.board:
+        if card.family != Family.LAPIN:
+            continue
+
+        # Check bonus_text for Lapincruste effect
+        if not card.bonus_text:
+            continue
+
+        match = _LAPIN_BOARD_EXPANSION_PATTERN.search(card.bonus_text)
+        if match:
+            bonus = int(match.group(1))
+            result.lapincruste_bonus += bonus
+
+    return result
+
+
+def can_play_lapin_card(
+    player: PlayerState,
+    base_limit: int = 8,
+) -> bool:
+    """Check if a Lapin card can be played on the board.
+
+    Takes into account Lapincruste bonuses and family thresholds
+    when determining if another Lapin card can be played.
+
+    Args:
+        player: The player attempting to play a Lapin card.
+        base_limit: The base board limit (default 8).
+
+    Returns:
+        True if a Lapin card can be played, False otherwise.
+    """
+    limit_result = calculate_lapin_board_limit(player, base_limit)
+
+    # Count current Lapin cards on board
+    lapin_count = sum(1 for card in player.board if card.family == Family.LAPIN)
+
+    return lapin_count < limit_result.total_limit
 
 
 def resolve_bonus_text_effects(

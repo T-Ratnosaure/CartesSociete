@@ -11,6 +11,7 @@ from typing import NoReturn
 from src.cards.models import Card, CardType, Family
 from src.cards.repository import CardRepository, get_repository
 
+from .abilities import can_play_lapin_card
 from .state import GamePhase, GameState, PlayerState
 
 
@@ -188,13 +189,28 @@ def play_card(
     if not any(c is card for c in player.hand) and card not in player.hand:
         raise InvalidCardError(f"Card {card.name} is not in hand")
 
-    # Check board limit (Lapin family can exceed limit)
+    # Check board limit
     is_lapin = card.family == Family.LAPIN
     is_demon = card.card_type == CardType.DEMON
     max_board = state.config.max_board_size
 
-    # Demons don't count towards limit, Lapin can exceed limit
-    if not is_demon and not is_lapin and not player.can_play_card(max_board):
+    # Demons don't count towards board limit
+    if is_demon:
+        pass  # Demons bypass board limit entirely
+    elif is_lapin:
+        # Lapins have special board limit rules based on Lapincruste + family thresholds
+        if not can_play_lapin_card(player, max_board):
+            # Calculate current limit for error message
+            from .abilities import calculate_lapin_board_limit
+
+            limit_result = calculate_lapin_board_limit(player, max_board)
+            lapin_count = sum(1 for c in player.board if c.family == Family.LAPIN)
+            raise BoardFullError(
+                f"Lapin board is full ({lapin_count}/{limit_result.total_limit}). "
+                f"Need Lapincruste or more Lapins to expand limit."
+            )
+    elif not player.can_play_card(max_board):
+        # Normal cards use standard board limit
         raise BoardFullError(
             f"Board is full ({player.get_board_count()}/{max_board}). "
             "Replace a card instead."
