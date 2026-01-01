@@ -224,6 +224,84 @@ def draw_weapons(state: GameState, player_id: int, count: int) -> list[WeaponCar
     return drawn
 
 
+def summon_demon(
+    state: GameState,
+    player_id: int,
+    demon_name: str,
+) -> DemonCard | None:
+    """Summon a specific demon from the demon deck to a player's board.
+
+    Used by Invocateur class ability to summon demons based on threshold:
+    - Threshold 1: "Diablotin"
+    - Threshold 2: "Demon mineur"
+    - Threshold 4: "Succube"
+    - Threshold 6: "Demon Majeur"
+
+    Args:
+        state: Current game state.
+        player_id: ID of the player summoning.
+        demon_name: Name of the demon to summon.
+
+    Returns:
+        The summoned demon card, or None if not found.
+    """
+    # Find the player
+    player = None
+    for p in state.players:
+        if p.player_id == player_id:
+            player = p
+            break
+
+    if player is None:
+        return None
+
+    # Search for a demon matching the name in the demon deck
+    demon_name_lower = demon_name.lower()
+    for i, demon in enumerate(state.demon_deck):
+        if demon_name_lower in demon.name.lower():
+            # Found a matching demon
+            summoned = state.demon_deck.pop(i)
+            player.board.append(summoned)
+            return summoned
+
+    return None
+
+
+def draw_cost5_card(
+    state: GameState,
+    player_id: int,
+) -> Card | None:
+    """Draw a random cost-5 card from the cost_5 deck to a player's hand.
+
+    Used by Monture class ability at threshold 3:
+    "piocher une carte coût 5 dans la pile (au hasard)"
+
+    Args:
+        state: Current game state.
+        player_id: ID of the player drawing.
+
+    Returns:
+        The drawn card, or None if deck is empty.
+    """
+    # Find the player
+    player = None
+    for p in state.players:
+        if p.player_id == player_id:
+            player = p
+            break
+
+    if player is None:
+        return None
+
+    # Draw from cost_5 deck (already shuffled)
+    if state.cost_5_deck:
+        card = state.cost_5_deck.pop()
+        player.hand.append(card)
+        return card
+
+    return None
+
+
 def get_market_summary(state: GameState) -> str:
     """Generate a summary of the current market state.
 
