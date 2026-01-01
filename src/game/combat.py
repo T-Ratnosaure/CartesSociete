@@ -62,12 +62,14 @@ class CombatResult:
         eliminations: List of players eliminated this combat.
         health_changes: Dict mapping player_id to health change.
         self_damage: Dict mapping player_id to self-damage (e.g., Berserker).
+        on_attacked_damage: Dict mapping player_id to damage from on-attacked effects.
     """
 
     damage_dealt: list[DamageBreakdown] = field(default_factory=list)
     eliminations: list[PlayerState] = field(default_factory=list)
     health_changes: dict[int, int] = field(default_factory=dict)
     self_damage: dict[int, int] = field(default_factory=dict)
+    on_attacked_damage: dict[int, int] = field(default_factory=dict)
 
 
 def calculate_imblocable_damage(player: PlayerState) -> int:
@@ -117,8 +119,8 @@ def calculate_damage(
     attacker_abilities = resolve_all_abilities(attacker)
     defender_abilities = resolve_all_abilities(defender)
 
-    # Resolve bonus_text effects
-    bonus_text_result = resolve_bonus_text_effects(attacker, defender)
+    # Resolve bonus_text effects for attacker
+    attacker_bonus_text = resolve_bonus_text_effects(attacker, defender)
 
     # Resolve conditional abilities (Dragon PO spending)
     conditional_result = resolve_conditional_abilities(attacker)
@@ -126,17 +128,21 @@ def calculate_damage(
     # Calculate attack with all bonuses
     base_attack = attacker.get_total_attack()
     attack_bonus = attacker_abilities.total_attack_bonus
-    bonus_text_attack = bonus_text_result.attack_bonus
+    bonus_text_attack = attacker_bonus_text.attack_bonus
+    # Apply attack penalty from defender's bonus_text (e.g., "-1 ATQ pour les cyborgs")
+    attack_penalty = attacker_bonus_text.attack_penalty
     conditional_attack_bonus = conditional_result.total_attack_bonus
     attack_multiplier = conditional_result.attack_multiplier
 
-    # Apply multiplier to base attack, then add bonuses
+    # Apply multiplier to base attack, then add bonuses minus penalties
     # Multiplier only affects base attack (from Dragon conditional abilities)
-    total_attack = (
+    total_attack = max(
+        0,
         (base_attack * attack_multiplier)
         + attack_bonus
         + bonus_text_attack
         + conditional_attack_bonus
+        - attack_penalty,
     )
 
     # Calculate defense with ability bonuses
@@ -184,6 +190,7 @@ def resolve_combat(state: GameState) -> CombatResult:
     In CartesSociete, all players attack all opponents simultaneously.
     Damage is calculated for each attacker-defender pair, then applied.
     Self-damage from abilities (e.g., Berserker) is also applied.
+    On-attacked damage is dealt back to attackers by defenders.
 
     Args:
         state: Current game state.
@@ -203,6 +210,30 @@ def resolve_combat(state: GameState) -> CombatResult:
                 breakdown = calculate_damage(attacker, defender)
                 result.damage_dealt.append(breakdown)
                 damage_to_apply[defender.player_id] += breakdown.total_damage
+
+    # Calculate on-attacked damage (defenders damage attackers when attacked)
+    # This is separate from the main damage calculation
+    for defender in alive_players:
+        defender_bonus_text = resolve_bonus_text_effects(defender, None)
+        if defender_bonus_text.on_attacked_damage > 0:
+            # Defender deals this damage to all attackers (other players)
+            for attacker in alive_players:
+                if attacker.player_id != defender.player_id:
+                    damage_to_apply[attacker.player_id] += (
+                        defender_bonus_text.on_attacked_damage
+                    )
+            result.on_attacked_damage[defender.player_id] = (
+                defender_bonus_text.on_attacked_damage
+            )
+
+        # Add per-turn imblocable from bonus_text to damage
+        if defender_bonus_text.per_turn_imblocable > 0:
+            # Per-turn imblocable damages all opponents
+            for opponent in alive_players:
+                if opponent.player_id != defender.player_id:
+                    damage_to_apply[opponent.player_id] += (
+                        defender_bonus_text.per_turn_imblocable
+                    )
 
     # Calculate self-damage from abilities (e.g., Berserker)
     for player in alive_players:
@@ -297,6 +328,17 @@ def get_combat_summary(result: CombatResult) -> str:
             for bd in result.damage_dealt:
                 if bd.source_player.player_id == player_id:
                     lines.append(f"  {bd.source_player.name}: {damage} self-damage")
+                    break
+
+    # On-attacked damage (from bonus_text effects)
+    if result.on_attacked_damage:
+        lines.append("\nOn-attacked damage (dealt by defenders):")
+        for player_id, damage in result.on_attacked_damage.items():
+            # Find player name
+            for bd in result.damage_dealt:
+                if bd.target_player.player_id == player_id:
+                    name = bd.target_player.name
+                    lines.append(f"  {name}: deals {damage} damage when attacked")
                     break
 
     # Health changes

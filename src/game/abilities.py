@@ -129,11 +129,21 @@ class BonusTextResult:
     Attributes:
         attack_bonus: Total attack bonus from bonus_text.
         health_bonus: Total health bonus from bonus_text.
+        attack_penalty: Total attack penalty (negative modifier) from bonus_text.
+        on_attacked_damage: Damage dealt when this player is attacked.
+        per_turn_imblocable: Per-turn imblocable damage from bonus_text.
+        spell_damage_block: Amount of spell damage blocked.
+        extra_po: Extra PO generated from bonus_text effects.
         effects: Description of active bonus_text effects.
     """
 
     attack_bonus: int = 0
     health_bonus: int = 0
+    attack_penalty: int = 0
+    on_attacked_damage: int = 0
+    per_turn_imblocable: int = 0
+    spell_damage_block: int = 0
+    extra_po: int = 0
     effects: list[str] = field(default_factory=list)
 
 
@@ -209,6 +219,77 @@ _BONUS_IF_THRESHOLD_PATTERN = re.compile(
 # Patterns for conditional targeting
 _FOR_CLASS_PATTERN = re.compile(r"pour (?:les |tous les )?(\w+)", re.IGNORECASE)
 _IF_DEFENDERS_PATTERN = re.compile(r"si (?:\d+ )?d[ée]fenseurs?", re.IGNORECASE)
+
+# Patterns for bonus_text: negative ATK modifiers
+_NEGATIVE_ATK_FOR_CLASS_PATTERN = re.compile(
+    r"-(\d+)\s*ATQ\s+pour\s+(?:les\s+)?(\w+)", re.IGNORECASE
+)
+
+# Patterns for bonus_text: on-attacked damage
+_ON_ATTACKED_DAMAGE_PATTERN = re.compile(
+    r"[Ii]nflige\s+(\d+)\s+(?:points?\s+de\s+)?dgt\s+quand\s+attaqu[ée]", re.IGNORECASE
+)
+
+# Patterns for bonus_text: per-turn imblocable
+_PER_TURN_IMBLOCABLE_PATTERN = re.compile(
+    r"\+(\d+)\s+dgt\s+imblocable/?tour", re.IGNORECASE
+)
+
+# Patterns for bonus_text: spell damage blocking
+_SPELL_DAMAGE_BLOCK_PATTERN = re.compile(
+    r"[Bb]loque\s+(\d+)\s+(?:points?\s+de\s+)?(?:dgt|DGT)\s+(?:des\s+sorts|magique|par\s+sort)",
+    re.IGNORECASE,
+)
+
+# Patterns for bonus_text: PO generation
+_PO_PER_TURN_IF_PATTERN = re.compile(
+    r"\+(\d+)\s+PO\s*/?(?:tour)?\s+si\s+(\w+)\s+(\d+)", re.IGNORECASE
+)
+_PO_IF_NINJA_PATTERN = re.compile(r"\+(\d+)\s+PO\s+si\s+ninja\s+choisi", re.IGNORECASE)
+_PO_PER_RATONS_PATTERN = re.compile(
+    r"\+(\d+)\s+PO\s+par\s+tranche\s+de\s+(\d+)\s+ratons", re.IGNORECASE
+)
+
+# Patterns for bonus_text: raccoon family bonus
+_RACCOON_FAMILY_BONUS_PATTERN = re.compile(
+    r"[Ll]es\s+raccoon\s+[Ff]amilly\s+gagne\s+\+(\d+)\s+ATQ", re.IGNORECASE
+)
+
+# Patterns for bonus_text: solo ninja
+_SOLO_NINJA_PATTERN = re.compile(
+    r"\+(\d+)\s+ATQ\s+si\s+c'?est\s+le\s+seul\s+ninja", re.IGNORECASE
+)
+
+# Patterns for bonus_text: card-specific bonuses
+_BONUS_IF_JOE_PATTERN = re.compile(
+    r"\+(\d+)\s+(?:dgts?|ATQ)\s+si\s+Joe\s+est\s+sur\s+plateau", re.IGNORECASE
+)
+_BONUS_IF_REINE_PATTERN = re.compile(
+    r"\+(\d+)\s+ATQ\s+si\s+(?:la\s+)?Reine\s+est\s+en\s+jeu", re.IGNORECASE
+)
+_BONUS_IF_RATON_MIGNON_PATTERN = re.compile(
+    r"[Gg]agne\s+\+(\d+)\s+ATQ\s+si\s+Raton\s+Mignon", re.IGNORECASE
+)
+_BONUS_IF_MAITRE_RAT_PATTERN = re.compile(
+    r"\+(\d+)\s+ATQ/?(?:\+\d+\s+PV)?\s+si\s+ma[îi]tre\s+rat", re.IGNORECASE
+)
+_PV_IF_MAITRE_RAT_PATTERN = re.compile(
+    r"\+(\d+)\s+PV\s+si\s+ma[îi]tre\s+rat", re.IGNORECASE
+)
+
+# Patterns for bonus_text: per-econome bonus
+_ATK_PER_ENEMY_ECONOME_PATTERN = re.compile(
+    r"[Gg]agne\s+\+(\d+)\s+ATQ\s+par\s+[ée]conomes?\s+sur\s+le\s+plateau\s+ennemi",
+    re.IGNORECASE,
+)
+
+# Patterns for bonus_text: demon-specific
+_IMBLOCABLE_FOR_DEMON_PATTERN = re.compile(
+    r"\+(\d+)\s+(?:dgts?|dgt)\s+imblocable\s+pour\s+le\s+d[ée]mon", re.IGNORECASE
+)
+_ATK_PV_FOR_DEMON_PATTERN = re.compile(
+    r"\+(\d+)\s+ATQ\s*/\s*-(\d+)\s+PV\s+pour\s+le\s+d[ée]mon", re.IGNORECASE
+)
 
 
 def count_cards_by_class(player: PlayerState) -> Counter[CardClass]:
@@ -892,6 +973,14 @@ def resolve_bonus_text_effects(
     - "+X ATQ pour les [family/class]" - attack bonus for matching cards
     - "+X ATQ si bonus [Class] Y" - attack bonus if class threshold met
     - "+X ATQ aux [family] alliés" - attack bonus to allied family
+    - "-X ATQ pour les [class]" - attack penalty for class
+    - "Inflige X dgt quand attaqué" - on-attacked damage
+    - "+X dgt imblocable/tour" - per-turn imblocable
+    - "Bloque X dgt par sort" - spell damage blocking
+    - "+X PO / tour si [condition]" - PO generation
+    - "Les raccoon Familly gagne +X ATQ" - raccoon family bonus
+    - "+X ATQ si c'est le seul ninja" - solo ninja bonus
+    - Card-specific bonuses (Joe, Reine, Raton Mignon, etc.)
 
     Args:
         player: The player whose bonus_text to resolve.
@@ -902,6 +991,7 @@ def resolve_bonus_text_effects(
     """
     result = BonusTextResult()
     class_counts = count_cards_by_class(player)
+    family_counts = count_cards_by_family(player)
 
     # Map for French names to Family/Class
     family_map = {
@@ -917,6 +1007,7 @@ def resolve_bonus_text_effects(
         "raton": Family.RATON,
         "ratons": Family.RATON,
         "raccoon": Family.RATON,
+        "hall": Family.HALL_OF_WIN,
     }
 
     class_map_lower = {
@@ -938,6 +1029,30 @@ def resolve_bonus_text_effects(
         "economes": CardClass.ECONOME,
     }
 
+    # Helper: check if a specific card is on any board
+    def card_on_any_board(card_name: str) -> bool:
+        """Check if a card with the given name is on any player's board."""
+        name_lower = card_name.lower()
+        # Check player's board
+        for c in player.board:
+            if name_lower in c.name.lower():
+                return True
+        # Check opponent's board if available
+        if opponent:
+            for c in opponent.board:
+                if name_lower in c.name.lower():
+                    return True
+        return False
+
+    # Helper: check if a specific card is on player's board
+    def card_on_player_board(card_name: str) -> bool:
+        """Check if a card with the given name is on player's board."""
+        name_lower = card_name.lower()
+        for c in player.board:
+            if name_lower in c.name.lower():
+                return True
+        return False
+
     for card in player.board:
         if card.card_type == CardType.DEMON:
             continue  # Demons can't benefit from most bonuses
@@ -946,6 +1061,145 @@ def resolve_bonus_text_effects(
         if not bonus:
             continue
 
+        bonus_lower = bonus.lower()
+
+        # === NEGATIVE ATK MODIFIERS ===
+        neg_match = _NEGATIVE_ATK_FOR_CLASS_PATTERN.search(bonus)
+        if neg_match:
+            penalty = int(neg_match.group(1))
+            target_name = neg_match.group(2).lower()
+            if target_name in class_map_lower:
+                target_class = class_map_lower[target_name]
+                matching = class_counts.get(target_class, 0)
+                if matching > 0:
+                    result.attack_penalty += penalty * matching
+                    result.effects.append(
+                        f"{card.name}: {bonus} (-{penalty * matching})"
+                    )
+
+        # === ON-ATTACKED DAMAGE ===
+        on_attacked_match = _ON_ATTACKED_DAMAGE_PATTERN.search(bonus)
+        if on_attacked_match:
+            damage = int(on_attacked_match.group(1))
+            result.on_attacked_damage += damage
+            result.effects.append(f"{card.name}: {bonus}")
+
+        # === PER-TURN IMBLOCABLE ===
+        per_turn_imb_match = _PER_TURN_IMBLOCABLE_PATTERN.search(bonus)
+        if per_turn_imb_match:
+            imb_damage = int(per_turn_imb_match.group(1))
+            result.per_turn_imblocable += imb_damage
+            result.effects.append(f"{card.name}: {bonus}")
+
+        # === SPELL DAMAGE BLOCKING ===
+        spell_block_match = _SPELL_DAMAGE_BLOCK_PATTERN.search(bonus)
+        if spell_block_match:
+            block_amount = int(spell_block_match.group(1))
+            result.spell_damage_block += block_amount
+            result.effects.append(f"{card.name}: {bonus}")
+
+        # === PO GENERATION ===
+        # "+X PO / tour si [family] Y"
+        po_turn_match = _PO_PER_TURN_IF_PATTERN.search(bonus)
+        if po_turn_match:
+            po_bonus = int(po_turn_match.group(1))
+            target_name = po_turn_match.group(2).lower()
+            threshold = int(po_turn_match.group(3))
+            # Check family or class threshold
+            if target_name in family_map:
+                target_family = family_map[target_name]
+                if family_counts.get(target_family, 0) >= threshold:
+                    result.extra_po += po_bonus
+                    result.effects.append(f"{card.name}: {bonus}")
+            elif target_name in class_map_lower:
+                target_class = class_map_lower[target_name]
+                if class_counts.get(target_class, 0) >= threshold:
+                    result.extra_po += po_bonus
+                    result.effects.append(f"{card.name}: {bonus}")
+
+        # "+X PO par tranche de Y ratons"
+        po_ratons_match = _PO_PER_RATONS_PATTERN.search(bonus)
+        if po_ratons_match:
+            po_per = int(po_ratons_match.group(1))
+            per_count = int(po_ratons_match.group(2))
+            raton_count = family_counts.get(Family.RATON, 0)
+            if raton_count >= per_count:
+                tranches = raton_count // per_count
+                result.extra_po += po_per * tranches
+                result.effects.append(f"{card.name}: {bonus} ({tranches} tranches)")
+
+        # === RACCOON FAMILY BONUS ===
+        raccoon_match = _RACCOON_FAMILY_BONUS_PATTERN.search(bonus)
+        if raccoon_match:
+            atk_bonus = int(raccoon_match.group(1))
+            raton_count = family_counts.get(Family.RATON, 0)
+            if raton_count > 0:
+                result.attack_bonus += atk_bonus * raton_count
+                result.effects.append(f"{card.name}: {bonus} ({raton_count} ratons)")
+
+        # === SOLO NINJA BONUS ===
+        solo_ninja_match = _SOLO_NINJA_PATTERN.search(bonus)
+        if solo_ninja_match:
+            atk_bonus = int(solo_ninja_match.group(1))
+            ninja_count = family_counts.get(Family.NINJA, 0)
+            if ninja_count == 1:
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+
+        # === CARD-SPECIFIC BONUSES ===
+        # "+X dgts si Joe est sur plateau"
+        joe_match = _BONUS_IF_JOE_PATTERN.search(bonus)
+        if joe_match:
+            atk_bonus = int(joe_match.group(1))
+            if card_on_any_board("joe"):
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+
+        # "+X ATQ si la Reine est en jeu"
+        reine_match = _BONUS_IF_REINE_PATTERN.search(bonus)
+        if reine_match:
+            atk_bonus = int(reine_match.group(1))
+            if card_on_any_board("reine"):
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+
+        # "Gagne +X ATQ si Raton Mignon"
+        raton_mignon_match = _BONUS_IF_RATON_MIGNON_PATTERN.search(bonus)
+        if raton_mignon_match:
+            atk_bonus = int(raton_mignon_match.group(1))
+            if card_on_player_board("raton mignon"):
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+
+        # "+X ATQ/+Y PV si maître rat"
+        maitre_rat_match = _BONUS_IF_MAITRE_RAT_PATTERN.search(bonus)
+        if maitre_rat_match:
+            atk_bonus = int(maitre_rat_match.group(1))
+            if card_on_player_board("maître rat") or card_on_player_board("maitre rat"):
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+                # Also check for PV bonus
+                pv_match = _PV_IF_MAITRE_RAT_PATTERN.search(bonus)
+                if pv_match:
+                    pv_bonus = int(pv_match.group(1))
+                    result.health_bonus += pv_bonus
+
+        # "Gagne +X ATQ par économes sur le plateau ennemi"
+        econome_enemy_match = _ATK_PER_ENEMY_ECONOME_PATTERN.search(bonus)
+        if econome_enemy_match and opponent:
+            atk_per = int(econome_enemy_match.group(1))
+            enemy_economes = sum(
+                1
+                for c in opponent.board
+                if c.card_class == CardClass.ECONOME and c.card_type != CardType.DEMON
+            )
+            if enemy_economes > 0:
+                result.attack_bonus += atk_per * enemy_economes
+                result.effects.append(
+                    f"{card.name}: {bonus} ({enemy_economes} economes)"
+                )
+
+        # === EXISTING PATTERNS ===
         # Pattern: "+X ATQ si bonus [Class] Y" (threshold-based)
         threshold_match = _BONUS_IF_THRESHOLD_PATTERN.search(bonus)
         if threshold_match:
@@ -955,16 +1209,24 @@ def resolve_bonus_text_effects(
 
             # Check if the threshold is met
             target_class = class_map_lower.get(target_name)
+            target_family = family_map.get(target_name)
             if target_class and class_counts.get(target_class, 0) >= threshold:
                 result.attack_bonus += atk_bonus
                 result.effects.append(f"{card.name}: {bonus}")
-            continue  # Don't double-process
+            elif target_family and family_counts.get(target_family, 0) >= threshold:
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+            continue  # Don't double-process with for_match
 
         # Pattern: "+X ATQ pour les [target]" or "+X ATQ aux [target]"
         for_match = _BONUS_FOR_FAMILY_PATTERN.search(bonus)
         if for_match:
             atk_bonus = int(for_match.group(1))
             target_name = for_match.group(2).lower()
+
+            # Skip if already handled by more specific patterns
+            if "raccoon" in bonus_lower and "familly" in bonus_lower:
+                continue  # Handled by raccoon pattern
 
             # Check if it's a family
             if target_name in family_map:

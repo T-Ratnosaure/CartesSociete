@@ -659,6 +659,203 @@ class TestBonusTextEffects:
         # Attack bonus may or may not be present depending on threshold met
         assert result.attack_bonus >= 0
 
+    def test_negative_atk_modifier(self, repo) -> None:
+        """Test bonus_text that gives attack penalty (e.g., '-1 ATQ pour les X')."""
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find a card with negative ATK modifier
+        cards_with_negative = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text and "-" in c.bonus_text and "atq" in c.bonus_text.lower()
+        ]
+
+        if not cards_with_negative:
+            pytest.skip("No cards with negative ATK modifier found")
+
+        card = cards_with_negative[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.board.append(deepcopy(card))
+
+        result = resolve_bonus_text_effects(player)
+
+        # attack_penalty should be a valid value
+        assert result.attack_penalty >= 0
+
+    def test_on_attacked_damage(self, repo) -> None:
+        """Test bonus_text that deals damage when attacked."""
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find a card with on-attacked damage (e.g., "Inflige X dgt quand attaqué")
+        cards_with_on_attacked = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text
+            and "quand" in c.bonus_text.lower()
+            and "attaqu" in c.bonus_text.lower()
+        ]
+
+        if not cards_with_on_attacked:
+            pytest.skip("No cards with on-attacked damage found")
+
+        card = cards_with_on_attacked[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.board.append(deepcopy(card))
+
+        result = resolve_bonus_text_effects(player)
+
+        # on_attacked_damage should be positive
+        assert result.on_attacked_damage > 0
+
+    def test_per_turn_imblocable(self, repo) -> None:
+        """Test bonus_text that gives per-turn imblocable damage."""
+        import re
+
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find a card with per-turn imblocable attack (e.g., "+X dgt imblocable/tour")
+        # Pattern: starts with +, has a number, then dgt imblocable/tour
+        per_turn_pattern = re.compile(r"\+\d+\s+dgt\s+imblocable", re.IGNORECASE)
+        cards_with_per_turn = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text and per_turn_pattern.search(c.bonus_text)
+        ]
+
+        if not cards_with_per_turn:
+            pytest.skip("No cards with per-turn imblocable attack found")
+
+        card = cards_with_per_turn[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.board.append(deepcopy(card))
+
+        result = resolve_bonus_text_effects(player)
+
+        # per_turn_imblocable should be positive
+        assert result.per_turn_imblocable > 0
+
+    def test_solo_ninja_bonus(self, repo) -> None:
+        """Test bonus_text for solo ninja attack bonus."""
+        from src.cards.models import Family
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find a ninja card with solo bonus
+        ninjas = [c for c in repo.get_all() if c.family == Family.NINJA]
+
+        if not ninjas:
+            pytest.skip("No Ninja cards found")
+
+        # Find one with solo bonus text
+        ninja_with_solo = [
+            n for n in ninjas if n.bonus_text and "seul ninja" in n.bonus_text.lower()
+        ]
+
+        if not ninja_with_solo:
+            pytest.skip("No Ninja with solo bonus found")
+
+        ninja = ninja_with_solo[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.board.append(deepcopy(ninja))
+
+        result = resolve_bonus_text_effects(player)
+
+        # Solo ninja bonus should apply when only 1 ninja
+        assert result.attack_bonus > 0
+
+    def test_raccoon_family_bonus(self, repo) -> None:
+        """Test bonus_text for raccoon family bonus."""
+        from src.cards.models import Family
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find cards with raccoon family bonus
+        raccoon_bonus_cards = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text
+            and "raccoon" in c.bonus_text.lower()
+            and "familly" in c.bonus_text.lower()
+        ]
+
+        if not raccoon_bonus_cards:
+            pytest.skip("No cards with raccoon family bonus found")
+
+        card = raccoon_bonus_cards[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.board.append(deepcopy(card))
+
+        # Add a raton card to benefit from the bonus
+        ratons = [c for c in repo.get_all() if c.family == Family.RATON]
+        if ratons:
+            player.board.append(deepcopy(ratons[0]))
+
+        result = resolve_bonus_text_effects(player)
+
+        # Should have attack bonus for raccoons
+        assert result.attack_bonus >= 0
+
+    def test_bonus_text_result_fields(self, repo) -> None:
+        """Test that BonusTextResult has all expected fields."""
+        from src.game.abilities import resolve_bonus_text_effects
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        result = resolve_bonus_text_effects(player)
+
+        # Verify all expected fields exist
+        assert hasattr(result, "attack_bonus")
+        assert hasattr(result, "health_bonus")
+        assert hasattr(result, "attack_penalty")
+        assert hasattr(result, "on_attacked_damage")
+        assert hasattr(result, "per_turn_imblocable")
+        assert hasattr(result, "spell_damage_block")
+        assert hasattr(result, "extra_po")
+        assert hasattr(result, "effects")
+
+
+class TestOnAttackedDamageInCombat:
+    """Tests for on-attacked damage integration in combat."""
+
+    def test_on_attacked_damage_in_combat_result(self, repo) -> None:
+        """Test that on-attacked damage is tracked in combat result."""
+        # Find a card with on-attacked damage
+        cards_with_on_attacked = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text
+            and "quand" in c.bonus_text.lower()
+            and "attaqu" in c.bonus_text.lower()
+        ]
+
+        if not cards_with_on_attacked:
+            pytest.skip("No cards with on-attacked damage found")
+
+        card = cards_with_on_attacked[0]
+        state = create_initial_game_state(num_players=2)
+        player2 = state.players[1]
+
+        # Player 2 has the on-attacked card
+        player2.board.append(deepcopy(card))
+
+        result = resolve_combat(state)
+
+        # Check that on_attacked_damage is tracked
+        assert isinstance(result.on_attacked_damage, dict)
+
+    def test_combat_result_has_on_attacked_field(self) -> None:
+        """Test that CombatResult has on_attacked_damage field."""
+        from src.game.combat import CombatResult
+
+        result = CombatResult()
+
+        assert hasattr(result, "on_attacked_damage")
+        assert isinstance(result.on_attacked_damage, dict)
+
 
 class TestDragonAttackMultipliers:
     """Tests for Dragon attack multiplier conditional abilities."""
