@@ -10,6 +10,7 @@ from src.cards.models import Card
 
 from .abilities import (
     apply_per_turn_effects,
+    resolve_bonus_text_effects,
     resolve_forgeron_abilities,
     resolve_invocateur_abilities,
     resolve_monture_abilities,
@@ -122,6 +123,11 @@ class GameEngine:
             # Calculate Econome PO bonus
             passives = resolve_passive_abilities(player)
             extra_po = passives.extra_po
+
+            # Calculate per-turn PO bonus from bonus_text effects
+            bonus_text = resolve_bonus_text_effects(player, None)
+            extra_po += bonus_text.per_turn_po
+
             player.po = base_po + extra_po
 
             if extra_po > 0:
@@ -212,13 +218,18 @@ class GameEngine:
             all_eliminations = list(combat_result.eliminations)
 
         for player in self.state.get_alive_players():
-            damage = apply_per_turn_effects(player)
-            if damage > 0:
-                per_turn_damage[player.player_id] = damage
-                # Check for elimination from per-turn damage
-                if player.health <= 0 and not player.eliminated:
-                    player.eliminated = True
-                    all_eliminations.append(player)
+            effects = apply_per_turn_effects(player)
+            # Track net damage (self-damage minus healing)
+            net_damage = effects.total_self_damage - effects.total_pv_heal
+            if net_damage > 0:
+                per_turn_damage[player.player_id] = net_damage
+            elif net_damage < 0:
+                # Negative damage = healing, store as negative for display
+                per_turn_damage[player.player_id] = net_damage
+            # Check for elimination from per-turn damage
+            if player.health <= 0 and not player.eliminated:
+                player.eliminated = True
+                all_eliminations.append(player)
 
         # Check for game over
         if self.state.is_game_over():

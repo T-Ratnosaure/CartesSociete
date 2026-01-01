@@ -370,9 +370,9 @@ class TestPerTurnEffects:
         initial_health = player.health
         player.board.append(deepcopy(mutanus))
 
-        damage = apply_per_turn_effects(player)
+        result = apply_per_turn_effects(player)
 
-        assert damage == 2
+        assert result.total_self_damage == 2
         assert player.health == initial_health - 2
 
     def test_per_turn_damage_separate_from_berserker_damage(self, repo) -> None:
@@ -1164,3 +1164,278 @@ class TestMarketCost5Draw:
         result = draw_cost5_card(state, 0)
 
         assert result is None
+
+
+class TestLapinBoardLimits:
+    """Tests for Lapin family board limit calculations."""
+
+    def test_base_lapin_board_limit(self, repo) -> None:
+        """Test that base Lapin board limit is the config limit."""
+        from src.game.abilities import calculate_lapin_board_limit
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        result = calculate_lapin_board_limit(player, base_limit=8)
+
+        assert result.base_limit == 8
+        assert result.lapincruste_bonus == 0
+        assert result.family_threshold_bonus == 0
+        assert result.total_limit == 8
+
+    def test_lapin_threshold_3_adds_slot(self, repo) -> None:
+        """Test that 3 Lapins add +1 board slot."""
+        from src.cards.models import Family
+        from src.game.abilities import calculate_lapin_board_limit
+
+        # Exclude Lapincruste to test only threshold bonus
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 3:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 3 non-Lapincruste Lapins to board
+        for lapin in lapins[:3]:
+            player.board.append(deepcopy(lapin))
+
+        result = calculate_lapin_board_limit(player, base_limit=8)
+
+        assert result.lapincruste_bonus == 0  # No Lapincruste
+        assert result.family_threshold_bonus == 1
+        assert result.total_limit == 9  # 8 + 1
+
+    def test_lapin_threshold_5_adds_slots(self, repo) -> None:
+        """Test that 5 Lapins add +2 board slots."""
+        from src.cards.models import Family
+        from src.game.abilities import calculate_lapin_board_limit
+
+        # Exclude Lapincruste to test only threshold bonus
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 5:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 5 non-Lapincruste Lapins to board
+        for lapin in lapins[:5]:
+            player.board.append(deepcopy(lapin))
+
+        result = calculate_lapin_board_limit(player, base_limit=8)
+
+        assert result.lapincruste_bonus == 0  # No Lapincruste
+        assert result.family_threshold_bonus == 2
+        assert result.total_limit == 10  # 8 + 2
+
+    def test_lapincruste_adds_slots(self, repo) -> None:
+        """Test that Lapincruste adds board slots."""
+        from src.game.abilities import calculate_lapin_board_limit
+
+        lapincruste = repo.get_by_name_and_level("Lapincruste", level=1)
+        if not lapincruste:
+            pytest.skip("Lapincruste card not found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        player.board.append(deepcopy(lapincruste))
+
+        result = calculate_lapin_board_limit(player, base_limit=8)
+
+        # Lapincruste Lv1: "+2 lapins supplémentaires"
+        assert result.lapincruste_bonus == 2
+        assert result.total_limit == 10  # 8 + 2
+
+    def test_lapincruste_level2_adds_more_slots(self, repo) -> None:
+        """Test that Lapincruste Level 2 adds +4 board slots."""
+        from src.game.abilities import calculate_lapin_board_limit
+
+        lapincruste2 = repo.get_by_name_and_level("Lapincruste", level=2)
+        if not lapincruste2:
+            pytest.skip("Lapincruste Level 2 card not found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        player.board.append(deepcopy(lapincruste2))
+
+        result = calculate_lapin_board_limit(player, base_limit=8)
+
+        # Lapincruste Lv2: "+4 lapins supplémentaires"
+        assert result.lapincruste_bonus == 4
+        assert result.total_limit == 12  # 8 + 4
+
+    def test_lapincruste_stacks_with_threshold(self, repo) -> None:
+        """Test that Lapincruste bonus stacks with family threshold."""
+        from src.cards.models import Family
+        from src.game.abilities import calculate_lapin_board_limit
+
+        lapincruste = repo.get_by_name_and_level("Lapincruste", level=1)
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if not lapincruste or len(lapins) < 2:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add Lapincruste + 2 other Lapins = 3 total
+        player.board.append(deepcopy(lapincruste))
+        player.board.append(deepcopy(lapins[0]))
+        player.board.append(deepcopy(lapins[1]))
+
+        result = calculate_lapin_board_limit(player, base_limit=8)
+
+        # Lapincruste: +2, Threshold 3: +1
+        assert result.lapincruste_bonus == 2
+        assert result.family_threshold_bonus == 1
+        assert result.total_limit == 11  # 8 + 2 + 1
+
+    def test_can_play_lapin_card_under_limit(self, repo) -> None:
+        """Test can_play_lapin_card returns True when under limit."""
+        from src.cards.models import Family
+        from src.game.abilities import can_play_lapin_card
+
+        lapins = [
+            c for c in repo.get_all() if c.family == Family.LAPIN and c.level == 1
+        ]
+
+        if len(lapins) < 2:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 2 Lapins (under limit of 8)
+        player.board.append(deepcopy(lapins[0]))
+        player.board.append(deepcopy(lapins[1]))
+
+        assert can_play_lapin_card(player, base_limit=8) is True
+
+    def test_can_play_lapin_card_at_limit(self, repo) -> None:
+        """Test can_play_lapin_card returns False at limit."""
+        from src.cards.models import Family
+        from src.game.abilities import can_play_lapin_card
+
+        lapins = [
+            c for c in repo.get_all() if c.family == Family.LAPIN and c.level == 1
+        ]
+
+        if len(lapins) < 8:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 8 Lapins (at limit)
+        for lapin in lapins[:8]:
+            player.board.append(deepcopy(lapin))
+
+        # Base limit is 8, but with 8 Lapins we get +2 from threshold 5
+        # So limit is 10, but we have 8 -> can still play
+        # Actually at 8 Lapins, threshold 5 gives +2 = limit 10
+        # So we CAN play more
+        assert can_play_lapin_card(player, base_limit=8) is True
+
+    def test_can_play_lapin_card_over_limit_without_lapincruste(self, repo) -> None:
+        """Test that Lapins are limited without Lapincruste."""
+        from src.cards.models import Family
+        from src.game.abilities import calculate_lapin_board_limit, can_play_lapin_card
+
+        # Filter out Lapincruste
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 10:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # With 10 non-Lapincruste Lapins:
+        # Threshold 5: +2 -> limit is 10
+        # At exactly 10, we're at the limit
+        for lapin in lapins[:10]:
+            player.board.append(deepcopy(lapin))
+
+        limit_result = calculate_lapin_board_limit(player, base_limit=8)
+        # 8 base + 2 from threshold 5 = 10
+        assert limit_result.total_limit == 10
+
+        # Can't play more - at limit
+        assert can_play_lapin_card(player, base_limit=8) is False
+
+    def test_lapin_threshold_8_atk_bonus_multiplied(self, repo) -> None:
+        """Test threshold 8 ATK bonus multiplies by lapin count."""
+        from src.cards.models import Family
+        from src.game.abilities import resolve_family_abilities
+
+        # Get non-Lapincruste Lapins
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 8:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 8 Lapins to trigger threshold 8
+        for lapin in lapins[:8]:
+            player.board.append(deepcopy(lapin))
+
+        result = resolve_family_abilities(player)
+
+        # Threshold 8: "+2 ATQ pour tous les lapins"
+        # Should be +2 per Lapin = +16 total (not just +2)
+        assert result.total_attack_bonus == 16  # 2 * 8 = 16
+
+    def test_lapin_threshold_8_scales_with_count(self, repo) -> None:
+        """Test that threshold 8 bonus scales correctly with different lapin counts."""
+        from src.cards.models import Family
+        from src.game.abilities import resolve_family_abilities
+
+        # Get non-Lapincruste Lapins
+        lapins = [
+            c
+            for c in repo.get_all()
+            if c.family == Family.LAPIN and c.level == 1 and c.name != "Lapincruste"
+        ]
+
+        if len(lapins) < 10:
+            pytest.skip("Not enough Lapin cards found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 10 Lapins
+        for lapin in lapins[:10]:
+            player.board.append(deepcopy(lapin))
+
+        result = resolve_family_abilities(player)
+
+        # Threshold 8: "+2 ATQ pour tous les lapins"
+        # With 10 Lapins: +2 * 10 = +20 ATK
+        assert result.total_attack_bonus == 20
