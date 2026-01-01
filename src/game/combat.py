@@ -6,7 +6,11 @@ special damage types (imblocable), and applying damage to players.
 
 from dataclasses import dataclass, field
 
-from .abilities import resolve_all_abilities
+from .abilities import (
+    resolve_all_abilities,
+    resolve_bonus_text_effects,
+    resolve_conditional_abilities,
+)
 from .state import GameState, PlayerState
 
 
@@ -19,12 +23,14 @@ class DamageBreakdown:
         target_player: The player receiving damage.
         base_attack: Base attack from card stats.
         attack_bonus: Attack bonus from class/family abilities.
-        total_attack: Total attack value (base + bonus).
+        bonus_text_attack: Attack bonus from bonus_text effects.
+        total_attack: Total attack value (base + bonuses).
         base_defense: Base defense from card stats.
         defense_bonus: Defense bonus from class/family abilities.
         target_defense: Total defense (base + bonus).
         base_damage: Normal damage (attack - defense, min 0).
         imblocable_damage: Damage that bypasses defense.
+        conditional_imblocable: Imblocable from Dragon conditional abilities.
         total_damage: Total damage dealt to target's PV.
     """
 
@@ -32,12 +38,14 @@ class DamageBreakdown:
     target_player: PlayerState
     base_attack: int
     attack_bonus: int
+    bonus_text_attack: int
     total_attack: int
     base_defense: int
     defense_bonus: int
     target_defense: int
     base_damage: int
     imblocable_damage: int
+    conditional_imblocable: int
     total_damage: int
 
 
@@ -87,11 +95,12 @@ def calculate_damage(
     """Calculate damage from one player to another.
 
     Combat formula:
-    1. Calculate attacker's total attack (base + ability bonuses)
+    1. Calculate attacker's total attack (base + ability bonuses + bonus_text)
     2. Calculate defender's total HP/defense (base + ability bonuses)
     3. Base damage = attack - defense (min 0)
     4. Add imblocable damage (bypasses defense)
-    5. Total damage = base + imblocable
+    5. Add conditional imblocable (Dragon PO abilities)
+    6. Total damage = base + imblocable + conditional
 
     Args:
         attacker: The attacking player.
@@ -104,10 +113,17 @@ def calculate_damage(
     attacker_abilities = resolve_all_abilities(attacker)
     defender_abilities = resolve_all_abilities(defender)
 
-    # Calculate attack with ability bonuses
+    # Resolve bonus_text effects
+    bonus_text_result = resolve_bonus_text_effects(attacker, defender)
+
+    # Resolve conditional abilities (Dragon PO spending)
+    conditional_result = resolve_conditional_abilities(attacker)
+
+    # Calculate attack with all bonuses
     base_attack = attacker.get_total_attack()
     attack_bonus = attacker_abilities.total_attack_bonus
-    total_attack = base_attack + attack_bonus
+    bonus_text_attack = bonus_text_result.attack_bonus
+    total_attack = base_attack + attack_bonus + bonus_text_attack
 
     # Calculate defense with ability bonuses
     base_defense = defender.get_total_health()
@@ -124,19 +140,24 @@ def calculate_damage(
         + attacker_abilities.total_imblocable_bonus
     )
 
-    total_damage = base_damage + imblocable_damage
+    # Conditional imblocable from Dragon PO abilities
+    conditional_imblocable = conditional_result.total_imblocable_damage
+
+    total_damage = base_damage + imblocable_damage + conditional_imblocable
 
     return DamageBreakdown(
         source_player=attacker,
         target_player=defender,
         base_attack=base_attack,
         attack_bonus=attack_bonus,
+        bonus_text_attack=bonus_text_attack,
         total_attack=total_attack,
         base_defense=base_defense,
         defense_bonus=defense_bonus,
         target_defense=target_defense,
         base_damage=base_damage,
         imblocable_damage=imblocable_damage,
+        conditional_imblocable=conditional_imblocable,
         total_damage=total_damage,
     )
 
@@ -213,12 +234,14 @@ def get_combat_summary(result: CombatResult) -> str:
         bd = breakdowns[0]
         lines.append(f"\n{attacker.name} attacks:")
 
-        # Show attack breakdown with bonuses
+        # Show attack breakdown with all bonuses
+        attack_parts = [f"{bd.base_attack} base"]
         if bd.attack_bonus > 0:
-            lines.append(
-                f"  ATK: {bd.base_attack} base + {bd.attack_bonus} bonus = "
-                f"{bd.total_attack}"
-            )
+            attack_parts.append(f"{bd.attack_bonus} ability")
+        if bd.bonus_text_attack > 0:
+            attack_parts.append(f"{bd.bonus_text_attack} bonus_text")
+        if len(attack_parts) > 1:
+            lines.append(f"  ATK: {' + '.join(attack_parts)} = {bd.total_attack}")
         else:
             lines.append(f"  ATK: {bd.total_attack}")
 
@@ -231,9 +254,18 @@ def get_combat_summary(result: CombatResult) -> str:
             else:
                 defense_str = f"(DEF: {bd.target_defense})"
 
+            # Build imblocable string
+            if bd.conditional_imblocable > 0:
+                imblocable_str = (
+                    f"{bd.imblocable_damage}+{bd.conditional_imblocable} "
+                    f"(Dragon) imblocable"
+                )
+            else:
+                imblocable_str = f"{bd.imblocable_damage} imblocable"
+
             lines.append(
                 f"  vs {bd.target_player.name} {defense_str}: "
-                f"{bd.base_damage} base + {bd.imblocable_damage} imblocable = "
+                f"{bd.base_damage} base + {imblocable_str} = "
                 f"{bd.total_damage} damage"
             )
 

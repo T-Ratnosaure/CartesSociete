@@ -190,6 +190,40 @@ def refresh_market(state: GameState, count: int | None = None) -> list[Card]:
     return []
 
 
+def draw_weapons(state: GameState, player_id: int, count: int) -> list[WeaponCard]:
+    """Draw weapons from the weapon deck to a player's hand.
+
+    Used by Forgeron class ability to draw weapons.
+
+    Args:
+        state: Current game state.
+        player_id: ID of the player drawing weapons.
+        count: Number of weapons to draw.
+
+    Returns:
+        List of drawn weapon cards.
+    """
+    drawn: list[WeaponCard] = []
+
+    # Find the player
+    player = None
+    for p in state.players:
+        if p.player_id == player_id:
+            player = p
+            break
+
+    if player is None:
+        return drawn
+
+    for _ in range(count):
+        if state.weapon_deck:
+            weapon = state.weapon_deck.pop()
+            player.hand.append(weapon)
+            drawn.append(weapon)
+
+    return drawn
+
+
 def get_market_summary(state: GameState) -> str:
     """Generate a summary of the current market state.
 

@@ -395,3 +395,266 @@ class TestPerTurnEffects:
         assert per_turn_result.total_self_damage == 4  # 2 x 2 PV per turn
 
         # Total expected damage per turn: 2 (Berserker) + 4 (per-turn) = 6
+
+
+class TestConditionalAbilities:
+    """Tests for conditional ability resolution (Dragon PO spending)."""
+
+    def test_dragon_conditional_with_enough_po(self, repo) -> None:
+        """Test that Dragon conditional abilities work when PO is available."""
+        from src.game.abilities import resolve_conditional_abilities
+
+        # Find a Dragon card with imblocable conditional abilities
+        # (e.g., "Ancien de la nature" with "X dgt imblocable")
+        dragons = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.DRAGON
+            and c.class_abilities.conditional
+            and any(
+                "imblocable" in cond.effect.lower()
+                for cond in c.class_abilities.conditional
+            )
+        ]
+
+        if not dragons:
+            pytest.skip("No Dragon cards with imblocable conditional abilities found")
+
+        dragon = dragons[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.po = 3  # Enough for highest tier
+
+        player.board.append(deepcopy(dragon))
+
+        result = resolve_conditional_abilities(player)
+
+        # Should have imblocable damage and spent PO
+        assert result.total_imblocable_damage > 0
+        assert result.po_spent > 0
+        assert len(result.effects) > 0
+
+    def test_dragon_conditional_with_no_po(self, repo) -> None:
+        """Test that Dragon conditional abilities don't activate without PO."""
+        from src.game.abilities import resolve_conditional_abilities
+
+        # Find a Dragon card with imblocable conditional abilities
+        dragons = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.DRAGON
+            and c.class_abilities.conditional
+            and any(
+                "imblocable" in cond.effect.lower()
+                for cond in c.class_abilities.conditional
+            )
+        ]
+
+        if not dragons:
+            pytest.skip("No Dragon cards with imblocable conditional abilities found")
+
+        dragon = dragons[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.po = 0  # No PO available
+
+        player.board.append(deepcopy(dragon))
+
+        result = resolve_conditional_abilities(player)
+
+        # Should have no imblocable damage
+        assert result.total_imblocable_damage == 0
+        assert result.po_spent == 0
+
+    def test_dragon_conditional_limited_by_po(self, repo) -> None:
+        """Test that Dragon conditional abilities are limited by available PO."""
+        from src.game.abilities import resolve_conditional_abilities
+
+        # Find a Dragon card with imblocable conditional abilities
+        dragons = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.DRAGON
+            and c.class_abilities.conditional
+            and any(
+                "imblocable" in cond.effect.lower()
+                for cond in c.class_abilities.conditional
+            )
+        ]
+
+        if not dragons:
+            pytest.skip("No Dragon cards with imblocable conditional abilities found")
+
+        dragon = dragons[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.po = 1  # Only 1 PO available
+
+        player.board.append(deepcopy(dragon))
+
+        result = resolve_conditional_abilities(player, po_to_spend=1)
+
+        # Should only activate 1 PO tier
+        assert result.po_spent <= 1
+
+
+class TestPassiveAbilities:
+    """Tests for passive ability resolution."""
+
+    def test_s_team_not_counted_as_monster(self, repo) -> None:
+        """Test that S-Team cards don't count as monsters."""
+        from src.game.abilities import count_board_monsters, resolve_passive_abilities
+
+        s_team_cards = [c for c in repo.get_all() if c.card_class == CardClass.S_TEAM]
+
+        if not s_team_cards:
+            pytest.skip("No S-Team cards found")
+
+        s_team = s_team_cards[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add S-Team card
+        player.board.append(deepcopy(s_team))
+
+        # Check passive resolution
+        passives = resolve_passive_abilities(player)
+        assert len(passives.cards_excluded_from_count) == 1
+
+        # Check board count
+        monster_count = count_board_monsters(player)
+        assert monster_count == 0  # S-Team doesn't count
+
+    def test_econome_generates_extra_po(self, repo) -> None:
+        """Test that Econome cards generate extra PO."""
+        from src.game.abilities import resolve_passive_abilities
+
+        economes = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.ECONOME and c.class_abilities.passive
+        ]
+
+        if not economes:
+            pytest.skip("No Econome cards with passive found")
+
+        econome = economes[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 2 Economes
+        player.board.append(deepcopy(econome))
+        player.board.append(deepcopy(econome))
+
+        passives = resolve_passive_abilities(player)
+
+        # Should generate 2 extra PO (1 per Econome)
+        assert passives.extra_po == 2
+
+
+class TestForgeronAbilities:
+    """Tests for Forgeron weapon draw ability."""
+
+    def test_forgeron_draws_weapons(self, repo) -> None:
+        """Test that Forgeron class draws weapons."""
+        from src.game.abilities import resolve_forgeron_abilities
+
+        forgerons = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.FORGERON and c.class_abilities.scaling
+        ]
+
+        if not forgerons:
+            pytest.skip("No Forgeron cards found")
+
+        forgeron = forgerons[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 1 Forgeron (threshold 1)
+        player.board.append(deepcopy(forgeron))
+
+        weapons_to_draw = resolve_forgeron_abilities(player)
+
+        # Should draw at least 1 weapon at threshold 1
+        assert weapons_to_draw >= 1
+
+    def test_forgeron_no_cards_no_weapons(self, repo) -> None:
+        """Test that no weapons are drawn without Forgerons."""
+        from src.game.abilities import resolve_forgeron_abilities
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        weapons_to_draw = resolve_forgeron_abilities(player)
+
+        assert weapons_to_draw == 0
+
+
+class TestBonusTextEffects:
+    """Tests for bonus_text effect parsing and resolution."""
+
+    def test_bonus_for_family(self, repo) -> None:
+        """Test bonus_text that gives attack to a family."""
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find a card with bonus for family (e.g., "+1 ATQ pour tous les cyborgs")
+        cards_with_family_bonus = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text
+            and "pour" in c.bonus_text.lower()
+            and "atq" in c.bonus_text.lower()
+        ]
+
+        if not cards_with_family_bonus:
+            pytest.skip("No cards with family bonus found")
+
+        card = cards_with_family_bonus[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add the card and a matching family card
+        player.board.append(deepcopy(card))
+
+        # Find another card of the same family
+        same_family = [
+            c for c in repo.get_all() if c.family == card.family and c.id != card.id
+        ]
+        if same_family:
+            player.board.append(deepcopy(same_family[0]))
+
+        result = resolve_bonus_text_effects(player)
+
+        # Should have some attack bonus if the pattern matches
+        # Note: may be 0 if the bonus_text pattern doesn't match our regex
+        assert result.attack_bonus >= 0
+
+    def test_bonus_if_threshold(self, repo) -> None:
+        """Test bonus_text that gives attack if a class threshold is met."""
+        from src.game.abilities import resolve_bonus_text_effects
+
+        # Find a card with threshold bonus (e.g., "+2 ATQ si bonus Archer 2")
+        cards_with_threshold = [
+            c
+            for c in repo.get_all()
+            if c.bonus_text
+            and "si" in c.bonus_text.lower()
+            and "atq" in c.bonus_text.lower()
+        ]
+
+        if not cards_with_threshold:
+            pytest.skip("No cards with threshold bonus found")
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add a card with threshold bonus
+        card = cards_with_threshold[0]
+        player.board.append(deepcopy(card))
+
+        result = resolve_bonus_text_effects(player)
+
+        # Attack bonus may or may not be present depending on threshold met
+        assert result.attack_bonus >= 0

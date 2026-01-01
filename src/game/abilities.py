@@ -10,9 +10,24 @@ from collections import Counter
 from dataclasses import dataclass, field
 from enum import Enum
 
-from src.cards.models import CardClass, CardType, Family, ScalingAbility
+from src.cards.models import (
+    CardClass,
+    CardType,
+    ConditionalAbility,
+    Family,
+    ScalingAbility,
+)
 
 from .state import PlayerState
+
+
+class PassiveType(Enum):
+    """Types of passive abilities."""
+
+    S_TEAM_NOT_MONSTER = "s_team_not_monster"  # Doesn't count as monster
+    ECONOME_PO = "econome_po"  # Generates extra PO
+    DEMON_RESTRICTION = "demon_restriction"  # Demons can't gain most bonuses
+    FORGERON_DRAW = "forgeron_draw"  # Draw weapon cards
 
 
 class AbilityTarget(Enum):
@@ -71,11 +86,73 @@ class AbilityResolutionResult:
     class_counts: dict[CardClass, int] = field(default_factory=dict)
 
 
+@dataclass
+class ConditionalAbilityResult:
+    """Result of resolving conditional abilities (e.g., Dragon PO spending).
+
+    Attributes:
+        total_imblocable_damage: Imblocable damage from conditional abilities.
+        po_spent: Total PO spent on conditional abilities.
+        effects: List of activated conditional effects.
+    """
+
+    total_imblocable_damage: int = 0
+    po_spent: int = 0
+    effects: list[str] = field(default_factory=list)
+
+
+@dataclass
+class PassiveAbilityResult:
+    """Result of resolving passive abilities.
+
+    Attributes:
+        extra_po: Additional PO generated (from Econome).
+        cards_excluded_from_count: Cards that don't count as monsters (S-Team).
+        weapons_to_draw: Number of weapons to draw (from Forgeron).
+    """
+
+    extra_po: int = 0
+    cards_excluded_from_count: list[str] = field(default_factory=list)
+    weapons_to_draw: int = 0
+
+
+@dataclass
+class BonusTextResult:
+    """Result of parsing bonus_text effects.
+
+    Attributes:
+        attack_bonus: Total attack bonus from bonus_text.
+        health_bonus: Total health bonus from bonus_text.
+        effects: Description of active bonus_text effects.
+    """
+
+    attack_bonus: int = 0
+    health_bonus: int = 0
+    effects: list[str] = field(default_factory=list)
+
+
 # Regex patterns for parsing ability effects
 _ATK_PATTERN = re.compile(r"\+(\d+)\s*(?:ATQ|dgt|atq)", re.IGNORECASE)
 _PV_PATTERN = re.compile(r"\+(\d+)\s*(?:PV|pv|HP)", re.IGNORECASE)
 _SELF_DAMAGE_PATTERN = re.compile(r"-(\d+)\s*(?:PV|pv)", re.IGNORECASE)
 _IMBLOCABLE_PATTERN = re.compile(r"(\d+)\s*(?:dgt|dgts)?\s*imblocable", re.IGNORECASE)
+
+# Patterns for conditional ability conditions
+_PO_CONDITION_PATTERN = re.compile(r"(\d+)\s*PO", re.IGNORECASE)
+
+# Patterns for bonus_text effects
+_BONUS_FOR_FAMILY_PATTERN = re.compile(
+    r"\+(\d+)\s*(?:ATQ|dgt|atq)\s+(?:pour|aux)\s+(?:les\s+)?(\w+)",
+    re.IGNORECASE,
+)
+_BONUS_FOR_CLASS_PATTERN = re.compile(
+    r"\+(\d+)\s*(?:ATQ|dgt|atq)\s+(?:pour|aux)\s+(?:les\s+)?(\w+)",
+    re.IGNORECASE,
+)
+_BONUS_IF_THRESHOLD_PATTERN = re.compile(
+    r"\+(\d+)\s*(?:ATQ|dgt|atq)\s+si\s+(?:bonus\s+)?(\w+)\s+(\d+)",
+    re.IGNORECASE,
+)
 
 # Patterns for conditional targeting
 _FOR_CLASS_PATTERN = re.compile(r"pour (?:les |tous les )?(\w+)", re.IGNORECASE)
@@ -355,32 +432,298 @@ def resolve_all_abilities(player: PlayerState) -> AbilityResolutionResult:
     return combined
 
 
-def get_player_attack_with_abilities(player: PlayerState) -> int:
-    """Get total attack including ability bonuses.
+def resolve_conditional_abilities(
+    player: PlayerState,
+    po_to_spend: int | None = None,
+) -> ConditionalAbilityResult:
+    """Resolve conditional abilities (e.g., Dragon PO spending).
+
+    Dragon class cards have conditional abilities like:
+    - "1 PO": "2 dgt imblocable"
+    - "2 PO": "3 dgt imblocable"
+
+    This function determines which conditional ability to activate based on
+    available PO and returns the effect.
 
     Args:
-        player: The player to calculate attack for.
+        player: The player whose abilities to resolve.
+        po_to_spend: Optional PO amount to spend. If None, uses player's full PO.
 
     Returns:
-        Total attack value.
+        ConditionalAbilityResult with imblocable damage and PO spent.
     """
-    base_attack = player.get_total_attack()
-    abilities = resolve_all_abilities(player)
-    return base_attack + abilities.total_attack_bonus
+    result = ConditionalAbilityResult()
+    available_po = po_to_spend if po_to_spend is not None else player.po
+
+    # Find all Dragon cards with conditional abilities
+    for card in player.board:
+        if card.card_class != CardClass.DRAGON:
+            continue
+        if card.card_type == CardType.DEMON:
+            continue  # Demons can't use most abilities
+
+        conditionals = card.class_abilities.conditional
+        if not conditionals:
+            continue
+
+        # Find the best conditional ability we can afford
+        best_ability: ConditionalAbility | None = None
+        best_po_cost = 0
+
+        for ability in conditionals:
+            # Parse PO cost from condition
+            match = _PO_CONDITION_PATTERN.search(ability.condition)
+            if match:
+                po_cost = int(match.group(1))
+                if po_cost <= available_po and po_cost > best_po_cost:
+                    best_ability = ability
+                    best_po_cost = po_cost
+
+        if best_ability:
+            # Parse the effect for imblocable damage
+            effect_match = _IMBLOCABLE_PATTERN.search(best_ability.effect)
+            if effect_match:
+                damage = int(effect_match.group(1))
+                result.total_imblocable_damage += damage
+                result.po_spent += best_po_cost
+                result.effects.append(
+                    f"{card.name}: {best_ability.effect} (cost: {best_po_cost} PO)"
+                )
+                available_po -= best_po_cost
+
+    return result
 
 
-def get_player_health_with_abilities(player: PlayerState) -> int:
-    """Get total health including ability bonuses.
+def resolve_passive_abilities(player: PlayerState) -> PassiveAbilityResult:
+    """Resolve passive abilities for a player.
+
+    Passive abilities are always-active effects:
+    - S-Team: "Ne compte pas comme un monstre du plateau"
+    - Econome: "les économes apportent 1- nb d'économes PO/Tour"
 
     Args:
-        player: The player to calculate health for.
+        player: The player whose passive abilities to resolve.
 
     Returns:
-        Total health value.
+        PassiveAbilityResult with all passive effects.
     """
-    base_health = player.get_total_health()
-    abilities = resolve_all_abilities(player)
-    return base_health + abilities.total_health_bonus
+    result = PassiveAbilityResult()
+    econome_count = 0
+
+    for card in player.board:
+        passive = card.class_abilities.passive
+
+        if not passive:
+            # Check family passive
+            passive = card.family_abilities.passive
+
+        if not passive:
+            continue
+
+        passive_lower = passive.lower()
+
+        # S-Team: doesn't count as monster
+        if "ne compte pas comme un monstre" in passive_lower:
+            result.cards_excluded_from_count.append(card.id)
+
+        # Econome: extra PO generation
+        if (
+            "économes apportent" in passive_lower
+            or "economes apportent" in passive_lower
+        ):
+            econome_count += 1
+
+    # Econome passive: each Econome adds 1 extra PO
+    # Text says "les économes apportent 1- nb d'économes PO/Tour"
+    # This means 1 PO per Econome
+    if econome_count > 0:
+        result.extra_po = econome_count
+
+    return result
+
+
+def resolve_forgeron_abilities(player: PlayerState) -> int:
+    """Resolve Forgeron weapon draw ability.
+
+    Forgeron class abilities allow drawing weapons:
+    - Threshold 1: "Piocher une arme" (draw 1 weapon)
+    - Threshold 2: "2 armes" (draw 2 weapons)
+    - Threshold 3: "3 armes" (draw 3 weapons)
+
+    Args:
+        player: The player whose Forgeron abilities to resolve.
+
+    Returns:
+        Number of weapons to draw.
+    """
+    forgeron_count = sum(
+        1
+        for card in player.board
+        if card.card_class == CardClass.FORGERON and card.card_type != CardType.DEMON
+    )
+
+    if forgeron_count == 0:
+        return 0
+
+    # Find a Forgeron card to get its scaling abilities
+    for card in player.board:
+        if card.card_class != CardClass.FORGERON:
+            continue
+        if card.card_type == CardType.DEMON:
+            continue
+
+        scaling = card.class_abilities.scaling
+        if not scaling:
+            continue
+
+        # Get the active scaling ability
+        active = get_active_scaling_ability(scaling, forgeron_count)
+        if not active:
+            continue
+
+        # Parse the number of weapons to draw
+        effect_lower = active.effect.lower()
+        if "piocher une arme" in effect_lower:
+            return 1
+        elif "2 armes" in effect_lower:
+            return 2
+        elif "3 armes" in effect_lower:
+            return 3
+
+    return 0
+
+
+def count_board_monsters(player: PlayerState) -> int:
+    """Count monsters on board, excluding S-Team and demons.
+
+    S-Team cards have the passive "Ne compte pas comme un monstre du plateau"
+    and should be excluded from the board count for limit purposes.
+
+    Args:
+        player: The player whose board to count.
+
+    Returns:
+        Number of monsters counting towards board limit.
+    """
+    passives = resolve_passive_abilities(player)
+    excluded_ids = set(passives.cards_excluded_from_count)
+
+    count = 0
+    for card in player.board:
+        if card.card_type == CardType.DEMON:
+            continue  # Demons don't count towards board limit
+        if card.id in excluded_ids:
+            continue  # S-Team cards don't count
+        count += 1
+
+    return count
+
+
+def resolve_bonus_text_effects(
+    player: PlayerState,
+    opponent: PlayerState | None = None,
+) -> BonusTextResult:
+    """Resolve bonus_text effects for combat.
+
+    Parses and resolves bonus_text patterns like:
+    - "+X ATQ pour les [family/class]" - attack bonus for matching cards
+    - "+X ATQ si bonus [Class] Y" - attack bonus if class threshold met
+    - "+X ATQ aux [family] alliés" - attack bonus to allied family
+
+    Args:
+        player: The player whose bonus_text to resolve.
+        opponent: Optional opponent for opponent-dependent effects.
+
+    Returns:
+        BonusTextResult with total bonuses from bonus_text.
+    """
+    result = BonusTextResult()
+    class_counts = count_cards_by_class(player)
+
+    # Map for French names to Family/Class
+    family_map = {
+        "cyborg": Family.CYBORG,
+        "cyborgs": Family.CYBORG,
+        "nature": Family.NATURE,
+        "atlantide": Family.ATLANTIDE,
+        "ninja": Family.NINJA,
+        "ninjas": Family.NINJA,
+        "neige": Family.NEIGE,
+        "lapin": Family.LAPIN,
+        "lapins": Family.LAPIN,
+        "raton": Family.RATON,
+        "ratons": Family.RATON,
+        "raccoon": Family.RATON,
+    }
+
+    class_map_lower = {
+        "combattants": CardClass.COMBATTANT,
+        "combattant": CardClass.COMBATTANT,
+        "défenseurs": CardClass.DEFENSEUR,
+        "defenseurs": CardClass.DEFENSEUR,
+        "défenseur": CardClass.DEFENSEUR,
+        "defenseur": CardClass.DEFENSEUR,
+        "mages": CardClass.MAGE,
+        "mage": CardClass.MAGE,
+        "archers": CardClass.ARCHER,
+        "archer": CardClass.ARCHER,
+        "dragons": CardClass.DRAGON,
+        "dragon": CardClass.DRAGON,
+        "s-team": CardClass.S_TEAM,
+        "econome": CardClass.ECONOME,
+        "économes": CardClass.ECONOME,
+        "economes": CardClass.ECONOME,
+    }
+
+    for card in player.board:
+        if card.card_type == CardType.DEMON:
+            continue  # Demons can't benefit from most bonuses
+
+        bonus = card.bonus_text
+        if not bonus:
+            continue
+
+        # Pattern: "+X ATQ si bonus [Class] Y" (threshold-based)
+        threshold_match = _BONUS_IF_THRESHOLD_PATTERN.search(bonus)
+        if threshold_match:
+            atk_bonus = int(threshold_match.group(1))
+            target_name = threshold_match.group(2).lower()
+            threshold = int(threshold_match.group(3))
+
+            # Check if the threshold is met
+            target_class = class_map_lower.get(target_name)
+            if target_class and class_counts.get(target_class, 0) >= threshold:
+                result.attack_bonus += atk_bonus
+                result.effects.append(f"{card.name}: {bonus}")
+            continue  # Don't double-process
+
+        # Pattern: "+X ATQ pour les [target]" or "+X ATQ aux [target]"
+        for_match = _BONUS_FOR_FAMILY_PATTERN.search(bonus)
+        if for_match:
+            atk_bonus = int(for_match.group(1))
+            target_name = for_match.group(2).lower()
+
+            # Check if it's a family
+            if target_name in family_map:
+                target_family = family_map[target_name]
+                # Count cards of that family
+                matching = sum(
+                    1
+                    for c in player.board
+                    if c.family == target_family and c.card_type != CardType.DEMON
+                )
+                if matching > 0:
+                    result.attack_bonus += atk_bonus * matching
+                    result.effects.append(f"{card.name}: {bonus} ({matching} cards)")
+            # Check if it's a class
+            elif target_name in class_map_lower:
+                target_class = class_map_lower[target_name]
+                matching = class_counts.get(target_class, 0)
+                if matching > 0:
+                    result.attack_bonus += atk_bonus * matching
+                    result.effects.append(f"{card.name}: {bonus} ({matching} cards)")
+
+    return result
 
 
 def get_ability_summary(player: PlayerState) -> str:
