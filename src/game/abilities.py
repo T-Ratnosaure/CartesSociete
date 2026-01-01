@@ -161,6 +161,8 @@ class BonusTextResult:
         reduced_monture_threshold: Reduced threshold for Monture ability.
         pv_damage_from_healing: Damage dealt per PV healed this turn.
         gold_if_imblocable: Extra gold if imblocable damage is dealt.
+        flat_imblocable_damage: Flat imblocable damage dealt (e.g., Demon Majeur).
+        lifelink: If True, gain PV equal to damage dealt.
         effects: Description of active bonus_text effects.
     """
 
@@ -198,6 +200,8 @@ class BonusTextResult:
     reduced_monture_threshold: int = 0
     pv_damage_from_healing: int = 0
     gold_if_imblocable: int = 0
+    flat_imblocable_damage: int = 0
+    lifelink: bool = False
     effects: list[str] = field(default_factory=list)
 
 
@@ -287,6 +291,16 @@ _ON_ATTACKED_DAMAGE_PATTERN = re.compile(
 # Patterns for bonus_text: per-turn imblocable
 _PER_TURN_IMBLOCABLE_PATTERN = re.compile(
     r"\+(\d+)\s+dgt\s+imblocable/?tour", re.IGNORECASE
+)
+
+# Patterns for bonus_text: flat imblocable damage (e.g., "10 dgt imblocable")
+_FLAT_IMBLOCABLE_PATTERN = re.compile(
+    r"^(\d+)\s+(?:dgt|dgts)\s+imblocable$", re.IGNORECASE
+)
+
+# Patterns for bonus_text: lifelink ("Gagne en PV le nombre de DGT qu'elle inflige")
+_LIFELINK_PATTERN = re.compile(
+    r"[Gg]agne\s+en\s+PV\s+le\s+nombre\s+de\s+(?:DGT|dgt)", re.IGNORECASE
 )
 
 # Patterns for bonus_text: spell damage blocking
@@ -1478,6 +1492,18 @@ def resolve_bonus_text_effects(
             result.per_turn_imblocable += imb_damage
             result.effects.append(f"{card.name}: {bonus}")
 
+        # === FLAT IMBLOCABLE DAMAGE ===
+        flat_imb_match = _FLAT_IMBLOCABLE_PATTERN.search(bonus)
+        if flat_imb_match:
+            imb_damage = int(flat_imb_match.group(1))
+            result.flat_imblocable_damage += imb_damage
+            result.effects.append(f"{card.name}: {imb_damage} imblocable")
+
+        # === LIFELINK ===
+        if _LIFELINK_PATTERN.search(bonus):
+            result.lifelink = True
+            result.effects.append(f"{card.name}: lifelink")
+
         # === SPELL DAMAGE BLOCKING ===
         spell_block_match = _SPELL_DAMAGE_BLOCK_PATTERN.search(bonus)
         if spell_block_match:
@@ -1554,7 +1580,8 @@ def resolve_bonus_text_effects(
         raton_mignon_match = _BONUS_IF_RATON_MIGNON_PATTERN.search(bonus)
         if raton_mignon_match:
             atk_bonus = int(raton_mignon_match.group(1))
-            if card_on_player_board("raton mignon"):
+            # Card is actually named "Ratons Mignons" (plural)
+            if card_on_player_board("ratons mignons"):
                 result.attack_bonus += atk_bonus
                 result.effects.append(f"{card.name}: {bonus}")
 
@@ -1965,6 +1992,24 @@ def resolve_bonus_text_effects(
                 result.effects.append(
                     f"{card.name}: +{atk_val * women_count} ATQ (~{women_count} femmes)"
                 )
+
+    # === DEMON-SPECIFIC EFFECTS ===
+    # Demons are normally skipped, but we need to parse their own bonus_text
+    # for effects like flat imblocable damage that they inherently have.
+    for card in player.board:
+        if card.card_type != CardType.DEMON:
+            continue
+
+        bonus = card.bonus_text
+        if not bonus:
+            continue
+
+        # Flat imblocable damage (e.g., "10 dgt imblocable")
+        flat_imb_match = _FLAT_IMBLOCABLE_PATTERN.search(bonus)
+        if flat_imb_match:
+            imb_damage = int(flat_imb_match.group(1))
+            result.flat_imblocable_damage += imb_damage
+            result.effects.append(f"{card.name}: {imb_damage} imblocable")
 
     return result
 
