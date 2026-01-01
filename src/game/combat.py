@@ -22,6 +22,7 @@ class DamageBreakdown:
         source_player: The player dealing damage.
         target_player: The player receiving damage.
         base_attack: Base attack from card stats.
+        weapon_attack: Attack bonus from equipped weapons.
         attack_bonus: Attack bonus from class/family abilities.
         bonus_text_attack: Attack bonus from bonus_text effects.
         diplo_attack_bonus: Attack bonus from Diplo synergy.
@@ -29,6 +30,7 @@ class DamageBreakdown:
         attack_multiplier: Attack multiplier from conditional abilities (Dragon).
         total_attack: Total attack value (base + bonuses) * multiplier.
         base_defense: Base defense from card stats.
+        weapon_defense: Defense bonus from equipped weapons.
         defense_bonus: Defense bonus from class/family abilities.
         defense_multiplier: Multiplier from bonus_text (e.g., "Double PV défense").
         target_defense: Total defense (base + bonus) * multiplier.
@@ -42,6 +44,7 @@ class DamageBreakdown:
     source_player: PlayerState
     target_player: PlayerState
     base_attack: int
+    weapon_attack: int
     attack_bonus: int
     bonus_text_attack: int
     diplo_attack_bonus: int
@@ -49,6 +52,7 @@ class DamageBreakdown:
     attack_multiplier: int
     total_attack: int
     base_defense: int
+    weapon_defense: int
     defense_bonus: int
     defense_multiplier: int
     target_defense: int
@@ -142,6 +146,11 @@ def calculate_damage(
     # Calculate attack with all bonuses
     base_attack = attacker.get_total_attack()
 
+    # Add weapon attack bonus
+    weapon_attack = attacker.get_total_weapon_attack()
+    # Apply weapon_atk_bonus from bonus_text (e.g., "+X ATQ par arme équipée")
+    weapon_attack += attacker_bonus_text.weapon_atk_bonus
+
     # Apply minimum ATK floor if applicable (e.g., "Les lapins ont minimum 4 ATQ")
     if attacker_bonus_text.min_atk_floor > 0 and attacker_bonus_text.min_atk_family:
         from src.cards.models import Family
@@ -172,9 +181,11 @@ def calculate_damage(
 
     # Apply multiplier to base attack, then add bonuses minus penalties
     # Multiplier only affects base attack (from Dragon conditional abilities)
+    # Weapon attack is added after multiplier (weapons don't multiply)
     total_attack = max(
         0,
         (base_attack * attack_multiplier)
+        + weapon_attack
         + attack_bonus
         + bonus_text_attack
         + diplo_attack_bonus
@@ -186,13 +197,15 @@ def calculate_damage(
 
     # Calculate defense with ability bonuses and multiplier
     base_defense = defender.get_total_health()
+    # Add weapon defense bonus
+    weapon_defense = defender.get_total_weapon_health()
     defense_bonus = defender_abilities.total_health_bonus
     # Add Diplo PV bonus to defense
     diplo_pv_bonus = defender_bonus_text.diplo_pv_bonus
     # Apply defense multiplier (e.g., "Double PV défense")
     defense_multiplier = defender_bonus_text.defense_multiplier
     target_defense = (
-        base_defense + defense_bonus + diplo_pv_bonus
+        base_defense + weapon_defense + defense_bonus + diplo_pv_bonus
     ) * defense_multiplier
 
     # Base damage: attack minus defense, minimum 0
@@ -224,6 +237,7 @@ def calculate_damage(
         source_player=attacker,
         target_player=defender,
         base_attack=base_attack,
+        weapon_attack=weapon_attack,
         attack_bonus=attack_bonus,
         bonus_text_attack=bonus_text_attack,
         diplo_attack_bonus=diplo_attack_bonus,
@@ -231,6 +245,7 @@ def calculate_damage(
         attack_multiplier=attack_multiplier,
         total_attack=total_attack,
         base_defense=base_defense,
+        weapon_defense=weapon_defense,
         defense_bonus=defense_bonus,
         defense_multiplier=defense_multiplier,
         target_defense=target_defense,
