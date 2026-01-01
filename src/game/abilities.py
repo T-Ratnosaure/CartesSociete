@@ -130,30 +130,74 @@ class BonusTextResult:
         attack_bonus: Total attack bonus from bonus_text.
         health_bonus: Total health bonus from bonus_text.
         attack_penalty: Total attack penalty (negative modifier) from bonus_text.
+        health_penalty: Total health penalty from bonus_text.
         on_attacked_damage: Damage dealt when this player is attacked.
         per_turn_imblocable: Per-turn imblocable damage from bonus_text.
         per_turn_pv_heal: Per-turn PV healing from bonus_text.
         per_turn_po: Per-turn PO generation from bonus_text.
+        per_turn_self_damage: Per-turn PV loss from bonus_text.
         spell_damage_block: Amount of spell damage blocked.
+        spell_damage: Spell damage dealt by mages.
+        spell_damage_bonus: Bonus to all spell damage.
         extra_po: Extra PO generated from bonus_text effects (one-time).
         deck_reveal_atk: ATK bonus from deck reveal mechanic.
+        deck_reveal_multiplier: Multiplier for deck reveal ATK.
         min_atk_floor: Minimum ATK floor for family cards.
         min_atk_family: Which family the ATK floor applies to.
+        defense_multiplier: Multiplier for defense during defense phase.
+        demon_imblocable_bonus: Imblocable damage bonus for summoned demon.
+        demon_atk_bonus: ATK bonus for summoned demon.
+        demon_pv_penalty: PV penalty for summoned demon.
+        weapon_atk_bonus: ATK bonus for all equipped weapons.
+        kdo_atk_bonus: Extra ATK per equipped Kdo.
+        kdo_pv_bonus: Extra PV per equipped Kdo.
+        diplo_atk_bonus: ATK bonus from Diplo synergy.
+        diplo_pv_bonus: PV bonus from Diplo synergy.
+        imblocable_scaling: Extra imblocable per X imblocable dealt.
+        imblocable_scaling_ratio: How many imblocable trigger the scaling.
+        enemy_high_atk_debuff: ATK debuff applied to enemy's strongest monster.
+        fire_vulnerability: If True, PV = 0 when hit by fire magic.
+        demons_gain_all_bonuses: If True, demons can gain normal bonuses.
+        reduced_monture_threshold: Reduced threshold for Monture ability.
+        pv_damage_from_healing: Damage dealt per PV healed this turn.
+        gold_if_imblocable: Extra gold if imblocable damage is dealt.
         effects: Description of active bonus_text effects.
     """
 
     attack_bonus: int = 0
     health_bonus: int = 0
     attack_penalty: int = 0
+    health_penalty: int = 0
     on_attacked_damage: int = 0
     per_turn_imblocable: int = 0
     per_turn_pv_heal: int = 0
     per_turn_po: int = 0
+    per_turn_self_damage: int = 0
     spell_damage_block: int = 0
+    spell_damage: int = 0
+    spell_damage_bonus: int = 0
     extra_po: int = 0
     deck_reveal_atk: int = 0
+    deck_reveal_multiplier: int = 1
     min_atk_floor: int = 0
     min_atk_family: str = ""
+    defense_multiplier: int = 1
+    demon_imblocable_bonus: int = 0
+    demon_atk_bonus: int = 0
+    demon_pv_penalty: int = 0
+    weapon_atk_bonus: int = 0
+    kdo_atk_bonus: int = 0
+    kdo_pv_bonus: int = 0
+    diplo_atk_bonus: int = 0
+    diplo_pv_bonus: int = 0
+    imblocable_scaling: int = 0
+    imblocable_scaling_ratio: int = 0
+    enemy_high_atk_debuff: int = 0
+    fire_vulnerability: bool = False
+    demons_gain_all_bonuses: bool = False
+    reduced_monture_threshold: int = 0
+    pv_damage_from_healing: int = 0
+    gold_if_imblocable: int = 0
     effects: list[str] = field(default_factory=list)
 
 
@@ -343,18 +387,154 @@ _DECK_REVEAL_ATK_PATTERN: re.Pattern[str] = re.compile(
     r"retourner\s+une\s+carte\s+de\s+la\s+pile.*gagne\s+son\s+ATQ", re.IGNORECASE
 )
 
-# === FUTURE WORK: Weapon/Spell Systems ===
-# These patterns are recognized but require new game systems to implement:
-#
-# "+X ATQ si équipé de la Hallebarde antique" - Weapon equipment system
-# Requires: Weapon cards, equipment slots, weapon attachment mechanics
-# Cards: Lapiculteur (Lv1/Lv2)
-#
-# "Magie de carottes X DGT des sorts" - Spell damage system
-# Requires: Spell cards, spell casting mechanics, spell damage resolution
-# Cards: Lapivoque (Lv1/Lv2)
-#
-# These effects are NOT currently parsed or implemented.
+# Deck reveal with multiplier (Yetiir Lvl 2: "x2, jusqu'à la fin du tour")
+_DECK_REVEAL_MULT_PATTERN = re.compile(
+    r"1/tour.*\+ATQ\s+de\s+la\s+1[èe]re\s+carte\s+de\s+la\s+pile\s*(?:x(\d+))?",
+    re.IGNORECASE,
+)
+
+# === NEW PATTERNS FOR BONUS_TEXT EFFECTS ===
+
+# Diplo synergy patterns
+_DIPLO_CROSS_ATK_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+si\s+diplo\s+(terre|air|mer)", re.IGNORECASE
+)
+_DIPLO_CROSS_PV_PATTERN = re.compile(
+    r"\+(\d+)\s*PV\s+si\s+Diplo\s+(terre|air|mer)", re.IGNORECASE
+)
+_DIPLO_COMBINED_PATTERN = re.compile(
+    r"Les?\s+\+(\d+)\s+ATQ\s+si\s+diplo\s+(\w+),\s*\+(\d+)\s+PV\s+si\s+Diplo\s+(\w+)",
+    re.IGNORECASE,
+)
+
+# Spell damage patterns
+_SPELL_DAMAGE_PATTERN = re.compile(
+    r"sorts?:\s*(\d+)\s*(?:dgt|DGT|dégâts)\s*(?:imblocables?|de\s+(?:feu|glace))?",
+    re.IGNORECASE,
+)
+_SPELL_DAMAGE_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s+(?:au\s+)?dgt\s+des\s+sorts\s+des\s+mages", re.IGNORECASE
+)
+_SPELL_DAMAGE_WITH_KDO_PATTERN = re.compile(
+    r"sorts?:\s*(\d+)\s*dgt\s+de\s+glace\s*\+(\d+)\s*par\s+Kdo", re.IGNORECASE
+)
+_MAGIE_CAROTTES_PATTERN = re.compile(
+    r"Magie\s+de\s+carottes\s+(\d+)\s+DGT\s+des\s+sorts", re.IGNORECASE
+)
+
+# Defense multiplier patterns
+_DOUBLE_PV_DEFENSE_PATTERN = re.compile(
+    r"Double\s+ses\s+PV\s+lors\s+des\s+d[ée]fenses", re.IGNORECASE
+)
+
+# ATK/PV tradeoff for class patterns
+_ATK_PV_TRADEOFF_CLASS_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s*/\s*-(\d+)\s*PV\s+pour\s+les\s+(\w+)", re.IGNORECASE
+)
+
+# Demon bonus patterns
+_DEMON_IMBLOCABLE_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s+dgts?\s+imblocable\s+pour\s+le\s+d[ée]mon", re.IGNORECASE
+)
+_DEMON_ATK_PV_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s*/\s*-(\d+)\s*PV\s+pour\s+le\s+d[ée]mon", re.IGNORECASE
+)
+_DEMONS_GAIN_BONUSES_PATTERN = re.compile(
+    r"[Ll]es\s+[Dd][ée]mons\s+gagnent\s+les\s+bonus\s+comme\s+les\s+autres",
+    re.IGNORECASE,
+)
+
+# Weapon/Equipment patterns
+_WEAPON_EQUIPPED_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+si\s+[ée]quip[ée]\s+de\s+(?:la\s+)?(\w+(?:\s+\w+)*)",
+    re.IGNORECASE,
+)
+_WEAPON_ATK_IF_NINJA_PATTERN = re.compile(
+    r"[Tt]outes\s+les\s+armes\s+\+(\d+)\s*ATQ\s+si\s+ninja\s+choisi", re.IGNORECASE
+)
+_WEAPON_ATK_PER_RATON_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+sur\s+une\s+arme\s+par\s+raton\s+en\s+jeu", re.IGNORECASE
+)
+
+# Kdo (Gift) patterns
+_KDO_PV_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s*PV\s+par\s+Kdo\s+[ée]quip[ée]\s+sur\s+lui", re.IGNORECASE
+)
+_KDO_ATK_EXTRA_PATTERN = re.compile(
+    r"[Ll]es\s+Kdo\s+donnent\s+\+(\d+)\s*ATQ\s+suppl[ée]mentaire", re.IGNORECASE
+)
+
+# Sacrifice patterns
+_SACRIFICE_FOR_ITEM_PATTERN = re.compile(
+    r"sacrifier\s+cette\s+carte,?\s+vous\s+gagnez\s+(\w+(?:\s+\w+)*)", re.IGNORECASE
+)
+_SACRIFICE_IF_THRESHOLD_PATTERN = re.compile(
+    r"si\s+(\d+)\s+(\w+),?\s+sacrifier\s+cette\s+carte", re.IGNORECASE
+)
+
+# Imblocable scaling pattern
+_IMBLOCABLE_SCALING_PATTERN = re.compile(
+    r"\+(\d+)\s+dgt\s+imblocable\s+tous\s+les\s+(\d+)\s+dgt\s+imblocables?",
+    re.IGNORECASE,
+)
+
+# Per-turn self-damage pattern
+_PER_TURN_SELF_DAMAGE_PATTERN = re.compile(
+    r"[Vv]ous\s+perdez\s+(\d+)\s+PV\s+(?:imblocables?\s+)?par\s+tour", re.IGNORECASE
+)
+
+# Enemy high ATK debuff pattern
+_ENEMY_HIGH_ATK_DEBUFF_PATTERN = re.compile(
+    r"-(\d+)\s*ATQ\s+pour\s+le\s+monstre\s+ennemi\s+avec\s+le\s+plus\s+d['']?ATQ",
+    re.IGNORECASE,
+)
+
+# Fire vulnerability pattern
+_FIRE_VULNERABILITY_PATTERN = re.compile(
+    r"PV\s*=\s*0\s+si\s+magie\s+de\s+feu", re.IGNORECASE
+)
+
+# Reduced monture threshold pattern
+_REDUCED_MONTURE_PATTERN = re.compile(
+    r"il\s+suffit\s+de\s+(\d+)\s+montures?\s+pour\s+activer", re.IGNORECASE
+)
+
+# Gold if imblocable pattern
+_GOLD_IF_IMBLOCABLE_PATTERN = re.compile(
+    r"\+(\d+)\s+d['']?or\s+si\s+des?\s+dgt\s+imblocable\s+sont?\s+inflig[ée]s?",
+    re.IGNORECASE,
+)
+
+# PV damage from healing pattern
+_PV_DAMAGE_FROM_HEALING_PATTERN = re.compile(
+    r"[Ii]nflige\s+(\d+)\s+DGT\s+par\s+PV\s+rendu\s+ce\s+tour", re.IGNORECASE
+)
+
+# Class threshold bonus pattern (e.g., "+2 ATQ si bonus Archer 2")
+_CLASS_BONUS_THRESHOLD_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+si\s+bonus\s+(\w+)\s+(\d+)", re.IGNORECASE
+)
+
+# Family count threshold pattern (e.g., "+4 ATQ si raccoon familly 2")
+_FAMILY_COUNT_THRESHOLD_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+(?:si|contre\s+si)\s+(?:raccoon\s+familly|lapins?|ratons?)\s+(\d+)",
+    re.IGNORECASE,
+)
+
+# Hall of Win threshold pattern
+_HALL_OF_WIN_THRESHOLD_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+si\s+Hall\s+of\s+win\s+(\d+)", re.IGNORECASE
+)
+
+# Cyborg and S-Team combined bonus pattern
+_CYBORG_STEAM_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+pour\s+les\s+cyborgs?\s+et\s+S-Team", re.IGNORECASE
+)
+
+# Women Atlantide bonus pattern
+_WOMEN_FAMILY_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s*ATQ\s+pour\s+les\s+femmes\s+(\w+)", re.IGNORECASE
+)
 
 
 def count_cards_by_class(player: PlayerState) -> Counter[CardClass]:
@@ -1518,6 +1698,273 @@ def resolve_bonus_text_effects(
             avg_atk = 3  # Average card ATK as approximation
             result.deck_reveal_atk += avg_atk
             result.effects.append(f"{card.name}: {bonus} (~{avg_atk} ATK)")
+
+        # === DECK REVEAL WITH MULTIPLIER (Yetiir) ===
+        deck_mult_match = _DECK_REVEAL_MULT_PATTERN.search(bonus)
+        if deck_mult_match:
+            avg_atk = 3  # Average card ATK
+            multiplier = 1
+            if deck_mult_match.group(1):
+                multiplier = int(deck_mult_match.group(1))
+            result.deck_reveal_atk += avg_atk
+            result.deck_reveal_multiplier = max(
+                result.deck_reveal_multiplier, multiplier
+            )
+            result.effects.append(f"{card.name}: {bonus} (~{avg_atk * multiplier} ATK)")
+
+        # === DIPLO SYNERGY ===
+        diplo_combined = _DIPLO_COMBINED_PATTERN.search(bonus)
+        if diplo_combined:
+            atk_bonus_val = int(diplo_combined.group(1))
+            atk_diplo = diplo_combined.group(2).lower()
+            pv_bonus_val = int(diplo_combined.group(3))
+            pv_diplo = diplo_combined.group(4).lower()
+
+            # Check if we have the required Diplo cards
+            diplo_cards_on_board = [
+                c.card_class.value.lower()
+                for c in player.board
+                if c.card_class == CardClass.DIPLO
+            ]
+            # Also check card names for Diplo-Terre, Diplo-Air, Diplo-Mer
+            for c in player.board:
+                name_lower = c.name.lower()
+                if "diplo-terre" in name_lower or "diplo terre" in name_lower:
+                    diplo_cards_on_board.append("terre")
+                if "diplo-air" in name_lower or "diplo air" in name_lower:
+                    diplo_cards_on_board.append("air")
+                if "diplo-mer" in name_lower or "diplo mer" in name_lower:
+                    diplo_cards_on_board.append("mer")
+
+            if atk_diplo in diplo_cards_on_board:
+                result.diplo_atk_bonus += atk_bonus_val
+                result.effects.append(
+                    f"{card.name}: +{atk_bonus_val} ATQ (Diplo {atk_diplo})"
+                )
+            if pv_diplo in diplo_cards_on_board:
+                result.diplo_pv_bonus += pv_bonus_val
+                result.effects.append(
+                    f"{card.name}: +{pv_bonus_val} PV (Diplo {pv_diplo})"
+                )
+
+        # === SPELL DAMAGE ===
+        spell_damage_match = _SPELL_DAMAGE_PATTERN.search(bonus)
+        if spell_damage_match:
+            damage = int(spell_damage_match.group(1))
+            result.spell_damage += damage
+            result.effects.append(f"{card.name}: sort {damage} dgt")
+
+        spell_bonus_match = _SPELL_DAMAGE_BONUS_PATTERN.search(bonus)
+        if spell_bonus_match:
+            bonus_val = int(spell_bonus_match.group(1))
+            result.spell_damage_bonus += bonus_val
+            result.effects.append(f"{card.name}: +{bonus_val} dgt sorts")
+
+        magie_carottes_match = _MAGIE_CAROTTES_PATTERN.search(bonus)
+        if magie_carottes_match:
+            damage = int(magie_carottes_match.group(1))
+            result.spell_damage += damage
+            result.effects.append(f"{card.name}: Magie carottes {damage} dgt")
+
+        # === DEFENSE MULTIPLIER ===
+        if _DOUBLE_PV_DEFENSE_PATTERN.search(bonus):
+            result.defense_multiplier = max(result.defense_multiplier, 2)
+            result.effects.append(f"{card.name}: Double PV défense")
+
+        # === ATK/PV TRADEOFF FOR CLASS ===
+        tradeoff_match = _ATK_PV_TRADEOFF_CLASS_PATTERN.search(bonus)
+        if tradeoff_match:
+            atk_val = int(tradeoff_match.group(1))
+            pv_val = int(tradeoff_match.group(2))
+            target_class_name = tradeoff_match.group(3).lower()
+            if target_class_name in class_map_lower:
+                target_class = class_map_lower[target_class_name]
+                matching = class_counts.get(target_class, 0)
+                if matching > 0:
+                    result.attack_bonus += atk_val * matching
+                    result.health_penalty += pv_val * matching
+                    result.effects.append(
+                        f"{card.name}: +{atk_val * matching} ATQ / "
+                        f"-{pv_val * matching} PV ({matching} {target_class_name})"
+                    )
+
+        # === DEMON BONUSES ===
+        demon_imb_match = _DEMON_IMBLOCABLE_BONUS_PATTERN.search(bonus)
+        if demon_imb_match:
+            imb_bonus = int(demon_imb_match.group(1))
+            result.demon_imblocable_bonus += imb_bonus
+            result.effects.append(f"{card.name}: +{imb_bonus} imb démon")
+
+        demon_atk_pv_match = _DEMON_ATK_PV_PATTERN.search(bonus)
+        if demon_atk_pv_match:
+            atk_val = int(demon_atk_pv_match.group(1))
+            pv_val = int(demon_atk_pv_match.group(2))
+            result.demon_atk_bonus += atk_val
+            result.demon_pv_penalty += pv_val
+            result.effects.append(f"{card.name}: +{atk_val}/-{pv_val} démon")
+
+        if _DEMONS_GAIN_BONUSES_PATTERN.search(bonus):
+            result.demons_gain_all_bonuses = True
+            result.effects.append(f"{card.name}: Démons gagnent tous bonus")
+
+        # === WEAPON/EQUIPMENT ===
+        weapon_ninja_match = _WEAPON_ATK_IF_NINJA_PATTERN.search(bonus)
+        if weapon_ninja_match:
+            # TODO: Check if ninja was chosen (requires game state tracking)
+            atk_val = int(weapon_ninja_match.group(1))
+            # For now, store the potential bonus
+            result.weapon_atk_bonus += atk_val
+            result.effects.append(f"{card.name}: +{atk_val} ATQ armes (ninja)")
+
+        weapon_raton_match = _WEAPON_ATK_PER_RATON_PATTERN.search(bonus)
+        if weapon_raton_match:
+            atk_per = int(weapon_raton_match.group(1))
+            raton_count = family_counts.get(Family.RATON, 0)
+            if raton_count > 0:
+                total_bonus = atk_per * raton_count
+                result.weapon_atk_bonus += total_bonus
+                result.effects.append(
+                    f"{card.name}: +{total_bonus} ATQ arme ({raton_count} ratons)"
+                )
+
+        # === KDO (GIFT) BONUSES ===
+        kdo_pv_match = _KDO_PV_BONUS_PATTERN.search(bonus)
+        if kdo_pv_match:
+            pv_per = int(kdo_pv_match.group(1))
+            result.kdo_pv_bonus = max(result.kdo_pv_bonus, pv_per)
+            result.effects.append(f"{card.name}: +{pv_per} PV par Kdo")
+
+        kdo_atk_match = _KDO_ATK_EXTRA_PATTERN.search(bonus)
+        if kdo_atk_match:
+            atk_extra = int(kdo_atk_match.group(1))
+            result.kdo_atk_bonus += atk_extra
+            result.effects.append(f"{card.name}: +{atk_extra} ATQ par Kdo")
+
+        # === IMBLOCABLE SCALING ===
+        imb_scaling_match = _IMBLOCABLE_SCALING_PATTERN.search(bonus)
+        if imb_scaling_match:
+            extra = int(imb_scaling_match.group(1))
+            ratio = int(imb_scaling_match.group(2))
+            result.imblocable_scaling = extra
+            result.imblocable_scaling_ratio = ratio
+            result.effects.append(f"{card.name}: +{extra} imb tous les {ratio} imb")
+
+        # === PER-TURN SELF DAMAGE ===
+        per_turn_self_dmg = _PER_TURN_SELF_DAMAGE_PATTERN.search(bonus)
+        if per_turn_self_dmg:
+            dmg = int(per_turn_self_dmg.group(1))
+            result.per_turn_self_damage += dmg
+            result.effects.append(f"{card.name}: -{dmg} PV/tour")
+
+        # === ENEMY HIGH ATK DEBUFF ===
+        enemy_debuff_match = _ENEMY_HIGH_ATK_DEBUFF_PATTERN.search(bonus)
+        if enemy_debuff_match:
+            debuff = int(enemy_debuff_match.group(1))
+            result.enemy_high_atk_debuff += debuff
+            result.effects.append(f"{card.name}: -{debuff} ATQ ennemi fort")
+
+        # === FIRE VULNERABILITY ===
+        if _FIRE_VULNERABILITY_PATTERN.search(bonus):
+            result.fire_vulnerability = True
+            result.effects.append(f"{card.name}: Vulnérable feu")
+
+        # === REDUCED MONTURE THRESHOLD ===
+        reduced_monture_match = _REDUCED_MONTURE_PATTERN.search(bonus)
+        if reduced_monture_match:
+            threshold = int(reduced_monture_match.group(1))
+            if (
+                result.reduced_monture_threshold == 0
+                or threshold < result.reduced_monture_threshold
+            ):
+                result.reduced_monture_threshold = threshold
+            result.effects.append(f"{card.name}: Monture à {threshold}")
+
+        # === GOLD IF IMBLOCABLE ===
+        gold_imb_match = _GOLD_IF_IMBLOCABLE_PATTERN.search(bonus)
+        if gold_imb_match:
+            gold = int(gold_imb_match.group(1))
+            result.gold_if_imblocable += gold
+            result.effects.append(f"{card.name}: +{gold} or si imb")
+
+        # === PV DAMAGE FROM HEALING ===
+        pv_from_heal_match = _PV_DAMAGE_FROM_HEALING_PATTERN.search(bonus)
+        if pv_from_heal_match:
+            dmg_per_heal = int(pv_from_heal_match.group(1))
+            result.pv_damage_from_healing = max(
+                result.pv_damage_from_healing, dmg_per_heal
+            )
+            result.effects.append(f"{card.name}: {dmg_per_heal} dgt par PV rendu")
+
+        # === CLASS BONUS THRESHOLD ===
+        class_bonus_match = _CLASS_BONUS_THRESHOLD_PATTERN.search(bonus)
+        if class_bonus_match:
+            atk_val = int(class_bonus_match.group(1))
+            class_name = class_bonus_match.group(2).lower()
+            threshold = int(class_bonus_match.group(3))
+            if class_name in class_map_lower:
+                target_class = class_map_lower[class_name]
+                if class_counts.get(target_class, 0) >= threshold:
+                    result.attack_bonus += atk_val
+                    result.effects.append(
+                        f"{card.name}: +{atk_val} ATQ (bonus {class_name} {threshold})"
+                    )
+
+        # === FAMILY COUNT THRESHOLD ===
+        family_count_match = _FAMILY_COUNT_THRESHOLD_PATTERN.search(bonus)
+        if family_count_match:
+            atk_val = int(family_count_match.group(1))
+            threshold = int(family_count_match.group(2))
+            # Check raccoon/lapin/raton family
+            if "raccoon" in bonus_lower or "raton" in bonus_lower:
+                if family_counts.get(Family.RATON, 0) >= threshold:
+                    result.attack_bonus += atk_val
+                    result.effects.append(
+                        f"{card.name}: +{atk_val} ATQ (raton {threshold})"
+                    )
+            elif "lapin" in bonus_lower:
+                if family_counts.get(Family.LAPIN, 0) >= threshold:
+                    result.attack_bonus += atk_val
+                    result.effects.append(
+                        f"{card.name}: +{atk_val} ATQ (lapin {threshold})"
+                    )
+
+        # === HALL OF WIN THRESHOLD ===
+        hall_match = _HALL_OF_WIN_THRESHOLD_PATTERN.search(bonus)
+        if hall_match:
+            atk_val = int(hall_match.group(1))
+            threshold = int(hall_match.group(2))
+            if family_counts.get(Family.HALL_OF_WIN, 0) >= threshold:
+                result.attack_bonus += atk_val
+                result.effects.append(f"{card.name}: +{atk_val} ATQ (Hall {threshold})")
+
+        # === CYBORG AND S-TEAM COMBINED BONUS ===
+        cyborg_steam_match = _CYBORG_STEAM_BONUS_PATTERN.search(bonus)
+        if cyborg_steam_match:
+            atk_val = int(cyborg_steam_match.group(1))
+            cyborg_count = family_counts.get(Family.CYBORG, 0)
+            steam_count = class_counts.get(CardClass.S_TEAM, 0)
+            total = cyborg_count + steam_count
+            if total > 0:
+                result.attack_bonus += atk_val * total
+                result.effects.append(
+                    f"{card.name}: +{atk_val * total} ATQ ({total} cyborg+steam)"
+                )
+
+        # === WOMEN FAMILY BONUS ===
+        # This is a placeholder - actual implementation would need gender data
+        women_match = _WOMEN_FAMILY_BONUS_PATTERN.search(bonus)
+        if women_match:
+            atk_val = int(women_match.group(1))
+            target_family_name = women_match.group(2).lower()
+            if target_family_name in family_map:
+                target_fam = family_map[target_family_name]
+                # Approximate: count half of family as "women"
+                fam_count = family_counts.get(target_fam, 0)
+                women_count = fam_count // 2 + 1
+                result.attack_bonus += atk_val * women_count
+                result.effects.append(
+                    f"{card.name}: +{atk_val * women_count} ATQ (~{women_count} femmes)"
+                )
 
     return result
 
