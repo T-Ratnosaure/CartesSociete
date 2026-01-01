@@ -397,7 +397,7 @@ class GameRunner:
     ) -> bool:
         """Execute the end phase and prepare for next turn.
 
-        Handles deck mixing and checks for game over.
+        Handles deck mixing, resets per-turn tracking, and checks for game over.
 
         Args:
             state: Current game state.
@@ -419,6 +419,9 @@ class GameRunner:
         # Handle deck mixing after even turns
         if should_mix_decks(state):
             mix_decks(state)
+
+        # Reset per-turn tracking (spells, sacrifices) for all players
+        state.reset_turn_tracking_all_players()
 
         # Advance to next turn
         state.turn += 1

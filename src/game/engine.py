@@ -246,6 +246,9 @@ class GameEngine:
         if should_mix_decks(self.state):
             mix_decks(self.state)
 
+        # Reset per-turn tracking (spells, sacrifices) for all players
+        self.state.reset_turn_tracking_all_players()
+
         # Start new turn
         self.state.turn += 1
         econome_bonuses, weapons_drawn, demons_summoned, cost5_drawn = (
