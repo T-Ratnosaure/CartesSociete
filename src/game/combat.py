@@ -24,15 +24,18 @@ class DamageBreakdown:
         base_attack: Base attack from card stats.
         attack_bonus: Attack bonus from class/family abilities.
         bonus_text_attack: Attack bonus from bonus_text effects.
+        diplo_attack_bonus: Attack bonus from Diplo synergy.
         conditional_attack_bonus: Attack bonus from conditional abilities (Dragon).
         attack_multiplier: Attack multiplier from conditional abilities (Dragon).
         total_attack: Total attack value (base + bonuses) * multiplier.
         base_defense: Base defense from card stats.
         defense_bonus: Defense bonus from class/family abilities.
-        target_defense: Total defense (base + bonus).
+        defense_multiplier: Multiplier from bonus_text (e.g., "Double PV défense").
+        target_defense: Total defense (base + bonus) * multiplier.
         base_damage: Normal damage (attack - defense, min 0).
         imblocable_damage: Damage that bypasses defense.
         conditional_imblocable: Imblocable from Dragon conditional abilities.
+        spell_damage: Damage from spells (mage abilities).
         total_damage: Total damage dealt to target's PV.
     """
 
@@ -41,15 +44,18 @@ class DamageBreakdown:
     base_attack: int
     attack_bonus: int
     bonus_text_attack: int
+    diplo_attack_bonus: int
     conditional_attack_bonus: int
     attack_multiplier: int
     total_attack: int
     base_defense: int
     defense_bonus: int
+    defense_multiplier: int
     target_defense: int
     base_damage: int
     imblocable_damage: int
     conditional_imblocable: int
+    spell_damage: int
     total_damage: int
 
 
@@ -63,6 +69,9 @@ class CombatResult:
         health_changes: Dict mapping player_id to health change.
         self_damage: Dict mapping player_id to self-damage (e.g., Berserker).
         on_attacked_damage: Dict mapping player_id to damage from on-attacked effects.
+        spell_damage: Dict mapping player_id to spell damage dealt.
+        health_penalty: Dict mapping player_id to HP penalty from bonus_text.
+        diplo_bonuses: Dict mapping player_id to Diplo ATK/PV bonuses applied.
     """
 
     damage_dealt: list[DamageBreakdown] = field(default_factory=list)
@@ -70,6 +79,9 @@ class CombatResult:
     health_changes: dict[int, int] = field(default_factory=dict)
     self_damage: dict[int, int] = field(default_factory=dict)
     on_attacked_damage: dict[int, int] = field(default_factory=dict)
+    spell_damage: dict[int, int] = field(default_factory=dict)
+    health_penalty: dict[int, int] = field(default_factory=dict)
+    diplo_bonuses: dict[int, tuple[int, int]] = field(default_factory=dict)
 
 
 def calculate_imblocable_damage(player: PlayerState) -> int:
@@ -101,12 +113,13 @@ def calculate_damage(
     """Calculate damage from one player to another.
 
     Combat formula:
-    1. Calculate attacker's total attack (base + ability bonuses + bonus_text)
-    2. Calculate defender's total HP/defense (base + ability bonuses)
+    1. Calculate attacker's total attack (base + ability bonuses + bonus_text + diplo)
+    2. Calculate defender's total HP/defense (base + ability bonuses) * multiplier
     3. Base damage = attack - defense (min 0)
     4. Add imblocable damage (bypasses defense)
     5. Add conditional imblocable (Dragon PO abilities)
-    6. Total damage = base + imblocable + conditional
+    6. Add spell damage (from mage abilities)
+    7. Total damage = base + imblocable + conditional + spell
 
     Args:
         attacker: The attacking player.
@@ -119,8 +132,9 @@ def calculate_damage(
     attacker_abilities = resolve_all_abilities(attacker)
     defender_abilities = resolve_all_abilities(defender)
 
-    # Resolve bonus_text effects for attacker
+    # Resolve bonus_text effects for both players
     attacker_bonus_text = resolve_bonus_text_effects(attacker, defender)
+    defender_bonus_text = resolve_bonus_text_effects(defender, attacker)
 
     # Resolve conditional abilities (Dragon PO spending)
     conditional_result = resolve_conditional_abilities(attacker)
@@ -145,10 +159,14 @@ def calculate_damage(
 
     attack_bonus = attacker_abilities.total_attack_bonus
     bonus_text_attack = attacker_bonus_text.attack_bonus
+    # Add Diplo synergy ATK bonus
+    diplo_attack_bonus = attacker_bonus_text.diplo_atk_bonus
     # Add deck reveal ATK bonus (from Lapindomptable)
     deck_reveal_atk = attacker_bonus_text.deck_reveal_atk
-    # Apply attack penalty from defender's bonus_text (e.g., "-1 ATQ pour les cyborgs")
+    # Apply attack penalty from attacker's bonus_text (e.g., "-1 ATQ pour les cyborgs")
     attack_penalty = attacker_bonus_text.attack_penalty
+    # Apply enemy high ATK debuff from defender's bonus_text
+    enemy_debuff = defender_bonus_text.enemy_high_atk_debuff
     conditional_attack_bonus = conditional_result.total_attack_bonus
     attack_multiplier = conditional_result.attack_multiplier
 
@@ -159,15 +177,23 @@ def calculate_damage(
         (base_attack * attack_multiplier)
         + attack_bonus
         + bonus_text_attack
+        + diplo_attack_bonus
         + deck_reveal_atk
         + conditional_attack_bonus
-        - attack_penalty,
+        - attack_penalty
+        - enemy_debuff,
     )
 
-    # Calculate defense with ability bonuses
+    # Calculate defense with ability bonuses and multiplier
     base_defense = defender.get_total_health()
     defense_bonus = defender_abilities.total_health_bonus
-    target_defense = base_defense + defense_bonus
+    # Add Diplo PV bonus to defense
+    diplo_pv_bonus = defender_bonus_text.diplo_pv_bonus
+    # Apply defense multiplier (e.g., "Double PV défense")
+    defense_multiplier = defender_bonus_text.defense_multiplier
+    target_defense = (
+        base_defense + defense_bonus + diplo_pv_bonus
+    ) * defense_multiplier
 
     # Base damage: attack minus defense, minimum 0
     base_damage = max(0, total_attack - target_defense)
@@ -182,7 +208,17 @@ def calculate_damage(
     # Conditional imblocable from Dragon PO abilities
     conditional_imblocable = conditional_result.total_imblocable_damage
 
-    total_damage = base_damage + imblocable_damage + conditional_imblocable
+    # Spell damage (from mage abilities, subject to spell_damage_block)
+    spell_damage = max(
+        0,
+        attacker_bonus_text.spell_damage
+        + attacker_bonus_text.spell_damage_bonus
+        - defender_bonus_text.spell_damage_block,
+    )
+
+    total_damage = (
+        base_damage + imblocable_damage + conditional_imblocable + spell_damage
+    )
 
     return DamageBreakdown(
         source_player=attacker,
@@ -190,15 +226,18 @@ def calculate_damage(
         base_attack=base_attack,
         attack_bonus=attack_bonus,
         bonus_text_attack=bonus_text_attack,
+        diplo_attack_bonus=diplo_attack_bonus,
         conditional_attack_bonus=conditional_attack_bonus,
         attack_multiplier=attack_multiplier,
         total_attack=total_attack,
         base_defense=base_defense,
         defense_bonus=defense_bonus,
+        defense_multiplier=defense_multiplier,
         target_defense=target_defense,
         base_damage=base_damage,
         imblocable_damage=imblocable_damage,
         conditional_imblocable=conditional_imblocable,
+        spell_damage=spell_damage,
         total_damage=total_damage,
     )
 
@@ -210,6 +249,7 @@ def resolve_combat(state: GameState) -> CombatResult:
     Damage is calculated for each attacker-defender pair, then applied.
     Self-damage from abilities (e.g., Berserker) is also applied.
     On-attacked damage is dealt back to attackers by defenders.
+    Spell damage, health penalties, and Diplo bonuses are tracked.
 
     Args:
         state: Current game state.
@@ -229,6 +269,20 @@ def resolve_combat(state: GameState) -> CombatResult:
                 breakdown = calculate_damage(attacker, defender)
                 result.damage_dealt.append(breakdown)
                 damage_to_apply[defender.player_id] += breakdown.total_damage
+
+                # Track spell damage
+                if breakdown.spell_damage > 0:
+                    if attacker.player_id not in result.spell_damage:
+                        result.spell_damage[attacker.player_id] = 0
+                    result.spell_damage[attacker.player_id] += breakdown.spell_damage
+
+                # Track Diplo bonuses
+                if breakdown.diplo_attack_bonus > 0:
+                    atk, pv = result.diplo_bonuses.get(attacker.player_id, (0, 0))
+                    result.diplo_bonuses[attacker.player_id] = (
+                        atk + breakdown.diplo_attack_bonus,
+                        pv,
+                    )
 
     # Calculate on-attacked damage (defenders damage attackers when attacked)
     # This is separate from the main damage calculation
@@ -253,6 +307,20 @@ def resolve_combat(state: GameState) -> CombatResult:
                     damage_to_apply[opponent.player_id] += (
                         defender_bonus_text.per_turn_imblocable
                     )
+
+        # Track Diplo PV bonuses
+        if defender_bonus_text.diplo_pv_bonus > 0:
+            atk, pv = result.diplo_bonuses.get(defender.player_id, (0, 0))
+            result.diplo_bonuses[defender.player_id] = (
+                atk,
+                pv + defender_bonus_text.diplo_pv_bonus,
+            )
+
+        # Track health penalty from bonus_text (e.g., ATK/PV tradeoff)
+        if defender_bonus_text.health_penalty > 0:
+            result.health_penalty[defender.player_id] = (
+                defender_bonus_text.health_penalty
+            )
 
     # Calculate self-damage from abilities (e.g., Berserker)
     for player in alive_players:
@@ -308,6 +376,8 @@ def get_combat_summary(result: CombatResult) -> str:
             attack_parts.append(f"{bd.attack_bonus} ability")
         if bd.bonus_text_attack > 0:
             attack_parts.append(f"{bd.bonus_text_attack} bonus_text")
+        if bd.diplo_attack_bonus > 0:
+            attack_parts.append(f"{bd.diplo_attack_bonus} diplo")
         if bd.conditional_attack_bonus > 0:
             attack_parts.append(f"{bd.conditional_attack_bonus} conditional")
         if len(attack_parts) > 1:
@@ -316,8 +386,12 @@ def get_combat_summary(result: CombatResult) -> str:
             lines.append(f"  ATK: {bd.total_attack}")
 
         for bd in breakdowns:
-            # Show defense breakdown with bonuses
-            if bd.defense_bonus > 0:
+            # Show defense breakdown with bonuses and multiplier
+            if bd.defense_multiplier > 1:
+                base_def = bd.base_defense + bd.defense_bonus
+                mult = bd.defense_multiplier
+                defense_str = f"(DEF: {base_def}x{mult}={bd.target_defense})"
+            elif bd.defense_bonus > 0:
                 defense_str = (
                     f"(DEF: {bd.base_defense}+{bd.defense_bonus}={bd.target_defense})"
                 )
@@ -333,9 +407,12 @@ def get_combat_summary(result: CombatResult) -> str:
             else:
                 imblocable_str = f"{bd.imblocable_damage} imblocable"
 
+            # Build spell damage string
+            spell_str = f" + {bd.spell_damage} spell" if bd.spell_damage > 0 else ""
+
             lines.append(
                 f"  vs {bd.target_player.name} {defense_str}: "
-                f"{bd.base_damage} base + {imblocable_str} = "
+                f"{bd.base_damage} base + {imblocable_str}{spell_str} = "
                 f"{bd.total_damage} damage"
             )
 
@@ -358,6 +435,32 @@ def get_combat_summary(result: CombatResult) -> str:
                 if bd.target_player.player_id == player_id:
                     name = bd.target_player.name
                     lines.append(f"  {name}: deals {damage} damage when attacked")
+                    break
+
+    # Spell damage
+    if result.spell_damage:
+        lines.append("\nSpell damage (mage abilities):")
+        for player_id, damage in result.spell_damage.items():
+            # Find player name
+            for bd in result.damage_dealt:
+                if bd.source_player.player_id == player_id:
+                    lines.append(f"  {bd.source_player.name}: {damage} spell damage")
+                    break
+
+    # Diplo bonuses
+    if result.diplo_bonuses:
+        lines.append("\nDiplo synergy bonuses:")
+        for player_id, (atk, pv) in result.diplo_bonuses.items():
+            # Find player name
+            for bd in result.damage_dealt:
+                if bd.source_player.player_id == player_id:
+                    parts = []
+                    if atk > 0:
+                        parts.append(f"+{atk} ATK")
+                    if pv > 0:
+                        parts.append(f"+{pv} PV")
+                    if parts:
+                        lines.append(f"  {bd.source_player.name}: {', '.join(parts)}")
                     break
 
     # Health changes
