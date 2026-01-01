@@ -512,8 +512,10 @@ class CartesSocieteEnv(gym.Env):
             "opponent_health": self._state.players[1].health if self._state else 0,
         }
 
-    def get_action_mask(self) -> np.ndarray:
-        """Get mask of valid actions.
+    def action_masks(self) -> np.ndarray:
+        """Get mask of valid actions (SB3-compatible method name).
+
+        This method is called by MaskablePPO to get valid actions.
 
         Returns:
             Boolean array where True indicates a valid action.
@@ -522,6 +524,10 @@ class CartesSocieteEnv(gym.Env):
         for i in range(min(len(self._legal_actions), self.max_actions)):
             mask[i] = True
         return mask
+
+    def get_action_mask(self) -> np.ndarray:
+        """Alias for action_masks() for backwards compatibility."""
+        return self.action_masks()
 
     def render(self) -> None:
         """Render the environment (text mode)."""

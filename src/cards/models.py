@@ -104,12 +104,14 @@ class ClassAbilities:
         conditional: Abilities that trigger on conditions.
         passive: Always-active passive ability text.
         imblocable_damage: Fixed imblocable damage dealt (bypasses defense).
+        per_turn_self_damage: Damage dealt to self each turn (from bonus_text).
     """
 
     scaling: list[ScalingAbility] = field(default_factory=list)
     conditional: list[ConditionalAbility] = field(default_factory=list)
     passive: str | None = None
     imblocable_damage: int = 0  # Structured field for imblocable damage
+    per_turn_self_damage: int = 0  # Self-damage applied each turn
 
 
 @dataclass

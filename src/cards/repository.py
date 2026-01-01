@@ -30,6 +30,12 @@ logger = logging.getLogger(__name__)
 _IMBLOCABLE_PATTERN = re.compile(r"(\d+)\s*(?:dgt|dgts|damage)?\s*imblocable")
 _IMBLOCABLE_REVERSE_PATTERN = re.compile(r"imblocable\s*(\d+)")
 
+# Pattern for per-turn self-damage: "Vous perdez X PV ... par tour"
+_PER_TURN_SELF_DMG_PATTERN = re.compile(
+    r"(?:vous\s+)?perd(?:ez|s)?\s+(\d+)\s*(?:PV|pv|HP).*?par\s+tour",
+    re.IGNORECASE,
+)
+
 
 @dataclass
 class CardLoadError:
@@ -91,16 +97,49 @@ def _extract_imblocable_damage(conditional: list[ConditionalAbility]) -> int:
     return total
 
 
-def _parse_class_abilities(data: dict) -> ClassAbilities:
-    """Parse class abilities from JSON data."""
+def _extract_per_turn_self_damage(bonus_text: str | None) -> int:
+    """Extract per-turn self-damage from bonus text.
+
+    Parses bonus_text looking for patterns like "Vous perdez X PV ... par tour".
+
+    Args:
+        bonus_text: The bonus text to parse (can be None).
+
+    Returns:
+        Per-turn self-damage amount, or 0 if not found.
+    """
+    if not bonus_text:
+        return 0
+
+    match = _PER_TURN_SELF_DMG_PATTERN.search(bonus_text)
+    if match:
+        return int(match.group(1))
+    return 0
+
+
+def _parse_class_abilities(
+    data: dict,
+    bonus_text: str | None = None,
+) -> ClassAbilities:
+    """Parse class abilities from JSON data.
+
+    Args:
+        data: Dictionary containing class abilities data.
+        bonus_text: Optional bonus text to extract per-turn effects from.
+
+    Returns:
+        ClassAbilities instance with all parsed data.
+    """
     conditional = _parse_conditional_abilities(data.get("conditional", []))
     imblocable = _extract_imblocable_damage(conditional)
+    per_turn_self_dmg = _extract_per_turn_self_damage(bonus_text)
 
     return ClassAbilities(
         scaling=_parse_scaling_abilities(data.get("scaling", [])),
         conditional=conditional,
         passive=data.get("passive"),
         imblocable_damage=imblocable,
+        per_turn_self_damage=per_turn_self_dmg,
     )
 
 
@@ -119,6 +158,7 @@ def _parse_card(data: dict) -> Card:
     card_type = CardType(data["card_type"])
     family = Family(data["family"])
     card_class = CardClass(data["card_class"])
+    bonus_text = data.get("bonus_text")
 
     base_kwargs = {
         "id": data["id"],
@@ -129,8 +169,11 @@ def _parse_card(data: dict) -> Card:
         "family": family,
         "card_class": card_class,
         "family_abilities": _parse_family_abilities(data.get("family_abilities", {})),
-        "class_abilities": _parse_class_abilities(data.get("class_abilities", {})),
-        "bonus_text": data.get("bonus_text"),
+        "class_abilities": _parse_class_abilities(
+            data.get("class_abilities", {}),
+            bonus_text,
+        ),
+        "bonus_text": bonus_text,
         "health": data["health"],
         "attack": data["attack"],
         "image_path": data["image_path"],

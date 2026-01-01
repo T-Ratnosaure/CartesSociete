@@ -6,6 +6,11 @@ special damage types (imblocable), and applying damage to players.
 
 from dataclasses import dataclass, field
 
+from .abilities import (
+    resolve_all_abilities,
+    resolve_bonus_text_effects,
+    resolve_conditional_abilities,
+)
 from .state import GameState, PlayerState
 
 
@@ -16,19 +21,31 @@ class DamageBreakdown:
     Attributes:
         source_player: The player dealing damage.
         target_player: The player receiving damage.
-        total_attack: Total attack value of source's board.
-        target_defense: Total defense (HP) of target's board.
+        base_attack: Base attack from card stats.
+        attack_bonus: Attack bonus from class/family abilities.
+        bonus_text_attack: Attack bonus from bonus_text effects.
+        total_attack: Total attack value (base + bonuses).
+        base_defense: Base defense from card stats.
+        defense_bonus: Defense bonus from class/family abilities.
+        target_defense: Total defense (base + bonus).
         base_damage: Normal damage (attack - defense, min 0).
         imblocable_damage: Damage that bypasses defense.
+        conditional_imblocable: Imblocable from Dragon conditional abilities.
         total_damage: Total damage dealt to target's PV.
     """
 
     source_player: PlayerState
     target_player: PlayerState
+    base_attack: int
+    attack_bonus: int
+    bonus_text_attack: int
     total_attack: int
+    base_defense: int
+    defense_bonus: int
     target_defense: int
     base_damage: int
     imblocable_damage: int
+    conditional_imblocable: int
     total_damage: int
 
 
@@ -40,11 +57,13 @@ class CombatResult:
         damage_dealt: List of damage breakdowns for each attacker-target pair.
         eliminations: List of players eliminated this combat.
         health_changes: Dict mapping player_id to health change.
+        self_damage: Dict mapping player_id to self-damage (e.g., Berserker).
     """
 
     damage_dealt: list[DamageBreakdown] = field(default_factory=list)
     eliminations: list[PlayerState] = field(default_factory=list)
     health_changes: dict[int, int] = field(default_factory=dict)
+    self_damage: dict[int, int] = field(default_factory=dict)
 
 
 def calculate_imblocable_damage(player: PlayerState) -> int:
@@ -76,11 +95,12 @@ def calculate_damage(
     """Calculate damage from one player to another.
 
     Combat formula:
-    1. Calculate attacker's total attack
-    2. Calculate defender's total HP (defense)
+    1. Calculate attacker's total attack (base + ability bonuses + bonus_text)
+    2. Calculate defender's total HP/defense (base + ability bonuses)
     3. Base damage = attack - defense (min 0)
     4. Add imblocable damage (bypasses defense)
-    5. Total damage = base + imblocable
+    5. Add conditional imblocable (Dragon PO abilities)
+    6. Total damage = base + imblocable + conditional
 
     Args:
         attacker: The attacking player.
@@ -89,24 +109,55 @@ def calculate_damage(
     Returns:
         DamageBreakdown with full calculation details.
     """
-    total_attack = attacker.get_total_attack()
-    target_defense = defender.get_total_health()
+    # Resolve abilities for both players
+    attacker_abilities = resolve_all_abilities(attacker)
+    defender_abilities = resolve_all_abilities(defender)
+
+    # Resolve bonus_text effects
+    bonus_text_result = resolve_bonus_text_effects(attacker, defender)
+
+    # Resolve conditional abilities (Dragon PO spending)
+    conditional_result = resolve_conditional_abilities(attacker)
+
+    # Calculate attack with all bonuses
+    base_attack = attacker.get_total_attack()
+    attack_bonus = attacker_abilities.total_attack_bonus
+    bonus_text_attack = bonus_text_result.attack_bonus
+    total_attack = base_attack + attack_bonus + bonus_text_attack
+
+    # Calculate defense with ability bonuses
+    base_defense = defender.get_total_health()
+    defense_bonus = defender_abilities.total_health_bonus
+    target_defense = base_defense + defense_bonus
 
     # Base damage: attack minus defense, minimum 0
     base_damage = max(0, total_attack - target_defense)
 
     # Imblocable damage bypasses defense entirely
-    imblocable_damage = calculate_imblocable_damage(attacker)
+    # Includes both pre-parsed imblocable and ability bonuses
+    imblocable_damage = (
+        calculate_imblocable_damage(attacker)
+        + attacker_abilities.total_imblocable_bonus
+    )
 
-    total_damage = base_damage + imblocable_damage
+    # Conditional imblocable from Dragon PO abilities
+    conditional_imblocable = conditional_result.total_imblocable_damage
+
+    total_damage = base_damage + imblocable_damage + conditional_imblocable
 
     return DamageBreakdown(
         source_player=attacker,
         target_player=defender,
+        base_attack=base_attack,
+        attack_bonus=attack_bonus,
+        bonus_text_attack=bonus_text_attack,
         total_attack=total_attack,
+        base_defense=base_defense,
+        defense_bonus=defense_bonus,
         target_defense=target_defense,
         base_damage=base_damage,
         imblocable_damage=imblocable_damage,
+        conditional_imblocable=conditional_imblocable,
         total_damage=total_damage,
     )
 
@@ -116,6 +167,7 @@ def resolve_combat(state: GameState) -> CombatResult:
 
     In CartesSociete, all players attack all opponents simultaneously.
     Damage is calculated for each attacker-defender pair, then applied.
+    Self-damage from abilities (e.g., Berserker) is also applied.
 
     Args:
         state: Current game state.
@@ -135,6 +187,13 @@ def resolve_combat(state: GameState) -> CombatResult:
                 breakdown = calculate_damage(attacker, defender)
                 result.damage_dealt.append(breakdown)
                 damage_to_apply[defender.player_id] += breakdown.total_damage
+
+    # Calculate self-damage from abilities (e.g., Berserker)
+    for player in alive_players:
+        abilities = resolve_all_abilities(player)
+        if abilities.total_self_damage > 0:
+            result.self_damage[player.player_id] = abilities.total_self_damage
+            damage_to_apply[player.player_id] += abilities.total_self_damage
 
     # Apply all damage simultaneously
     for player in alive_players:
@@ -172,15 +231,53 @@ def get_combat_summary(result: CombatResult) -> str:
 
     for attacker_id, breakdowns in by_attacker.items():
         attacker = breakdowns[0].source_player
+        bd = breakdowns[0]
         lines.append(f"\n{attacker.name} attacks:")
-        lines.append(f"  Total ATK: {breakdowns[0].total_attack}")
+
+        # Show attack breakdown with all bonuses
+        attack_parts = [f"{bd.base_attack} base"]
+        if bd.attack_bonus > 0:
+            attack_parts.append(f"{bd.attack_bonus} ability")
+        if bd.bonus_text_attack > 0:
+            attack_parts.append(f"{bd.bonus_text_attack} bonus_text")
+        if len(attack_parts) > 1:
+            lines.append(f"  ATK: {' + '.join(attack_parts)} = {bd.total_attack}")
+        else:
+            lines.append(f"  ATK: {bd.total_attack}")
 
         for bd in breakdowns:
+            # Show defense breakdown with bonuses
+            if bd.defense_bonus > 0:
+                defense_str = (
+                    f"(DEF: {bd.base_defense}+{bd.defense_bonus}={bd.target_defense})"
+                )
+            else:
+                defense_str = f"(DEF: {bd.target_defense})"
+
+            # Build imblocable string
+            if bd.conditional_imblocable > 0:
+                imblocable_str = (
+                    f"{bd.imblocable_damage}+{bd.conditional_imblocable} "
+                    f"(Dragon) imblocable"
+                )
+            else:
+                imblocable_str = f"{bd.imblocable_damage} imblocable"
+
             lines.append(
-                f"  vs {bd.target_player.name}: "
-                f"{bd.base_damage} base + {bd.imblocable_damage} imblocable = "
+                f"  vs {bd.target_player.name} {defense_str}: "
+                f"{bd.base_damage} base + {imblocable_str} = "
                 f"{bd.total_damage} damage"
             )
+
+    # Self-damage from abilities (e.g., Berserker)
+    if result.self_damage:
+        lines.append("\nSelf-damage (Berserker abilities):")
+        for player_id, damage in result.self_damage.items():
+            # Find player name
+            for bd in result.damage_dealt:
+                if bd.source_player.player_id == player_id:
+                    lines.append(f"  {bd.source_player.name}: {damage} self-damage")
+                    break
 
     # Health changes
     lines.append("\nHealth changes:")

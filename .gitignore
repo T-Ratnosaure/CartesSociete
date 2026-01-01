@@ -27,3 +27,7 @@ htmlcov/
 # Type checker cache
 .pyrefly/
 .mypy_cache/
+
+# RL training artifacts
+logs/
+models/
