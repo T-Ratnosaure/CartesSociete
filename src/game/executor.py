@@ -15,9 +15,11 @@ from .abilities import can_play_lapin_card
 from .actions import (
     ActionResult,
     buy_card,
+    equip_weapon,
     evolve_cards,
     play_card,
     replace_card,
+    sacrifice_card,
 )
 from .state import GameState, PlayerState
 
@@ -73,6 +75,18 @@ def execute_action(
         if action.evolve_cards is None:
             raise InvalidActionError("EVOLVE action requires evolve_cards")
         return evolve_cards(state, player, list(action.evolve_cards))
+
+    elif action.action_type == ActionType.EQUIP_WEAPON:
+        if action.card is None or action.target_card is None:
+            raise InvalidActionError(
+                "EQUIP_WEAPON action requires card (weapon) and target_card"
+            )
+        return equip_weapon(state, player, action.card, action.target_card)
+
+    elif action.action_type == ActionType.SACRIFICE_CARD:
+        if action.card is None:
+            raise InvalidActionError("SACRIFICE_CARD action requires a card")
+        return sacrifice_card(state, player, action.card)
 
     elif action.action_type == ActionType.END_PHASE:
         return ActionResult(
@@ -153,6 +167,18 @@ def get_legal_actions_for_player(
                 # Can evolve - take first 3 cards
                 evolve_set = cards_by_name[name][:3]
                 actions.append(Action.evolve(evolve_set))
+
+        # Can equip weapons from hand to board cards
+        weapons_in_hand = [c for c in player.hand if c.card_type == CardType.WEAPON]
+        for weapon in weapons_in_hand:
+            for board_card in player.board:
+                # Can only equip if card doesn't already have a weapon
+                if board_card.id not in player.equipped_weapons:
+                    actions.append(Action.equip_weapon(weapon, board_card))
+
+        # Can sacrifice cards from board
+        for board_card in player.board:
+            actions.append(Action.sacrifice(board_card))
 
         # Can always end phase
         actions.append(Action.end_phase())

@@ -19,6 +19,8 @@ class ActionType(Enum):
     PLAY_CARD = "play_card"
     REPLACE_CARD = "replace_card"
     EVOLVE = "evolve"
+    EQUIP_WEAPON = "equip_weapon"
+    SACRIFICE_CARD = "sacrifice_card"
     END_PHASE = "end_phase"
 
 
@@ -95,6 +97,35 @@ class Action:
         return cls(action_type=ActionType.EVOLVE, evolve_cards=tuple(cards))
 
     @classmethod
+    def equip_weapon(cls, weapon: "Card", target_card: "Card") -> "Action":
+        """Create an equip weapon action.
+
+        Args:
+            weapon: The weapon card from hand to equip.
+            target_card: The card on board to equip the weapon to.
+
+        Returns:
+            An equip weapon action.
+        """
+        return cls(
+            action_type=ActionType.EQUIP_WEAPON,
+            card=weapon,
+            target_card=target_card,
+        )
+
+    @classmethod
+    def sacrifice(cls, card: "Card") -> "Action":
+        """Create a sacrifice action.
+
+        Args:
+            card: The card on board to sacrifice.
+
+        Returns:
+            A sacrifice action for the specified card.
+        """
+        return cls(action_type=ActionType.SACRIFICE_CARD, card=card)
+
+    @classmethod
     def end_phase(cls) -> "Action":
         """Create an end phase action.
 
@@ -120,4 +151,11 @@ class Action:
         elif self.action_type == ActionType.EVOLVE:
             names = [c.name for c in self.evolve_cards] if self.evolve_cards else []
             return f"Action(EVOLVE: {names})"
+        elif self.action_type == ActionType.EQUIP_WEAPON:
+            weapon = self.card.name if self.card else "None"
+            target = self.target_card.name if self.target_card else "None"
+            return f"Action(EQUIP: {weapon} -> {target})"
+        elif self.action_type == ActionType.SACRIFICE_CARD:
+            name = self.card.name if self.card else "None"
+            return f"Action(SACRIFICE: {name})"
         return f"Action({self.action_type})"

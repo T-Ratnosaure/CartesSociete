@@ -364,6 +364,104 @@ def evolve_cards(
     )
 
 
+def equip_weapon(
+    state: GameState,
+    player: PlayerState,
+    weapon: Card,
+    target_card: Card,
+) -> ActionResult:
+    """Equip a weapon from hand to a card on the board.
+
+    Args:
+        state: Current game state.
+        player: The player equipping the weapon.
+        weapon: The weapon card from hand.
+        target_card: The card on board to equip the weapon to.
+
+    Returns:
+        ActionResult with the outcome.
+
+    Raises:
+        InvalidPhaseError: If not in play phase.
+        InvalidCardError: If weapon is not in hand, target not on board,
+            or target already has a weapon equipped.
+    """
+    if state.phase != GamePhase.PLAY:
+        raise InvalidPhaseError(f"Cannot equip weapons in {state.phase.value} phase")
+
+    # Verify weapon is in hand
+    if not any(c is weapon for c in player.hand) and weapon not in player.hand:
+        raise InvalidCardError(f"Weapon {weapon.name} is not in hand")
+
+    # Verify weapon is actually a weapon
+    if weapon.card_type != CardType.WEAPON:
+        raise InvalidCardError(f"{weapon.name} is not a weapon card")
+
+    # Verify target is on board (identity check, fallback to equality for MCTS)
+    in_board_id = any(c is target_card for c in player.board)
+    if not in_board_id and target_card not in player.board:
+        raise InvalidCardError(f"Card {target_card.name} is not on board")
+
+    # Try to equip the weapon
+    if not player.equip_weapon(target_card.id, weapon):
+        raise InvalidCardError(
+            f"Cannot equip weapon to {target_card.name} "
+            "(card may already have a weapon equipped)"
+        )
+
+    # Remove weapon from hand
+    _remove_by_identity(player.hand, weapon)
+
+    return ActionResult(
+        success=True,
+        message=f"{player.name} equipped {weapon.name} to {target_card.name}",
+        state=state,
+    )
+
+
+def sacrifice_card(
+    state: GameState,
+    player: PlayerState,
+    card: Card,
+) -> ActionResult:
+    """Sacrifice a card from the board.
+
+    Sacrificing a card removes it from the board and tracks it for
+    sacrifice-based abilities. Any equipped weapon is also removed.
+
+    Args:
+        state: Current game state.
+        player: The player sacrificing the card.
+        card: The card on board to sacrifice.
+
+    Returns:
+        ActionResult with the outcome.
+
+    Raises:
+        InvalidPhaseError: If not in play phase.
+        InvalidCardError: If card is not on board.
+    """
+    if state.phase != GamePhase.PLAY:
+        raise InvalidPhaseError(f"Cannot sacrifice cards in {state.phase.value} phase")
+
+    # Verify card is on board
+    if not any(c is card for c in player.board) and card not in player.board:
+        raise InvalidCardError(f"Card {card.name} is not on board")
+
+    # Perform sacrifice (this also removes equipped weapons)
+    if not player.sacrifice_card(card):
+        raise InvalidCardError(f"Failed to sacrifice {card.name}")
+
+    # Add sacrificed card to discard pile
+    state.discard_pile.append(card)
+
+    return ActionResult(
+        success=True,
+        message=f"{player.name} sacrificed {card.name}",
+        state=state,
+    )
+
+
 def end_turn(state: GameState) -> ActionResult:
     """End the current turn and move to the next phase or turn.
 
