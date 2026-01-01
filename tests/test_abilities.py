@@ -658,3 +658,312 @@ class TestBonusTextEffects:
 
         # Attack bonus may or may not be present depending on threshold met
         assert result.attack_bonus >= 0
+
+
+class TestDragonAttackMultipliers:
+    """Tests for Dragon attack multiplier conditional abilities."""
+
+    def test_dragon_attack_multiplier_parsed(self, repo) -> None:
+        """Test that Dragon attack multipliers are recognized."""
+        from src.game.abilities import resolve_conditional_abilities
+
+        # Find a Dragon card with attack multiplier conditionals
+        dragons = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.DRAGON
+            and c.class_abilities.conditional
+            and any(
+                "double" in cond.effect.lower()
+                or "triple" in cond.effect.lower()
+                or "quadruple" in cond.effect.lower()
+                for cond in c.class_abilities.conditional
+            )
+        ]
+
+        if not dragons:
+            pytest.skip("No Dragon cards with attack multiplier abilities found")
+
+        dragon = dragons[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+        player.po = 5  # Enough for any multiplier
+
+        player.board.append(deepcopy(dragon))
+
+        result = resolve_conditional_abilities(player)
+
+        # Should have an attack multiplier greater than 1
+        assert result.attack_multiplier >= 2
+
+    def test_dragon_multiplier_in_combat(self, repo) -> None:
+        """Test that Dragon attack multiplier is applied in combat."""
+        # Find a Dragon card with attack multiplier conditionals
+        dragons = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.DRAGON
+            and c.class_abilities.conditional
+            and any(
+                "double" in cond.effect.lower()
+                for cond in c.class_abilities.conditional
+            )
+        ]
+
+        if not dragons:
+            pytest.skip("No Dragon cards with double attack ability found")
+
+        dragon = dragons[0]
+        state = create_initial_game_state(num_players=2)
+        player1 = state.players[0]
+        player2 = state.players[1]
+        player1.po = 5  # Enough PO
+
+        player1.board.append(deepcopy(dragon))
+
+        breakdown = calculate_damage(player1, player2)
+
+        # Multiplier should be applied
+        assert breakdown.attack_multiplier >= 2
+        # Total attack should be at least base * multiplier
+        base_atk = player1.get_total_attack()
+        assert breakdown.total_attack >= base_atk * breakdown.attack_multiplier
+
+
+class TestInvocateurAbilities:
+    """Tests for Invocateur demon summoning ability."""
+
+    def test_invocateur_resolves_demons(self, repo) -> None:
+        """Test that Invocateur abilities return demon names to summon."""
+        from src.game.abilities import resolve_invocateur_abilities
+
+        invocateurs = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.INVOCATEUR and c.class_abilities.scaling
+        ]
+
+        if not invocateurs:
+            pytest.skip("No Invocateur cards found")
+
+        invocateur = invocateurs[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 1 Invocateur (threshold 1 should summon Diablotin)
+        player.board.append(deepcopy(invocateur))
+
+        result = resolve_invocateur_abilities(player)
+
+        # Should have demons to summon
+        assert len(result.demons_to_summon) >= 1
+        assert "Diablotin" in result.demons_to_summon
+
+    def test_invocateur_higher_threshold(self, repo) -> None:
+        """Test Invocateur at higher thresholds."""
+        from src.game.abilities import resolve_invocateur_abilities
+
+        invocateurs = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.INVOCATEUR and c.class_abilities.scaling
+        ]
+
+        if not invocateurs:
+            pytest.skip("No Invocateur cards found")
+
+        invocateur = invocateurs[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 2 Invocateurs (threshold 2 should summon Demon mineur)
+        player.board.append(deepcopy(invocateur))
+        player.board.append(deepcopy(invocateur))
+
+        result = resolve_invocateur_abilities(player)
+
+        # Should summon a higher tier demon
+        assert len(result.demons_to_summon) >= 1
+
+    def test_invocateur_no_cards_no_demons(self, repo) -> None:
+        """Test that no demons are summoned without Invocateurs."""
+        from src.game.abilities import resolve_invocateur_abilities
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        result = resolve_invocateur_abilities(player)
+
+        assert len(result.demons_to_summon) == 0
+
+
+class TestMontureAbilities:
+    """Tests for Monture card draw ability."""
+
+    def test_monture_resolves_card_draw(self, repo) -> None:
+        """Test that Monture abilities return cards to draw."""
+        from src.game.abilities import resolve_monture_abilities
+
+        montures = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.MONTURE and c.class_abilities.scaling
+        ]
+
+        if not montures:
+            pytest.skip("No Monture cards found")
+
+        monture = montures[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add 3 Montures (threshold 3 should draw a cost-5 card)
+        player.board.append(deepcopy(monture))
+        player.board.append(deepcopy(monture))
+        player.board.append(deepcopy(monture))
+
+        result = resolve_monture_abilities(player)
+
+        # Should have cards to draw
+        assert result.cards_to_draw >= 1
+
+    def test_monture_below_threshold(self, repo) -> None:
+        """Test Monture with insufficient count doesn't trigger draw."""
+        from src.game.abilities import resolve_monture_abilities
+
+        montures = [
+            c
+            for c in repo.get_all()
+            if c.card_class == CardClass.MONTURE and c.class_abilities.scaling
+        ]
+
+        if not montures:
+            pytest.skip("No Monture cards found")
+
+        monture = montures[0]
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Add only 1 Monture (below threshold 3)
+        player.board.append(deepcopy(monture))
+
+        result = resolve_monture_abilities(player)
+
+        # Should not have cards to draw below threshold
+        assert result.cards_to_draw == 0
+
+
+class TestMarketDemonSummoning:
+    """Tests for market demon summoning function."""
+
+    def test_summon_demon_adds_to_board(self, repo) -> None:
+        """Test that summon_demon adds demon to player's board."""
+        from src.cards.models import CardType
+        from src.game.market import summon_demon
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get demons from repo
+        demons = [c for c in repo.get_all() if c.card_type == CardType.DEMON]
+        if not demons:
+            pytest.skip("No demon cards found in repository")
+
+        # Add demons to the state's demon deck
+        for demon in demons[:3]:
+            state.demon_deck.append(deepcopy(demon))
+
+        initial_board_count = len(player.board)
+        demon_name = demons[0].name
+
+        result = summon_demon(state, player.player_id, demon_name)
+
+        if result:
+            assert len(player.board) == initial_board_count + 1
+            assert result.card_type == CardType.DEMON
+
+    def test_summon_demon_removes_from_deck(self, repo) -> None:
+        """Test that summon_demon removes the demon from deck."""
+        from src.cards.models import CardType
+        from src.game.market import summon_demon
+
+        state = create_initial_game_state(num_players=2)
+
+        # Get demons from repo
+        demons = [c for c in repo.get_all() if c.card_type == CardType.DEMON]
+        if not demons:
+            pytest.skip("No demon cards found in repository")
+
+        # Add demons to the state's demon deck
+        for demon in demons[:3]:
+            state.demon_deck.append(deepcopy(demon))
+
+        initial_deck_count = len(state.demon_deck)
+        demon_name = demons[0].name
+
+        result = summon_demon(state, 0, demon_name)
+
+        if result:
+            assert len(state.demon_deck) == initial_deck_count - 1
+
+
+class TestMarketCost5Draw:
+    """Tests for market cost-5 card draw function."""
+
+    def test_draw_cost5_adds_to_hand(self, repo) -> None:
+        """Test that draw_cost5_card adds card to player's hand."""
+        from src.game.market import draw_cost5_card
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get cost-5 cards from repo
+        cost5_cards = [c for c in repo.get_all() if c.cost == 5]
+        if not cost5_cards:
+            pytest.skip("No cost-5 cards found in repository")
+
+        # Add cards to the state's cost_5 deck
+        for card in cost5_cards[:3]:
+            state.cost_5_deck.append(deepcopy(card))
+
+        initial_hand_count = len(player.hand)
+
+        result = draw_cost5_card(state, player.player_id)
+
+        if result:
+            assert len(player.hand) == initial_hand_count + 1
+            assert result.cost == 5
+
+    def test_draw_cost5_removes_from_deck(self, repo) -> None:
+        """Test that draw_cost5_card removes card from deck."""
+        from src.game.market import draw_cost5_card
+
+        state = create_initial_game_state(num_players=2)
+
+        # Get cost-5 cards from repo
+        cost5_cards = [c for c in repo.get_all() if c.cost == 5]
+        if not cost5_cards:
+            pytest.skip("No cost-5 cards found in repository")
+
+        # Add cards to the state's cost_5 deck
+        for card in cost5_cards[:3]:
+            state.cost_5_deck.append(deepcopy(card))
+
+        initial_deck_count = len(state.cost_5_deck)
+
+        result = draw_cost5_card(state, 0)
+
+        if result:
+            assert len(state.cost_5_deck) == initial_deck_count - 1
+
+    def test_draw_cost5_empty_deck_returns_none(self) -> None:
+        """Test that draw_cost5_card returns None when deck is empty."""
+        from src.game.market import draw_cost5_card
+
+        state = create_initial_game_state(num_players=2)
+        # Empty deck
+        state.cost_5_deck.clear()
+
+        result = draw_cost5_card(state, 0)
+
+        assert result is None

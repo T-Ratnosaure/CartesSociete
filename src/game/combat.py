@@ -24,7 +24,9 @@ class DamageBreakdown:
         base_attack: Base attack from card stats.
         attack_bonus: Attack bonus from class/family abilities.
         bonus_text_attack: Attack bonus from bonus_text effects.
-        total_attack: Total attack value (base + bonuses).
+        conditional_attack_bonus: Attack bonus from conditional abilities (Dragon).
+        attack_multiplier: Attack multiplier from conditional abilities (Dragon).
+        total_attack: Total attack value (base + bonuses) * multiplier.
         base_defense: Base defense from card stats.
         defense_bonus: Defense bonus from class/family abilities.
         target_defense: Total defense (base + bonus).
@@ -39,6 +41,8 @@ class DamageBreakdown:
     base_attack: int
     attack_bonus: int
     bonus_text_attack: int
+    conditional_attack_bonus: int
+    attack_multiplier: int
     total_attack: int
     base_defense: int
     defense_bonus: int
@@ -123,7 +127,17 @@ def calculate_damage(
     base_attack = attacker.get_total_attack()
     attack_bonus = attacker_abilities.total_attack_bonus
     bonus_text_attack = bonus_text_result.attack_bonus
-    total_attack = base_attack + attack_bonus + bonus_text_attack
+    conditional_attack_bonus = conditional_result.total_attack_bonus
+    attack_multiplier = conditional_result.attack_multiplier
+
+    # Apply multiplier to base attack, then add bonuses
+    # Multiplier only affects base attack (from Dragon conditional abilities)
+    total_attack = (
+        (base_attack * attack_multiplier)
+        + attack_bonus
+        + bonus_text_attack
+        + conditional_attack_bonus
+    )
 
     # Calculate defense with ability bonuses
     base_defense = defender.get_total_health()
@@ -151,6 +165,8 @@ def calculate_damage(
         base_attack=base_attack,
         attack_bonus=attack_bonus,
         bonus_text_attack=bonus_text_attack,
+        conditional_attack_bonus=conditional_attack_bonus,
+        attack_multiplier=attack_multiplier,
         total_attack=total_attack,
         base_defense=base_defense,
         defense_bonus=defense_bonus,
@@ -236,10 +252,14 @@ def get_combat_summary(result: CombatResult) -> str:
 
         # Show attack breakdown with all bonuses
         attack_parts = [f"{bd.base_attack} base"]
+        if bd.attack_multiplier > 1:
+            attack_parts[0] = f"{bd.base_attack}x{bd.attack_multiplier} base"
         if bd.attack_bonus > 0:
             attack_parts.append(f"{bd.attack_bonus} ability")
         if bd.bonus_text_attack > 0:
             attack_parts.append(f"{bd.bonus_text_attack} bonus_text")
+        if bd.conditional_attack_bonus > 0:
+            attack_parts.append(f"{bd.conditional_attack_bonus} conditional")
         if len(attack_parts) > 1:
             lines.append(f"  ATK: {' + '.join(attack_parts)} = {bd.total_attack}")
         else:

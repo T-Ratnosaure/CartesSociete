@@ -92,11 +92,17 @@ class ConditionalAbilityResult:
 
     Attributes:
         total_imblocable_damage: Imblocable damage from conditional abilities.
+        total_attack_bonus: Attack bonus from conditional abilities.
+        total_health_bonus: Health bonus from conditional abilities.
+        attack_multiplier: Attack multiplier (e.g., 2 for double, 3 for triple).
         po_spent: Total PO spent on conditional abilities.
         effects: List of activated conditional effects.
     """
 
     total_imblocable_damage: int = 0
+    total_attack_bonus: int = 0
+    total_health_bonus: int = 0
+    attack_multiplier: int = 1  # Default is 1x (no multiplier)
     po_spent: int = 0
     effects: list[str] = field(default_factory=list)
 
@@ -131,6 +137,32 @@ class BonusTextResult:
     effects: list[str] = field(default_factory=list)
 
 
+@dataclass
+class InvocateurAbilityResult:
+    """Result of resolving Invocateur demon summoning.
+
+    Attributes:
+        demons_to_summon: List of demon names to summon.
+        effects: Description of summoning effects.
+    """
+
+    demons_to_summon: list[str] = field(default_factory=list)
+    effects: list[str] = field(default_factory=list)
+
+
+@dataclass
+class MontureAbilityResult:
+    """Result of resolving Monture card draw ability.
+
+    Attributes:
+        cards_to_draw: Number of cost-5 cards to draw.
+        effects: Description of draw effects.
+    """
+
+    cards_to_draw: int = 0
+    effects: list[str] = field(default_factory=list)
+
+
 # Regex patterns for parsing ability effects
 _ATK_PATTERN = re.compile(r"\+(\d+)\s*(?:ATQ|dgt|atq)", re.IGNORECASE)
 _PV_PATTERN = re.compile(r"\+(\d+)\s*(?:PV|pv|HP)", re.IGNORECASE)
@@ -139,6 +171,26 @@ _IMBLOCABLE_PATTERN = re.compile(r"(\d+)\s*(?:dgt|dgts)?\s*imblocable", re.IGNOR
 
 # Patterns for conditional ability conditions
 _PO_CONDITION_PATTERN = re.compile(r"(\d+)\s*PO", re.IGNORECASE)
+
+# Patterns for Dragon conditional effects
+_DOUBLE_ATTACK_PATTERN = re.compile(r"double\s+son\s+attaque", re.IGNORECASE)
+_TRIPLE_ATTACK_PATTERN = re.compile(r"triple\s+son\s+attaque", re.IGNORECASE)
+_QUADRUPLE_ATTACK_PATTERN = re.compile(r"quadruple\s+son\s+attaque", re.IGNORECASE)
+_PER_CARD_BONUS_PATTERN = re.compile(
+    r"\+(\d+)\s*(?:ATQ|dgt)\s+par\s+(\w+)", re.IGNORECASE
+)
+_BONUS_TO_CLASS_PATTERN = re.compile(
+    r"\+(\d+)\s*(?:ATQ|dgt)\s+aux\s+(\w+)", re.IGNORECASE
+)
+
+# Patterns for Invocateur demon summoning
+_SUMMON_DIABLOTIN_PATTERN = re.compile(r"invoque\s+un\s+diablotin", re.IGNORECASE)
+_SUMMON_DEMON_MINEUR_PATTERN = re.compile(r"d[ée]mon\s+mineur", re.IGNORECASE)
+_SUMMON_SUCCUBE_PATTERN = re.compile(r"une?\s+succube", re.IGNORECASE)
+_SUMMON_DEMON_MAJEUR_PATTERN = re.compile(r"d[ée]mon\s+majeur", re.IGNORECASE)
+
+# Patterns for Monture card draw
+_DRAW_COST_5_PATTERN = re.compile(r"piocher\s+une\s+carte\s+co[uû]t\s*5", re.IGNORECASE)
 
 # Patterns for bonus_text effects
 _BONUS_FOR_FAMILY_PATTERN = re.compile(
@@ -439,21 +491,46 @@ def resolve_conditional_abilities(
     """Resolve conditional abilities (e.g., Dragon PO spending).
 
     Dragon class cards have conditional abilities like:
-    - "1 PO": "2 dgt imblocable"
-    - "2 PO": "3 dgt imblocable"
+    - "1 PO": "2 dgt imblocable" (imblocable damage)
+    - "1 PO": "double son attaque" (attack multiplier)
+    - "1 PO": "+3 ATQ" (attack bonus)
+    - "2 PO": "et +3 PV" (health bonus, cumulative)
+    - "1 PO": "+1 ATQ par raton" (per-card bonus)
 
-    This function determines which conditional ability to activate based on
-    available PO and returns the effect.
+    This function determines which conditional abilities to activate based on
+    available PO and returns all effects. Dragon conditionals are CUMULATIVE -
+    spending 2 PO activates both the 1 PO and 2 PO effects if marked with "et".
 
     Args:
         player: The player whose abilities to resolve.
         po_to_spend: Optional PO amount to spend. If None, uses player's full PO.
 
     Returns:
-        ConditionalAbilityResult with imblocable damage and PO spent.
+        ConditionalAbilityResult with all bonuses and PO spent.
     """
     result = ConditionalAbilityResult()
     available_po = po_to_spend if po_to_spend is not None else player.po
+
+    # Count cards by family for per-card bonuses
+    family_counts: dict[Family, int] = {}
+    for c in player.board:
+        if c.card_type != CardType.DEMON:
+            family_counts[c.family] = family_counts.get(c.family, 0) + 1
+
+    # Map family names (French) to Family enum
+    family_name_map = {
+        "raton": Family.RATON,
+        "ratons": Family.RATON,
+        "lapin": Family.LAPIN,
+        "lapins": Family.LAPIN,
+        "cyborg": Family.CYBORG,
+        "cyborgs": Family.CYBORG,
+        "nature": Family.NATURE,
+        "atlantide": Family.ATLANTIDE,
+        "ninja": Family.NINJA,
+        "ninjas": Family.NINJA,
+        "neige": Family.NEIGE,
+    }
 
     # Find all Dragon cards with conditional abilities
     for card in player.board:
@@ -466,30 +543,92 @@ def resolve_conditional_abilities(
         if not conditionals:
             continue
 
-        # Find the best conditional ability we can afford
-        best_ability: ConditionalAbility | None = None
-        best_po_cost = 0
-
+        # Collect all affordable abilities (Dragon conditionals are cumulative)
+        # Sort by PO cost to apply in order
+        affordable: list[tuple[int, ConditionalAbility]] = []
         for ability in conditionals:
-            # Parse PO cost from condition
             match = _PO_CONDITION_PATTERN.search(ability.condition)
             if match:
                 po_cost = int(match.group(1))
-                if po_cost <= available_po and po_cost > best_po_cost:
-                    best_ability = ability
-                    best_po_cost = po_cost
+                if po_cost <= available_po:
+                    affordable.append((po_cost, ability))
 
-        if best_ability:
-            # Parse the effect for imblocable damage
-            effect_match = _IMBLOCABLE_PATTERN.search(best_ability.effect)
-            if effect_match:
-                damage = int(effect_match.group(1))
-                result.total_imblocable_damage += damage
-                result.po_spent += best_po_cost
-                result.effects.append(
-                    f"{card.name}: {best_ability.effect} (cost: {best_po_cost} PO)"
-                )
-                available_po -= best_po_cost
+        # Sort by cost and apply cumulative effects
+        affordable.sort(key=lambda x: x[0])
+
+        max_po_spent = 0
+        for po_cost, ability in affordable:
+            effect = ability.effect
+            effect_applied = False
+
+            # Check for attack multiplier
+            if _QUADRUPLE_ATTACK_PATTERN.search(effect):
+                result.attack_multiplier = max(result.attack_multiplier, 4)
+                effect_applied = True
+            elif _TRIPLE_ATTACK_PATTERN.search(effect):
+                result.attack_multiplier = max(result.attack_multiplier, 3)
+                effect_applied = True
+            elif _DOUBLE_ATTACK_PATTERN.search(effect):
+                result.attack_multiplier = max(result.attack_multiplier, 2)
+                effect_applied = True
+
+            # Check for imblocable damage
+            imblocable_match = _IMBLOCABLE_PATTERN.search(effect)
+            if imblocable_match:
+                result.total_imblocable_damage += int(imblocable_match.group(1))
+                effect_applied = True
+
+            # Check for attack bonus
+            atk_match = _ATK_PATTERN.search(effect)
+            if atk_match:
+                result.total_attack_bonus += int(atk_match.group(1))
+                effect_applied = True
+
+            # Check for health bonus
+            pv_match = _PV_PATTERN.search(effect)
+            if pv_match:
+                result.total_health_bonus += int(pv_match.group(1))
+                effect_applied = True
+
+            # Check for per-card bonus (e.g., "+1 ATQ par raton")
+            per_card_match = _PER_CARD_BONUS_PATTERN.search(effect)
+            if per_card_match:
+                bonus_per = int(per_card_match.group(1))
+                family_name = per_card_match.group(2).lower()
+                target_family = family_name_map.get(family_name)
+                if target_family:
+                    count = family_counts.get(target_family, 0)
+                    result.total_attack_bonus += bonus_per * count
+                    effect_applied = True
+
+            # Check for class/family bonus (e.g., "+3 ATQ aux dragons")
+            to_class_match = _BONUS_TO_CLASS_PATTERN.search(effect)
+            if to_class_match:
+                bonus = int(to_class_match.group(1))
+                target_name = to_class_match.group(2).lower()
+                # Count matching cards
+                if target_name in ("dragons", "dragon"):
+                    dragon_count = sum(
+                        1
+                        for c in player.board
+                        if c.card_class == CardClass.DRAGON
+                        and c.card_type != CardType.DEMON
+                    )
+                    result.total_attack_bonus += bonus * dragon_count
+                    effect_applied = True
+                elif target_name in family_name_map:
+                    target_family = family_name_map[target_name]
+                    count = family_counts.get(target_family, 0)
+                    result.total_attack_bonus += bonus * count
+                    effect_applied = True
+
+            if effect_applied:
+                max_po_spent = max(max_po_spent, po_cost)
+                result.effects.append(f"{card.name}: {effect} ({po_cost} PO)")
+
+        if max_po_spent > 0:
+            result.po_spent += max_po_spent
+            available_po -= max_po_spent
 
     return result
 
@@ -591,6 +730,130 @@ def resolve_forgeron_abilities(player: PlayerState) -> int:
             return 3
 
     return 0
+
+
+def resolve_invocateur_abilities(player: PlayerState) -> InvocateurAbilityResult:
+    """Resolve Invocateur demon summoning ability.
+
+    Invocateur class abilities summon demons based on threshold:
+    - Threshold 1: "invoque un diablotin" (summon Diablotin)
+    - Threshold 2: "démon mineur" (summon Demon mineur)
+    - Threshold 4: "une succube" (summon Succube)
+    - Threshold 6: "un démon majeur" (summon Demon Majeur)
+
+    Args:
+        player: The player whose Invocateur abilities to resolve.
+
+    Returns:
+        InvocateurAbilityResult with demons to summon.
+    """
+    result = InvocateurAbilityResult()
+
+    invocateur_count = sum(
+        1
+        for card in player.board
+        if card.card_class == CardClass.INVOCATEUR and card.card_type != CardType.DEMON
+    )
+
+    if invocateur_count == 0:
+        return result
+
+    # Find an Invocateur card to get its scaling abilities
+    for card in player.board:
+        if card.card_class != CardClass.INVOCATEUR:
+            continue
+        if card.card_type == CardType.DEMON:
+            continue
+
+        scaling = card.class_abilities.scaling
+        if not scaling:
+            continue
+
+        # Get the active scaling ability based on Invocateur count
+        active = get_active_scaling_ability(scaling, invocateur_count)
+        if not active:
+            continue
+
+        effect = active.effect
+
+        # Determine which demon to summon (cumulative - summon highest tier)
+        if _SUMMON_DEMON_MAJEUR_PATTERN.search(effect):
+            result.demons_to_summon.append("Demon Majeur")
+            result.effects.append(
+                f"Invocateur threshold {active.threshold}: Summon Demon Majeur"
+            )
+        elif _SUMMON_SUCCUBE_PATTERN.search(effect):
+            result.demons_to_summon.append("Succube")
+            result.effects.append(
+                f"Invocateur threshold {active.threshold}: Summon Succube"
+            )
+        elif _SUMMON_DEMON_MINEUR_PATTERN.search(effect):
+            result.demons_to_summon.append("Demon mineur")
+            result.effects.append(
+                f"Invocateur threshold {active.threshold}: Summon Demon mineur"
+            )
+        elif _SUMMON_DIABLOTIN_PATTERN.search(effect):
+            result.demons_to_summon.append("Diablotin")
+            result.effects.append(
+                f"Invocateur threshold {active.threshold}: Summon Diablotin"
+            )
+
+        break  # Only process one Invocateur's abilities
+
+    return result
+
+
+def resolve_monture_abilities(player: PlayerState) -> MontureAbilityResult:
+    """Resolve Monture card draw ability.
+
+    Monture class abilities draw cards:
+    - Threshold 3: "piocher une carte coût 5 dans la pile (au hasard)"
+
+    Args:
+        player: The player whose Monture abilities to resolve.
+
+    Returns:
+        MontureAbilityResult with cards to draw.
+    """
+    result = MontureAbilityResult()
+
+    monture_count = sum(
+        1
+        for card in player.board
+        if card.card_class == CardClass.MONTURE and card.card_type != CardType.DEMON
+    )
+
+    if monture_count == 0:
+        return result
+
+    # Find a Monture card to get its scaling abilities
+    for card in player.board:
+        if card.card_class != CardClass.MONTURE:
+            continue
+        if card.card_type == CardType.DEMON:
+            continue
+
+        scaling = card.class_abilities.scaling
+        if not scaling:
+            continue
+
+        # Get the active scaling ability based on Monture count
+        active = get_active_scaling_ability(scaling, monture_count)
+        if not active:
+            continue
+
+        effect = active.effect
+
+        # Check for cost-5 card draw
+        if _DRAW_COST_5_PATTERN.search(effect):
+            result.cards_to_draw = 1
+            result.effects.append(
+                f"Monture threshold {active.threshold}: Draw 1 cost-5 card"
+            )
+
+        break  # Only process one Monture's abilities
+
+    return result
 
 
 def count_board_monsters(player: PlayerState) -> int:
