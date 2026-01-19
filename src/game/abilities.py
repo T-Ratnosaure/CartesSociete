@@ -15,6 +15,7 @@ from src.cards.models import (
     CardType,
     ConditionalAbility,
     Family,
+    Gender,
     ScalingAbility,
 )
 
@@ -2122,20 +2123,25 @@ def resolve_bonus_text_effects(
                 )
 
         # === WOMEN FAMILY BONUS ===
-        # This is a placeholder - actual implementation would need gender data
+        # Count female cards of the target family on the player's board
         women_match = _WOMEN_FAMILY_BONUS_PATTERN.search(bonus)
         if women_match:
             atk_val = int(women_match.group(1))
             target_family_name = women_match.group(2).lower()
             if target_family_name in family_map:
                 target_fam = family_map[target_family_name]
-                # Approximate: count half of family as "women"
-                fam_count = family_counts.get(target_fam, 0)
-                women_count = fam_count // 2 + 1
-                result.attack_bonus += atk_val * women_count
-                result.effects.append(
-                    f"{card.name}: +{atk_val * women_count} ATQ (~{women_count} femmes)"
+                # Count actual female cards of the target family
+                women_count = sum(
+                    1
+                    for c in player.board
+                    if c.family == target_fam and c.gender == Gender.FEMALE
                 )
+                if women_count > 0:
+                    result.attack_bonus += atk_val * women_count
+                    total_atk = atk_val * women_count
+                    result.effects.append(
+                        f"{card.name}: +{total_atk} ATQ ({women_count} femmes)"
+                    )
 
     # === DEMON-SPECIFIC EFFECTS ===
     # Demons are normally skipped, but we need to parse their own bonus_text

@@ -54,6 +54,17 @@ class CardType(Enum):
     DEMON = "demon"
 
 
+class Gender(Enum):
+    """Gender of card characters for Women family bonus calculation.
+
+    Used by cards with "+X ATQ pour les femmes [family]" bonus text.
+    """
+
+    MALE = "male"
+    FEMALE = "female"
+    UNKNOWN = "unknown"  # Default for cards without specified gender
+
+
 @dataclass(frozen=True)
 class ScalingAbility:
     """An ability that scales with the number of family/class members.
@@ -132,6 +143,7 @@ class Card:
         health: Health points (PV).
         attack: Attack points (ATQ).
         image_path: Relative path to the card image file.
+        gender: Gender of the card character (for Women family bonus).
     """
 
     id: str
@@ -147,6 +159,7 @@ class Card:
     health: int
     attack: int
     image_path: str
+    gender: Gender = Gender.UNKNOWN  # Default to unknown for backward compatibility
 
 
 @dataclass
