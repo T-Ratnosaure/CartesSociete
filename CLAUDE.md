@@ -1,7 +1,7 @@
 # CLAUDE.md - CartesSociete
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-**READ THIS FILE CAREFULLY. RESPECT ALL INSTRUCTIONS.**
+**READ THIS FILE WITH EXTREME CARE. RESPECT EVERY INSTRUCTION. BMAD+AGENTIC WORKFLOW IS MANDATORY.**
 
 ---
 
@@ -13,6 +13,155 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Strategy optimization** - Optimal plays, probability analysis
 - **Simulation & testing** - Game state simulation, Monte Carlo analysis
 - **Balance analysis** - Card power levels, win rates, fairness
+- **Reinforcement Learning** - AI players using PPO, curriculum learning
+
+---
+
+## MANDATORY WORKFLOW: BMAD + AGENTIC
+
+> **BMAD is a behavior, not a structure.**
+> Every user request goes through Yoni, who determines the appropriate workflow based on complexity triggers.
+
+### 1. ALWAYS CALL YONI FIRST
+
+**FOR EVERY USER REQUEST**, you MUST call `yoni-orchestrator` via the Task tool.
+
+- Yoni coordinates all specialized agents and creates execution plans
+- Yoni selects the appropriate BMAD workflow based on triggers
+- **NEVER** try to handle complex tasks yourself - delegate to experts
+- **This is the MOST IMPORTANT rule in this project**
+
+### 2. Yoni Decision Transparency
+
+When dispatching a workflow, Yoni SHOULD log routing decisions for observability:
+
+```
+YONI ROUTING:
+├── Request: "{brief summary}"
+├── Triggers: [new_feature: YES, domain_crossing: NO, file_impact: 3]
+├── Workflow: FULL_PLANNING
+├── Agents: [alexios, clovis, qc, lamine]
+└── Rationale: New feature with >= 2 files
+```
+
+---
+
+## Agent Governance
+
+**Full agent governance is defined in:** `docs/agents/AGENTS.md`
+
+### Primary Agents (Always Available)
+
+| Agent | Specialty | When to Call |
+|-------|-----------|--------------|
+| **yoni-orchestrator** | Task coordination | **EVERY user request** - call FIRST |
+| **it-core-clovis** | Code quality | Git workflow, PR review, code optimization |
+| **quality-control-enforcer** | Quality assurance | Review implementations, catch shortcuts |
+| **lamine-deployment-expert** | CI/CD & TDD | Pipelines, testing infrastructure |
+
+### Conditional Agents (For Specific Tasks)
+
+| Agent | Specialty | When to Call |
+|-------|-----------|--------------|
+| **alexios-ml-predictor** | ML/optimization | RL design, balance prediction (adapt to game domain) |
+| **dulcy-ml-engineer** | ML engineering | Training pipelines, gymnasium integration |
+| **pierre-jean-ml-advisor** | ML guidance | Hyperparameter tuning, training optimization |
+| **ml-production-engineer** | Productionization | Research-to-production cleanup |
+| **data-engineer-sophie** | Data pipelines | Complex data flows (if needed) |
+
+### Agent Role Distinctions
+
+**Clovis vs QC:**
+- **Clovis** = Structural quality (architecture, design patterns, git workflow compliance)
+- **QC** = Implementation quality (correctness, completeness, edge cases, catching shortcuts)
+
+**Alexios vs Dulcy vs Pierre-Jean:**
+- **Alexios** = Architecture design, reward shaping, model selection
+- **Dulcy** = Pipeline implementation, PyTorch code, training loops
+- **Pierre-Jean** = Practical advice, hyperparameter tuning, troubleshooting
+
+### Rejected Agents (DO NOT USE)
+
+All financial domain agents are **explicitly rejected** for this project:
+- research-remy-stocks, iacopo, nicolas, victor, pnl-validator
+- trading-engine, cost-optimizer, french-tax, helena, portfolio-jean-yves
+- legal-team-lead, legal-compliance, antoine-nlp-expert
+
+**See** `docs/agents/AGENTS.md` **for full governance policies.**
+
+---
+
+## BMAD + AGENTIC Planning Framework
+
+### Complexity Triggers
+
+| Trigger | Condition | Workflow |
+|---------|-----------|----------|
+| `new_feature` | Any new capability | FULL_PLANNING |
+| `domain_crossing` | >= 2 domains touched | INTEGRATION |
+| `file_impact` | >= 2 files changed | FULL_PLANNING |
+| `rl_architecture` | RL model/training changes | ML_DESIGN |
+| `balance_analysis` | Card balance work | BALANCE_REVIEW |
+| `infrastructure` | CI/CD or config changes | ADR |
+| `simple_change` | Single file, low risk, no ML | SKIP (direct execute) |
+
+### Workflow Definitions
+
+**FULL_PLANNING_WORKFLOW**
+```
+ANALYZE → SCOPE → ARCHITECT → DECOMPOSE
+Artifacts: prd-lite.md, architecture.md, task-breakdown.yaml
+```
+
+**ML_DESIGN_WORKFLOW**
+```
+PROBLEM_DEFINITION → ARCHITECTURE_REVIEW → TRAINING_PLAN
+Artifacts: ml-design.md, training-config.yaml
+```
+
+**BALANCE_REVIEW_WORKFLOW**
+```
+CURRENT_STATE → METRICS_ANALYSIS → CHANGE_PROPOSAL
+Artifacts: balance-analysis.md
+```
+
+**INTEGRATION_WORKFLOW**
+```
+ANALYZE → INTERFACE_MAPPING → CONTRACT_DEFINITION
+Artifacts: integration-spec.md
+```
+
+**ADR_WORKFLOW**
+```
+CONTEXT → OPTIONS → DECISION → CONSEQUENCES
+Artifacts: adr-{number}-{title}.md
+```
+
+### Artifact Output Locations
+
+| Artifact Type | Location |
+|---------------|----------|
+| PRD-lite | `docs/planning/prd-lite/{date}-{feature}.md` |
+| Architecture | `docs/planning/architecture/{date}-{feature}.md` |
+| ML Design | `docs/planning/ml-design/{date}-{feature}.md` |
+| Balance Analysis | `docs/planning/balance/{date}-{analysis}.md` |
+| Task Breakdown | `docs/planning/task-breakdowns/{date}-{feature}.yaml` |
+| ADR | `docs/adr/{number}-{title}.md` |
+
+### Planning Mode Behavior
+
+1. **Autonomous** - No user approval ceremonies for workflow selection
+2. **Fast** - Maximum 60 seconds for planning phase
+3. **Artifact-rich** - Persist all decisions as .md files
+4. **Modular** - Each workflow is a separate cognitive unit
+
+### Key References
+
+- **Agent Governance:** `docs/agents/AGENTS.md`
+- **Workflow Config:** `_bmad/config.yaml`
+- **Workflow Details:** `_bmad/workflows.md`
+- **Templates:** `docs/planning/TEMPLATES.md`
+- **ADR Index:** `docs/adr/`
 
 ---
 
@@ -32,21 +181,21 @@ uv add --dev <package-name>
 
 **FORBIDDEN:** `uv pip install`, `@latest` syntax, pip directly
 
-### Code Quality
+### Code Quality (RUN IN THIS ORDER)
 ```bash
-# Import sorting (AUTHORITATIVE - run first)
+# 1. Import sorting (AUTHORITATIVE - run first)
 uv run isort .
 
-# Code formatting
+# 2. Code formatting
 uv run ruff format .
 
-# Linting
+# 3. Linting
 uv run ruff check .
 
-# Type checking
+# 4. Type checking
 uv run pyrefly check
 
-# Run tests
+# 5. Run tests
 uv run pytest
 ```
 
@@ -56,45 +205,28 @@ uv run pytest
 
 ```
 CartesSociete/
-├── src/                   # Main source code
+├── _bmad/                # BMAD framework configuration
+│   ├── config.yaml       # Triggers and workflow config
+│   ├── workflows.md      # Workflow definitions
+│   └── templates/        # Planning artifact templates
+├── src/                  # Main source code
 │   ├── cards/            # Card definitions and types
 │   ├── game/             # Game engine and rules
 │   ├── players/          # Player strategies and AI
+│   ├── rl/               # Reinforcement learning
 │   ├── simulation/       # Game simulation tools
 │   └── analysis/         # Balance and statistics analysis
 ├── tests/                # Test suite
 ├── data/                 # Card data, game logs
 ├── notebooks/            # Analysis notebooks
 ├── configs/              # Game configuration files
-└── scripts/              # CLI scripts
+├── scripts/              # CLI scripts
+├── docs/
+│   ├── agents/           # Agent governance (AGENTS.md)
+│   ├── planning/         # BMAD planning artifacts
+│   └── adr/              # Architecture Decision Records
+└── audits/               # Security/quality audits
 ```
-
----
-
-## Multi-Agent Architecture
-
-### MANDATORY WORKFLOW
-
-**These rules are NON-NEGOTIABLE. Failure to follow them is unacceptable.**
-
-1. **ALWAYS CALL YONI FIRST**
-   - **FOR EVERY USER REQUEST**, you MUST call `yoni-orchestrator` via the Task tool
-   - Yoni coordinates all specialized agents and creates execution plans
-   - **NEVER** try to handle complex tasks yourself - delegate to experts
-
-2. **ALWAYS USE SPECIALIZED AGENTS**
-   - Launch multiple agents in parallel when tasks are independent
-   - Trust agent outputs - they are domain experts
-
-### Primary Agents for This Project
-
-| Agent | Specialty | When to Call |
-|-------|-----------|--------------|
-| **yoni-orchestrator** | Task coordination | **EVERY user request** - call FIRST |
-| **alexios-ml-predictor** | ML/optimization | Balance analysis, win rate prediction |
-| **it-core-clovis** | Code quality | Git workflow, PR review, code optimization |
-| **quality-control-enforcer** | Quality assurance | Review implementations, catch shortcuts |
-| **lamine-deployment-expert** | CI/CD & TDD | Pipelines, testing infrastructure |
 
 ---
 
@@ -245,7 +377,35 @@ def play_card(card: Card, target: Target) -> GameState:
 ### Agent Anti-Patterns
 1. **NEVER** skip calling Yoni for user requests
 2. **NEVER** create PRs without review agents
+3. **NEVER** use rejected financial domain agents
+4. **NEVER** bypass BMAD workflows for complex tasks
+
+---
+
+## Example Planning Flow
+
+```
+User: "Add new Lapin card family synergy"
+
+Yoni detects:
+├── new_feature: true
+├── domains: [cards, game, players]
+├── estimated_files: 4+
+└── balance_impact: true
+
+Triggers:
+├── FULL_PLANNING (new feature, >2 files)
+└── BALANCE_REVIEW (affects game balance)
+
+Executes:
+├── FULL_PLANNING → prd-lite.md, architecture.md, task-breakdown.yaml
+└── BALANCE_REVIEW → balance-analysis.md
+
+Handoff:
+└── Task breakdown → Agent delegation → Execution
+```
 
 ---
 
 **Remember: ALWAYS call yoni-orchestrator FIRST for every user request!**
+**BMAD workflows ensure every complex task is properly planned and executed.**
