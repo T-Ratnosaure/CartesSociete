@@ -43,6 +43,34 @@ See: [Wealon Perspective](wealon-perspective.md) for full audit
 
 ---
 
+## ANALYTICAL MANDATE (NON-NEGOTIABLE)
+
+**CartesSociete is an analytical instrument, not a designer.**
+
+### Three-Layer Distinction
+
+| Layer | Scope | Authority |
+|-------|-------|-----------|
+| **Layer 1: Descriptive & Strategic Analysis** | Simulations, win rates, correlations, equilibria, outliers, comparisons | **AGENT-ALLOWED** |
+| **Layer 2: Normative Interpretation** | "Balanced", "good", "bad", "unhealthy" | **HUMAN-ONLY** |
+| **Layer 3: Prescriptive Decisions** | "Should change", "buff", "nerf" | **HUMAN-ONLY** |
+
+### Output Guidelines
+
+**✅ CORRECT:**
+- "Strategy A dominates Strategy B in 72% of matchups."
+- "Card X has a statistically significant win correlation (r=0.34)."
+- "The equilibrium favors Family Y under current rules."
+
+**❌ FORBIDDEN:**
+- "Card X is overpowered."
+- "This strategy is unhealthy for the game."
+- "The game would be better if…"
+
+**When interpretation is required:** State "This requires human judgment."
+
+---
+
 ## 1. Primary Agents
 
 ### yoni-orchestrator

@@ -310,25 +310,59 @@ After completing BMAD+AGENTIC design, the need for consistent quality control be
 
 ---
 
+### Decision D010: Analytical Mandate (Three-Layer Distinction)
+
+**Date**: 2026-01-19
+**Decision**: Establish a non-negotiable three-layer distinction for all agent output.
+
+**Context**:
+CartesSociete exists to analyze the game mathematically, statistically, and strategically. The distinction between what agents CAN do and what requires human judgment was implicit. This decision makes it explicit and binding.
+
+**The Three Layers**:
+
+| Layer | Scope | Authority |
+|-------|-------|-----------|
+| **Layer 1: Descriptive & Strategic Analysis** | Simulations, win rates, correlations, equilibria, outliers, comparisons | **AGENT-ALLOWED** |
+| **Layer 2: Normative Interpretation** | "Balanced", "unbalanced", "good", "bad", "healthy", "unhealthy" | **HUMAN-ONLY** |
+| **Layer 3: Prescriptive Decisions** | "Should change", "buff", "nerf", design recommendations | **HUMAN-ONLY** |
+
+**Decision**: This mandate is NON-NEGOTIABLE and defines the system's identity.
+
+**Rationale**:
+- Agents excel at computation, statistics, and game theory
+- Agents cannot reason about design intent or player experience
+- Clear boundaries prevent scope creep into game design
+- Human designers need data, not opinions
+
+**Consequences**:
+- All agent output must use descriptive language
+- Forbidden phrases: "overpowered", "unhealthy", "better design", "should be nerfed"
+- Required phrasing: "dominates in X% of matchups", "statistically significant correlation"
+- When interpretation is needed, agents must state "This requires human judgment"
+
+**Success Criterion**:
+1. Output reveals game structure without claiming design authority
+2. Humans can use agent data to make decisions
+3. Agents never substitute analysis for judgment
+
+**Technical Debt**: None (this is governance closure)
+
+---
+
 ## Part 2: Open Questions
 
 ### OQ001: Should Balance Analysis Be In-Scope for Agents?
 
+**Status**: ✅ RESOLVED by D010 (Analytical Mandate)
+
 **Question**: Can agents autonomously perform balance analysis, or is this inherently a human task?
 
-**Current Answer**: Partial. Agents can:
-- Run simulations (Dulcy)
-- Calculate metrics (Alexios)
-- Identify statistical outliers
+**Resolution**: The three-layer distinction clarifies this completely:
+- **Layer 1 (Agent-Allowed)**: Run simulations, compute statistics, identify outliers, calculate correlations
+- **Layer 2 (Human-Only)**: Interpret what "balanced" means, judge whether something is "good" or "bad"
+- **Layer 3 (Human-Only)**: Propose changes, recommend buffs/nerfs
 
-Agents cannot:
-- Interpret what "balanced" means for game feel
-- Propose specific card changes
-- Understand design intent
-
-**Implications**: Balance analysis is human-supervised, not autonomous.
-
-**Revisit When**: Balance questions become frequent enough to warrant dedicated workflow.
+**Final Answer**: Agents perform Layer 1 analysis. Layers 2 and 3 are human-only. This is not a limitation but the system's identity.
 
 ---
 
@@ -486,10 +520,13 @@ We don't have:
 
 ### Context That Must Be Preserved
 
-1. **SYSTEM IS FROZEN** - Baseline v1.0 is authoritative, see baseline-v1.0.md
-2. **Yoni is the entry point** - but Explore can be called directly for simple lookups
-3. **No agent understands game rules** - game design questions need human input
-4. **Balance analysis is OUT OF SCOPE** - agents collect data, humans interpret
+1. **ANALYTICAL MANDATE** - Three-layer distinction is NON-NEGOTIABLE (see D010)
+   - Layer 1 (Descriptive): Agents DO statistics, simulations, game theory
+   - Layer 2 (Normative): Agents DO NOT judge "balanced", "good", "bad"
+   - Layer 3 (Prescriptive): Agents DO NOT recommend changes
+2. **SYSTEM IS FROZEN** - Baseline v1.0 is authoritative, see baseline-v1.0.md
+3. **Yoni is the entry point** - but Explore can be called directly for simple lookups
+4. **No agent understands game rules** - game design questions need human input
 5. **ML escalation order is Dulcy → Pierre-Jean → Alexios**
 6. **Financial agents are never used** - domain mismatch is fundamental
 7. **Wealon is MANDATORY** - exit gate for every task (see D009)

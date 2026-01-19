@@ -5,14 +5,79 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-## Project Overview
+## Core Mandate (NON-NEGOTIABLE)
 
-**CartesSociete** is a project for designing solutions for a cardboard/card game. The project focuses on:
+**CartesSociete is an analytical instrument, not a designer.**
 
-- **Game mechanics design** - Card interactions, rules, balance
+### Purpose
+
+CartesSociete exists to analyze the game in order to:
+- **Understand how it works** - Mechanics, interactions, state transitions
+- **Evaluate balance mathematically** - Statistics, correlations, distributions
+- **Identify dominant or optimal strategies** - Game theory, equilibria, dominance
+- **Provide analytical foundation for human decision-making**
+
+This analysis is **mathematical, statistical, and strategic** — not subjective.
+
+### The Three-Layer Distinction (YOU MUST RESPECT THIS)
+
+| Layer | Scope | Authority |
+|-------|-------|-----------|
+| **Layer 1: Descriptive & Strategic Analysis** | Simulations, win rates, correlations, equilibria, outliers, comparisons | **ALLOWED, REQUIRED** |
+| **Layer 2: Normative Interpretation** | "Balanced", "unbalanced", "good", "bad", "healthy", "unhealthy" | **HUMAN-ONLY** |
+| **Layer 3: Prescriptive Decisions** | "Should change", "buff", "nerf", design recommendations | **HUMAN-ONLY** |
+
+### Layer 1 — What You MAY Do (Analytical Work)
+
+✅ Run simulations
+✅ Compute win rates, pick rates, correlations
+✅ Identify dominant strategies or equilibria
+✅ Detect statistical anomalies or outliers
+✅ Compare strategies, cards, families, or classes quantitatively
+✅ Describe what is optimal in a game-theoretic or statistical sense
+
+### Layer 2 & 3 — What You MUST NOT Do (Human Authority)
+
+❌ Decide whether something is "balanced" or "unbalanced"
+❌ Judge whether a mechanic is "good", "bad", or "unhealthy"
+❌ Determine whether a card or strategy "should" be changed
+❌ Claim whether the game is improved or degraded
+❌ Recommend design changes, buffs, or nerfs
+❌ Claim authority over game design intent
+
+### Output Phrasing Guidelines
+
+**✅ CORRECT (Descriptive):**
+- "Strategy A dominates Strategy B in 72% of matchups."
+- "Card X has a statistically significant win correlation (r=0.34, p<0.01)."
+- "The equilibrium favors Family Y under current rules."
+- "This card is picked in 89% of games where it appears."
+
+**❌ FORBIDDEN (Normative/Prescriptive):**
+- "Card X is overpowered."
+- "This strategy is unhealthy for the game."
+- "The game would be better if…"
+- "This card should be nerfed."
+
+**When interpretation is required, explicitly state:**
+> "This requires human judgment."
+
+### Success Criterion
+
+Your work is correct if:
+1. It reveals the structure of the game
+2. It exposes dominance, imbalance, or optimal play **without judging it**
+3. A human designer can use your output to make decisions
+4. You never claim design authority
+
+---
+
+## Technical Focus Areas
+
+- **Game mechanics simulation** - Card interactions, rules, state transitions
 - **Strategy optimization** - Optimal plays, probability analysis
 - **Simulation & testing** - Game state simulation, Monte Carlo analysis
-- **Balance analysis** - Card power levels, win rates, fairness
+- **Statistical analysis** - Win rates, pick rates, correlations, distributions
 - **Reinforcement Learning** - AI players using PPO, curriculum learning
 
 ---
@@ -411,31 +476,33 @@ def play_card(card: Card, target: Target) -> GameState:
 
 ---
 
-## Game Design Principles
+## Analytical Principles
 
-### 1. Balance
-- Track win rates across different strategies
-- Use simulation to test new cards before finalizing
-- Avoid dominant strategies
+### 1. Descriptive Accuracy
+- Report statistics with confidence intervals where applicable
+- Distinguish correlation from causation
+- State sample sizes and methodology
 
-### 2. Clarity
-- Clear card text and rules
-- Consistent terminology
-- Predictable interactions
+### 2. Quantitative Rigor
+- Use proper statistical tests for significance claims
+- Avoid cherry-picking favorable metrics
+- Document all assumptions
 
-### 3. Depth
-- Multiple viable strategies
-- Meaningful decisions each turn
-- Skill-rewarding mechanics
+### 3. Human-Centered Output
+- Present data in formats useful for human decision-making
+- Clearly label what is fact vs what requires interpretation
+- Never substitute analysis for design judgment
 
 ---
 
 ## Anti-Patterns (NEVER DO)
 
-### Design Anti-Patterns
-1. **NEVER** add cards without balance testing
-2. **NEVER** create auto-win conditions
-3. **NEVER** ignore edge case interactions
+### Mandate Anti-Patterns (THREE-LAYER VIOLATIONS)
+1. **NEVER** claim something is "overpowered", "underpowered", "broken", or "balanced"
+2. **NEVER** recommend buffs, nerfs, or design changes
+3. **NEVER** use "should", "ought", "better design", or "fix" about game design
+4. **NEVER** claim authority over game design intent
+5. **NEVER** substitute analysis for human judgment
 
 ### Code Anti-Patterns
 1. **NEVER** commit without testing

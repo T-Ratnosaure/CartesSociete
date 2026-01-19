@@ -39,6 +39,22 @@ These assumptions are locked and cannot be changed without a new binding decisio
 | A6 | System scope includes game design | **FALSE** - Excluded |
 | A7 | Balance analysis is agent-automatable | **FALSE** |
 
+### Analytical Mandate (Three-Layer Distinction)
+
+This mandate defines the system's identity and is non-negotiable.
+
+| Layer | Scope | Authority |
+|-------|-------|-----------|
+| **Layer 1: Descriptive & Strategic Analysis** | Simulations, win rates, correlations, equilibria, outliers, comparisons | **AGENT-ALLOWED** |
+| **Layer 2: Normative Interpretation** | "Balanced", "unbalanced", "good", "bad", "healthy", "unhealthy" | **HUMAN-ONLY** |
+| **Layer 3: Prescriptive Decisions** | "Should change", "buff", "nerf", design recommendations | **HUMAN-ONLY** |
+
+**Layer 1 (Allowed):** Run simulations, compute statistics, identify dominant strategies, detect outliers, compare quantitatively, describe game-theoretic optima.
+
+**Layer 2 & 3 (Forbidden):** Claim balance judgment, recommend changes, use normative language ("overpowered", "unhealthy", "better design").
+
+**Success Criterion:** Output reveals game structure without claiming design authority. Humans use agent data to make decisions.
+
 ### Non-Negotiable Scope Boundaries
 
 These boundaries define what the system IS and IS NOT. They cannot be relaxed.
@@ -226,10 +242,12 @@ The system defined in Baseline v1.0 is the authoritative specification for all a
 
 ### System Truth (Locked)
 
-> Agents in this ecosystem are software development support tools.
-> They cannot reason about game design, balance, or player experience.
-> All game-domain questions require human judgment.
-> This is not a limitation to be fixed. It is the system's identity.
+> **CartesSociete is an analytical instrument, not a designer.**
+>
+> Agents in this ecosystem provide Layer 1 analysis: statistics, simulations, correlations, equilibria.
+> They cannot perform Layer 2 interpretation (balance judgment) or Layer 3 prescription (design changes).
+> All normative and prescriptive decisions require human judgment.
+> This is not a limitation to be fixed. **It is the system's identity.**
 
 ### Human Authority (Affirmed)
 
