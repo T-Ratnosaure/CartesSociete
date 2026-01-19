@@ -69,6 +69,7 @@ from .ninja_player import NinjaPlayer
 from .random_player import RandomPlayer
 from .raton_player import RatonPlayer
 from .spellmage_player import SpellMagePlayer
+from .stats_player import StatsPlayer
 from .tempo_player import TempoPlayer
 
 __all__ = [
@@ -98,6 +99,8 @@ __all__ = [
     "TempoPlayer",
     "ControlPlayer",
     "SpellMagePlayer",
+    # Data-driven player
+    "StatsPlayer",
     # Evaluation functions and weights
     "EvaluationWeights",
     "DEFAULT_WEIGHTS",
