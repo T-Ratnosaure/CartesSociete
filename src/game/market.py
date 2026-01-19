@@ -8,6 +8,10 @@ import copy
 import random
 from typing import Protocol, runtime_checkable
 
+from src.cards.models import Card, CardType, CreatureCard, DemonCard, WeaponCard
+
+from .state import GameState
+
 
 @runtime_checkable
 class Shuffler(Protocol):
@@ -27,10 +31,6 @@ class _GlobalRandomShuffler:
 
 # Default shuffler uses global random module
 _default_shuffler = _GlobalRandomShuffler()
-
-from src.cards.models import Card, CardType, CreatureCard, DemonCard, WeaponCard
-
-from .state import GameState
 
 
 def setup_decks(
