@@ -20,6 +20,7 @@ from .models import (
     DemonCard,
     Family,
     FamilyAbilities,
+    Gender,
     ScalingAbility,
     WeaponCard,
 )
@@ -143,6 +144,26 @@ def _parse_class_abilities(
     )
 
 
+def _parse_gender(gender_str: str | None) -> Gender:
+    """Parse gender string from JSON data.
+
+    Args:
+        gender_str: Gender string ("male", "female", or None).
+
+    Returns:
+        Gender enum value, defaulting to UNKNOWN if not specified.
+    """
+    if gender_str is None:
+        return Gender.UNKNOWN
+    gender_lower = gender_str.lower()
+    if gender_lower == "male":
+        return Gender.MALE
+    elif gender_lower == "female":
+        return Gender.FEMALE
+    else:
+        return Gender.UNKNOWN
+
+
 def _parse_card(data: dict) -> Card:
     """Parse a card from JSON data.
 
@@ -159,6 +180,7 @@ def _parse_card(data: dict) -> Card:
     family = Family(data["family"])
     card_class = CardClass(data["card_class"])
     bonus_text = data.get("bonus_text")
+    gender = _parse_gender(data.get("gender"))
 
     base_kwargs = {
         "id": data["id"],
@@ -177,6 +199,7 @@ def _parse_card(data: dict) -> Card:
         "health": data["health"],
         "attack": data["attack"],
         "image_path": data["image_path"],
+        "gender": gender,
     }
 
     if card_type == CardType.CREATURE:

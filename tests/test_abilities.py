@@ -1974,3 +1974,137 @@ class TestDeckRevealMechanic:
         assert result.deck_reveal_multiplier == 2
         # Total effect should show 10 ATK (5 * 2)
         assert "+10 ATK" in result.effects[0]
+
+
+class TestWomenFamilyBonus:
+    """Tests for Women family bonus calculation using gender attribute (R-02)."""
+
+    def test_women_bonus_counts_female_cards(self, repo) -> None:
+        """Test that Women bonus correctly counts female cards of target family."""
+        from src.cards.models import Family, Gender
+        from src.game.abilities import resolve_bonus_text_effects
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get Atlantide cards and create copies with gender set
+        atlantide_cards = [c for c in repo.get_all() if c.family == Family.ATLANTIDE]
+        if len(atlantide_cards) < 3:
+            pytest.skip("Not enough Atlantide cards for test")
+
+        # Create a card with Women Atlantide bonus
+        card_with_bonus = deepcopy(atlantide_cards[0])
+        card_with_bonus.bonus_text = "+2 ATQ pour les femmes Atlantide"
+        card_with_bonus.gender = Gender.FEMALE
+        player.board.append(card_with_bonus)
+
+        # Add 2 female Atlantide cards (clear their bonus_text to isolate test)
+        female_card1 = deepcopy(atlantide_cards[1])
+        female_card1.gender = Gender.FEMALE
+        female_card1.bonus_text = None
+        player.board.append(female_card1)
+
+        female_card2 = deepcopy(atlantide_cards[2])
+        female_card2.gender = Gender.FEMALE
+        female_card2.bonus_text = None
+        player.board.append(female_card2)
+
+        # We have 3 female Atlantide cards total, bonus should be +6 ATQ (3 * 2)
+        result = resolve_bonus_text_effects(player)
+
+        assert result.attack_bonus == 6
+        assert "3 femmes" in result.effects[0]
+
+    def test_women_bonus_ignores_male_cards(self, repo) -> None:
+        """Test that Women bonus does not count male cards."""
+        from src.cards.models import Family, Gender
+        from src.game.abilities import resolve_bonus_text_effects
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        atlantide_cards = [c for c in repo.get_all() if c.family == Family.ATLANTIDE]
+        if len(atlantide_cards) < 3:
+            pytest.skip("Not enough Atlantide cards for test")
+
+        # Card with Women Atlantide bonus (female)
+        card_with_bonus = deepcopy(atlantide_cards[0])
+        card_with_bonus.bonus_text = "+2 ATQ pour les femmes Atlantide"
+        card_with_bonus.gender = Gender.FEMALE
+        player.board.append(card_with_bonus)
+
+        # Add 1 female and 1 male (clear their bonus_text to isolate test)
+        female_card = deepcopy(atlantide_cards[1])
+        female_card.gender = Gender.FEMALE
+        female_card.bonus_text = None
+        player.board.append(female_card)
+
+        male_card = deepcopy(atlantide_cards[2])
+        male_card.gender = Gender.MALE
+        male_card.bonus_text = None
+        player.board.append(male_card)
+
+        # Only 2 female Atlantide cards, bonus should be +4 ATQ (2 * 2)
+        result = resolve_bonus_text_effects(player)
+
+        assert result.attack_bonus == 4
+        assert "2 femmes" in result.effects[0]
+
+    def test_women_bonus_no_females_no_bonus(self, repo) -> None:
+        """Test that Women bonus is 0 when no female cards of target family."""
+        from src.cards.models import Family, Gender
+        from src.game.abilities import resolve_bonus_text_effects
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        atlantide_cards = [c for c in repo.get_all() if c.family == Family.ATLANTIDE]
+        if len(atlantide_cards) < 2:
+            pytest.skip("Not enough Atlantide cards for test")
+
+        # Card with Women Atlantide bonus but male
+        card_with_bonus = deepcopy(atlantide_cards[0])
+        card_with_bonus.bonus_text = "+2 ATQ pour les femmes Atlantide"
+        card_with_bonus.gender = Gender.MALE
+        player.board.append(card_with_bonus)
+
+        # Add only male cards (clear bonus_text to isolate test)
+        male_card = deepcopy(atlantide_cards[1])
+        male_card.gender = Gender.MALE
+        male_card.bonus_text = None
+        player.board.append(male_card)
+
+        # No female Atlantide cards, bonus should be 0
+        result = resolve_bonus_text_effects(player)
+
+        assert result.attack_bonus == 0
+
+    def test_women_bonus_unknown_gender_not_counted(self, repo) -> None:
+        """Test that cards with unknown gender are not counted as female."""
+        from src.cards.models import Family, Gender
+        from src.game.abilities import resolve_bonus_text_effects
+
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        atlantide_cards = [c for c in repo.get_all() if c.family == Family.ATLANTIDE]
+        if len(atlantide_cards) < 2:
+            pytest.skip("Not enough Atlantide cards for test")
+
+        # Card with Women Atlantide bonus (female)
+        card_with_bonus = deepcopy(atlantide_cards[0])
+        card_with_bonus.bonus_text = "+2 ATQ pour les femmes Atlantide"
+        card_with_bonus.gender = Gender.FEMALE
+        player.board.append(card_with_bonus)
+
+        # Add 1 card with unknown gender (should not count, clear bonus_text)
+        unknown_card = deepcopy(atlantide_cards[1])
+        unknown_card.gender = Gender.UNKNOWN
+        unknown_card.bonus_text = None
+        player.board.append(unknown_card)
+
+        # Only 1 female Atlantide card (the bonus card itself)
+        result = resolve_bonus_text_effects(player)
+
+        assert result.attack_bonus == 2
+        assert "1 femmes" in result.effects[0]
