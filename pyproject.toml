@@ -10,6 +10,20 @@ dependencies = [
     "sb3-contrib>=2.7.1",
     "stable-baselines3[extra]>=2.7.1",
     "tensorboard>=2.20.0",
+    # Card recognition (Phase 1)
+    "albumentations>=1.4.0",
+    "opencv-python>=4.9.0",
+    "pillow>=10.0.0",
+    "pyyaml>=6.0.0",
+]
+
+[project.optional-dependencies]
+recognition = [
+    # YOLOv8 training and inference (Phase 2)
+    "ultralytics>=8.1.0",
+    # ONNX export and inference for mobile deployment
+    "onnx>=1.15.0",
+    "onnxruntime>=1.16.0",
 ]
 
 [dependency-groups]
