@@ -654,28 +654,21 @@ We don't have:
 
 ### OQ005: Hardcoded Approximations in Ability Effects
 
-**Status**: OPEN - Awaiting Human Decision
+**Status**: ✅ RESOLVED
 
 **Context**: Technical review found two hardcoded approximations in abilities.py:
 
-1. **R-01 (Deck Reveal ATK)**: `avg_atk = 3` used instead of actual deck contents
-   - Line: abilities.py:1723-1727
-   - Affects: Cards that reveal deck and gain ATK
+1. **R-01 (Deck Reveal ATK)**: ✅ RESOLVED - Implemented actual deck peek in PR #27
+   - Original: `avg_atk = 3` approximation
+   - Solution: Added `game_state` parameter to `resolve_bonus_text_effects()`, uses actual `peek_current_deck()` to get top card ATK
 
-2. **R-02 (Women Family Bonus)**: `women_count = fam_count // 2 + 1`
-   - Line: abilities.py:1988-1994
-   - No gender data exists in card definitions
+2. **R-02 (Women Family Bonus)**: ✅ RESOLVED - Added gender attribute in PR #28
+   - Original: `women_count = fam_count // 2 + 1` approximation
+   - Solution: Added `Gender` enum to card models, repository parses gender from JSON, abilities.py counts actual female cards
 
-**Question**: Are these approximations acceptable or should exact computation be implemented?
+**Resolution**: Human chose Option B for both - implement exact computation.
 
-**Options**:
-| Option | Pros | Cons |
-|--------|------|------|
-| **A: Keep approximations** | Simple, fast | Not accurate |
-| **B: Implement exact computation** | Accurate | Requires deck state access / gender data |
-| **C: Remove these effects** | No approximation needed | Loses card functionality |
-
-**Recommendation**: Human decision required. This is a game mechanics interpretation question.
+**Note**: R-02 requires gender data to be populated in card JSON files for full functionality. Cards without gender data default to UNKNOWN.
 
 ---
 
@@ -748,8 +741,8 @@ The weapon ATK bonus for ninja cards does not verify ninja selection.
 | TD004 | Small changes to abilities.py | LOW | D006 | Commit messages | Lower handoff threshold for this file |
 | TD005 | Silent ability parsing failure | ✅ RESOLVED | OQ003 | D011 | Strict mode implemented per D011 |
 | TD006 | No RL behavior validation | MEDIUM | OQ002 | Manual inspection | Add qualitative metrics |
-| TD007 | Deck reveal ATK approximation | LOW | OQ005 | avg_atk=3 | Awaiting OQ005 decision |
-| TD008 | Women family bonus approximation | LOW | OQ005 | fam/2+1 | Awaiting OQ005 decision |
+| TD007 | Deck reveal ATK approximation | ✅ RESOLVED | OQ005 | - | Fixed via actual deck peek in PR #27 |
+| TD008 | Women family bonus approximation | ✅ RESOLVED | OQ005 | - | Fixed via gender attribute in PR #28 |
 | TD009 | Ninja check not implemented | LOW | OQ008 | Unconditional bonus | Awaiting OQ008 decision |
 | TD010 | Windows parallelism limitation | LOW | RL-05 | DummyVecEnv | Accept or document Linux requirement |
 | TD011 | Dual RNG sources | ✅ RESOLVED | S-01 | - | Fixed via Shuffler protocol in PR #26 |
@@ -861,7 +854,8 @@ The weapon ATK bonus for ninja cards does not verify ninja selection.
 17. **RNG UNIFIED** - market.py now accepts optional Shuffler for reproducibility (S-01, PR #26)
 18. **MCTS DEFAULT TIMEOUT** - 5 second timeout prevents DoS (S-04, PR #26)
 19. **SELF-PLAY WORKS** - ModelOpponentPlayer + SelfPlayCallback properly copy model weights (RL-02, PR #26)
-20. **OPEN QUESTIONS PENDING** - OQ005-OQ008 await human decisions on game mechanics interpretation
+20. **OQ005 RESOLVED** - Both R-01 (deck reveal) and R-02 (women bonus) now use exact computation (PR #27, #28)
+21. **OPEN QUESTIONS PENDING** - OQ006-OQ008 await human decisions on game mechanics interpretation
 
 ### Patterns That Work
 
