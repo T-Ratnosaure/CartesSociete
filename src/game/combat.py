@@ -113,6 +113,7 @@ def calculate_imblocable_damage(player: PlayerState) -> int:
 def calculate_damage(
     attacker: PlayerState,
     defender: PlayerState,
+    dragon_po_spend: int = 0,
 ) -> DamageBreakdown:
     """Calculate damage from one player to another.
 
@@ -128,6 +129,8 @@ def calculate_damage(
     Args:
         attacker: The attacking player.
         defender: The defending player.
+        dragon_po_spend: Explicit PO to spend on Dragon conditional abilities (OQ006).
+            Must be specified explicitly; defaults to 0 (no Dragon abilities activate).
 
     Returns:
         DamageBreakdown with full calculation details.
@@ -140,8 +143,8 @@ def calculate_damage(
     attacker_bonus_text = resolve_bonus_text_effects(attacker, defender)
     defender_bonus_text = resolve_bonus_text_effects(defender, attacker)
 
-    # Resolve conditional abilities (Dragon PO spending)
-    conditional_result = resolve_conditional_abilities(attacker)
+    # Resolve conditional abilities (Dragon PO spending) - OQ006: explicit PO required
+    conditional_result = resolve_conditional_abilities(attacker, dragon_po_spend)
 
     # Calculate attack with all bonuses
     base_attack = attacker.get_total_attack()
@@ -257,7 +260,10 @@ def calculate_damage(
     )
 
 
-def resolve_combat(state: GameState) -> CombatResult:
+def resolve_combat(
+    state: GameState,
+    dragon_po_choices: dict[int, int] | None = None,
+) -> CombatResult:
     """Resolve combat for all players simultaneously.
 
     In CartesSociete, all players attack all opponents simultaneously.
@@ -268,10 +274,14 @@ def resolve_combat(state: GameState) -> CombatResult:
 
     Args:
         state: Current game state.
+        dragon_po_choices: Map of player_id to PO to spend on Dragon abilities (OQ006).
+            If not provided or player not in map, defaults to 0 (no Dragon abilities).
 
     Returns:
         CombatResult with all damage dealt and eliminations.
     """
+    if dragon_po_choices is None:
+        dragon_po_choices = {}
     result = CombatResult()
     alive_players = state.get_alive_players()
 
@@ -281,7 +291,8 @@ def resolve_combat(state: GameState) -> CombatResult:
     for attacker in alive_players:
         for defender in alive_players:
             if attacker.player_id != defender.player_id:
-                breakdown = calculate_damage(attacker, defender)
+                dragon_po = dragon_po_choices.get(attacker.player_id, 0)
+                breakdown = calculate_damage(attacker, defender, dragon_po)
                 result.damage_dealt.append(breakdown)
                 damage_to_apply[defender.player_id] += breakdown.total_damage
 

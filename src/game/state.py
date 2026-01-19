@@ -42,6 +42,7 @@ class PlayerState:
         spells_cast_this_turn: Number of spells cast this turn.
         spell_damage_dealt: Total spell damage dealt this turn.
         sacrificed_this_turn: Cards sacrificed this turn.
+        ninja_selected: Whether a Ninja was selected during the draft phase (OQ008).
     """
 
     player_id: int
@@ -58,6 +59,8 @@ class PlayerState:
     spell_damage_dealt: int = 0
     # Sacrifice tracking
     sacrificed_this_turn: list[Card] = field(default_factory=list)
+    # Ninja selection tracking (OQ008)
+    ninja_selected: bool = False
 
     def __post_init__(self) -> None:
         """Validate player state after initialization."""
