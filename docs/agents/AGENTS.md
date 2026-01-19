@@ -22,9 +22,10 @@ This document is part of **Baseline v1.0** and is now frozen.
 | Category | Agents | Count |
 |----------|--------|-------|
 | **Primary** | yoni, clovis, quality-control, lamine | 4 |
+| **Mandatory Exit Gate** | wealon | 1 |
 | **Conditional** | alexios, dulcy, pierre-jean, ml-production, data-sophie | 5 |
 | **System** | Explore, Plan, general-purpose, claude-code-guide | 4 |
-| **Available but Inactive** | cybersecurity-maxime, wealon | 2 |
+| **Available but Inactive** | cybersecurity-maxime | 1 |
 | **Explicitly Rejected** | Financial domain agents (14) | 14 |
 
 ---
@@ -135,25 +136,32 @@ Step 3: alexios-ml-predictor
 
 ---
 
-## 4. Available but Inactive
+## 4. Mandatory Exit Gate
+
+### wealon-regulatory-auditor
+- **Status**: MANDATORY (every task)
+- **Role**: Exit gate auditor - reviews all work before completion
+- **Trigger**: End of every task (after implementation, before completion)
+- **Responsibilities**:
+  - Audit all code changes
+  - Review for shortcuts and workarounds
+  - Verify completeness
+  - Check compliance with project standards
+  - Flag issues that must be resolved
+- **Rule**: No task is complete until Wealon has reviewed it
+
+---
+
+## 5. Available but Inactive
 
 ### cybersecurity-expert-maxime
 - **Status**: INACTIVE
 - **Activate When**: Project becomes externally exposed
 - **Rationale**: No production deployment, no security surface
 
-### wealon-regulatory-auditor
-- **Status**: INACTIVE (triggered activation only)
-- **Activation Triggers**:
-  - Pre-release checkpoint
-  - External code exposure
-  - Authentication/security changes
-  - Monthly technical debt inventory
-- **Rationale**: Overkill for daily research work
-
 ---
 
-## 5. Explicitly Rejected Agents
+## 6. Explicitly Rejected Agents
 
 **DO NOT USE** - Wrong domain for card game project:
 
@@ -178,16 +186,25 @@ Step 3: alexios-ml-predictor
 
 ---
 
-## 6. Usage Rules
+## 7. Usage Rules
 
-### Rule 1: Yoni-First (With Exceptions)
+### Rule 1: Yoni-First (Entry Gate)
 ```
 For user requests:
   1. Simple file lookup → Explore directly
   2. Everything else → Yoni first
 ```
 
-### Rule 2: Development Workflow
+### Rule 2: Wealon-Last (Exit Gate)
+```
+At end of every task:
+  1. Call wealon-regulatory-auditor
+  2. Wealon audits all changes
+  3. Fix any issues Wealon identifies
+  4. Task complete only after Wealon approval
+```
+
+### Rule 3: Development Workflow
 ```
 After writing code:
   1. Quality-Control validates substance
@@ -195,7 +212,7 @@ After writing code:
   3. Lamine handles CI issues
 ```
 
-### Rule 3: ML Workflow
+### Rule 4: ML Workflow
 ```
 For RL issues:
   1. Dulcy (implementation)
@@ -203,7 +220,7 @@ For RL issues:
   3. Alexios (architecture)
 ```
 
-### Rule 4: Handoff Contracts Required For
+### Rule 5: Handoff Contracts Required For
 ```
 - New model architecture
 - New game mechanic
@@ -220,7 +237,7 @@ See: [Decisions Log](decisions.md) for full decision rationale
 
 ---
 
-## 7. Known Friction Points
+## 8. Known Friction Points
 
 From [Friction Map](friction-map.md):
 
@@ -234,19 +251,19 @@ From [Friction Map](friction-map.md):
 
 ---
 
-## 8. Compliance Requirements
+## 9. Compliance Requirements
 
 | Requirement | Policy |
 |-------------|--------|
 | Financial agents | NEVER use |
 | Game design questions | Escalate to human |
 | Balance decisions | Human approval required |
-| Wealon audits | Triggered activation only |
+| Wealon audits | MANDATORY exit gate - every task |
 | Human approval | Required for agent changes |
 
 ---
 
-## 9. Changelog
+## 10. Changelog
 
 | Date | Change | Approved By |
 |------|--------|-------------|
@@ -256,7 +273,7 @@ From [Friction Map](friction-map.md):
 
 ---
 
-## 10. Supporting Documents (Deep Design)
+## 11. Supporting Documents (Deep Design)
 
 ### Governance
 | Document | Purpose |

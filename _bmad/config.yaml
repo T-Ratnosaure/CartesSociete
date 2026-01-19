@@ -1,0 +1,206 @@
+# BMAD + AGENTIC Framework Configuration
+# CartesSociete - Card Game Design & Simulation
+# Version: 1.0
+# Last Updated: 2026-01-19
+
+project:
+  name: CartesSociete
+  type: game-design-simulation
+  domains:
+    - game-engine
+    - ai-players
+    - reinforcement-learning
+    - balance-analysis
+    - simulation
+
+# Complexity triggers that activate Planning Mode
+triggers:
+  # Game Engine Domain
+  new_feature:
+    condition: "Any new game mechanic or system"
+    workflow: FULL_PLANNING
+    threshold: 1
+
+  domain_crossing:
+    condition: ">= 2 domains touched"
+    workflow: INTEGRATION
+    threshold: 2
+
+  file_impact:
+    condition: ">= 2 files changed"
+    workflow: FULL_PLANNING
+    threshold: 2
+
+  # AI/ML Domain
+  rl_architecture:
+    condition: "RL model design or training changes"
+    workflow: ML_DESIGN
+    threshold: 1
+
+  balance_analysis:
+    condition: "Card balance or game rule changes"
+    workflow: BALANCE_REVIEW
+    threshold: 1
+
+  # Infrastructure
+  infrastructure:
+    condition: "CI/CD or config changes"
+    workflow: ADR
+    threshold: 1
+
+  # Simple changes (skip planning)
+  simple_change:
+    condition: "Single file, low risk, no ML"
+    workflow: SKIP
+    threshold: 0
+
+# Workflow definitions
+workflows:
+  FULL_PLANNING:
+    stages:
+      - ANALYZE
+      - SCOPE
+      - ARCHITECT
+      - DECOMPOSE
+    artifacts:
+      - prd-lite.md
+      - architecture.md
+      - task-breakdown.yaml
+    agents:
+      - yoni-orchestrator
+      - it-core-clovis
+      - quality-control-enforcer
+
+  INTEGRATION:
+    stages:
+      - ANALYZE
+      - INTERFACE_MAPPING
+      - CONTRACT_DEFINITION
+    artifacts:
+      - integration-spec.md
+    agents:
+      - yoni-orchestrator
+      - it-core-clovis
+
+  ML_DESIGN:
+    stages:
+      - PROBLEM_DEFINITION
+      - ARCHITECTURE_REVIEW
+      - TRAINING_PLAN
+    artifacts:
+      - ml-design.md
+      - training-config.yaml
+    agents:
+      - yoni-orchestrator
+      - alexios-ml-predictor
+      - dulcy-ml-engineer
+
+  BALANCE_REVIEW:
+    stages:
+      - CURRENT_STATE
+      - METRICS_ANALYSIS
+      - CHANGE_PROPOSAL
+    artifacts:
+      - balance-analysis.md
+    agents:
+      - yoni-orchestrator
+      - alexios-ml-predictor
+
+  ADR:
+    stages:
+      - CONTEXT
+      - OPTIONS
+      - DECISION
+      - CONSEQUENCES
+    artifacts:
+      - adr-{number}-{title}.md
+    agents:
+      - yoni-orchestrator
+      - lamine-deployment-expert
+
+  SKIP:
+    stages: []
+    artifacts: []
+    agents: []
+
+# Agent routing configuration
+routing:
+  entry_point: yoni-orchestrator
+
+  tracks:
+    development:
+      agents:
+        - it-core-clovis
+        - quality-control-enforcer
+        - lamine-deployment-expert
+      triggers:
+        - code_change
+        - pr_creation
+        - ci_cd_issue
+
+    ml_rl:
+      agents:
+        - alexios-ml-predictor
+        - dulcy-ml-engineer
+        - pierre-jean-ml-advisor
+        - ml-production-engineer
+      triggers:
+        - rl_design
+        - training_pipeline
+        - model_optimization
+
+    exploration:
+      agents:
+        - Explore
+        - Plan
+        - general-purpose
+      triggers:
+        - codebase_question
+        - research_task
+
+# Artifact output locations
+artifacts:
+  prd_lite: "docs/planning/prd-lite/{date}-{feature}.md"
+  architecture: "docs/planning/architecture/{date}-{feature}.md"
+  ml_design: "docs/planning/ml-design/{date}-{feature}.md"
+  balance: "docs/planning/balance/{date}-{analysis}.md"
+  task_breakdown: "docs/planning/task-breakdowns/{date}-{feature}.yaml"
+  adr: "docs/adr/{number}-{title}.md"
+  integration: "docs/planning/integration/{date}-{feature}.md"
+
+# Planning mode behavior
+planning_mode:
+  autonomous: true
+  max_duration_seconds: 60
+  artifact_persistence: true
+  modular_workflows: true
+
+# Quality gates
+quality_gates:
+  pre_commit:
+    - isort
+    - ruff_format
+    - ruff_check
+    - pytest
+
+  pre_merge:
+    - ci_pass
+    - quality_control_review
+    - clovis_review
+
+  # MANDATORY: Exit gate for every task
+  task_completion:
+    - wealon_audit  # REQUIRED - no task is complete without Wealon review
+
+# Agent gates (entry and exit)
+agent_gates:
+  entry:
+    agent: yoni-orchestrator
+    trigger: start_of_task
+    required: true
+
+  exit:
+    agent: wealon-regulatory-auditor
+    trigger: end_of_task
+    required: true
+    blocks_completion: true

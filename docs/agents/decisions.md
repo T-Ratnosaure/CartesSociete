@@ -150,7 +150,9 @@ Three ML agents (Dulcy, Pierre-Jean, Alexios) overlap. Need routing clarity.
 ### Decision D005: Conditional Wealon Activation
 
 **Date**: 2026-01-19
-**Decision**: Wealon (auditor) is inactive by default, activated only for specific triggers.
+**Status**: ⚠️ SUPERSEDED by D009
+
+**Original Decision**: Wealon (auditor) is inactive by default, activated only for specific triggers.
 
 **Context**:
 Wealon provides deep audits but adds review overhead.
@@ -163,24 +165,23 @@ Wealon provides deep audits but adds review overhead.
 | **B: Never active** | Fast iteration | Miss security/quality issues |
 | **C: Triggered activation** | Balance | Requires trigger definition |
 
-**Decision**: Option C
+**Original Decision**: Option C
 
-**Activation Triggers**:
+**Original Activation Triggers**:
 - Pre-release checkpoint
 - External code exposure
 - Authentication/security changes
 - Monthly technical debt inventory
 
-**Rationale**:
+**Original Rationale**:
 - Research project doesn't need constant auditing
 - Major milestones benefit from deep review
 - Monthly cadence catches drift
 
-**Consequences**:
-- Most changes don't get Wealon review
-- Risk of issues between audits
+**SUPERSESSION NOTE (2026-01-19)**:
+This decision was superseded by D009 which makes Wealon MANDATORY for every task as an exit gate. The original "triggered activation" approach was upgraded to "always active" to ensure quality control on all work.
 
-**Technical Debt**: None
+**Technical Debt**: None (superseded)
 
 ---
 
@@ -276,6 +277,36 @@ After completing BMAD+AGENTIC design phases, Wealon audit, system truth resoluti
 - Scope boundaries are non-negotiable
 
 **Technical Debt**: None (this is governance closure)
+
+---
+
+### Decision D009: Mandatory Wealon Exit Gate
+
+**Date**: 2026-01-19
+**Decision**: Wealon is MANDATORY for every task as an exit gate auditor.
+
+**Context**:
+After completing BMAD+AGENTIC design, the need for consistent quality control became apparent. The original D005 (conditional activation) was insufficient.
+
+**Supersedes**: D005 (Conditional Wealon Activation)
+
+**New Rule**:
+- Wealon MUST be called at the end of every task
+- No task is complete until Wealon has reviewed it
+- Wealon audits: code changes, planning artifacts, compliance, completeness
+
+**Rationale**:
+- Consistent quality enforcement
+- Catches shortcuts and workarounds
+- Ensures compliance with project standards
+- Exit gate prevents incomplete work from being marked done
+
+**Consequences**:
+- Every task takes longer (audit step added)
+- Higher quality output
+- Issues caught before commit, not after
+
+**Technical Debt**: None
 
 ---
 
@@ -461,7 +492,7 @@ We don't have:
 4. **Balance analysis is OUT OF SCOPE** - agents collect data, humans interpret
 5. **ML escalation order is Dulcy → Pierre-Jean → Alexios**
 6. **Financial agents are never used** - domain mismatch is fundamental
-7. **Wealon is dormant** - activate only at triggers
+7. **Wealon is MANDATORY** - exit gate for every task (see D009)
 8. **abilities.py is high-risk** - extra care for changes
 9. **Human checkpoints are MANDATORY** - for combat.py, abilities.py, state.py
 10. **Design phase is CLOSED** - all changes are governed, not exploratory

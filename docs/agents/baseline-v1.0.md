@@ -59,6 +59,15 @@ SYSTEM IS NOT:
 └── Autonomous game analyst
 ```
 
+### Mandatory Agent Gates
+
+These gates are permanent. They cannot be removed or bypassed.
+
+| Gate | Trigger | Agent | Action |
+|------|---------|-------|--------|
+| AG-01 | Start of every task | yoni-orchestrator | Entry coordination |
+| AG-02 | End of every task | wealon-regulatory-auditor | Exit audit |
+
 ### Mandatory Human Checkpoints
 
 These checkpoints are permanent. They cannot be removed or delegated.

@@ -389,7 +389,10 @@ These agents exist but are NOT integrated for CartesSociete. Listed here for com
 **Why Inactive**: CartesSociete is not production software, no external exposure, no security requirements. Activate only if project becomes externally deployed.
 
 ### 4.2 wealon-regulatory-auditor
-**Why Inactive**: Overkill for research/game project. Activate for major releases or if code becomes production-critical.
+**Status**: MANDATORY EXIT GATE
+**Role**: Audits all work before task completion. Catches shortcuts, verifies completeness, ensures compliance with project standards.
+**Trigger**: End of every task (after implementation, before marking complete).
+**Note**: Upgraded from "inactive" to "mandatory" per governance decision 2026-01-19. See AGENTS.md section 4.
 
 ### 4.3 Manager Agents (jacques, jean-david, gabriel)
 **Why Inactive**: Small project with single developer. Manager orchestration is overhead. Yoni handles coordination.
