@@ -968,23 +968,26 @@ def resolve_conditional_abilities(
     Dragon class cards have conditional abilities like:
     - "1 PO": "2 dgt imblocable" (imblocable damage)
     - "1 PO": "double son attaque" (attack multiplier)
-    - "1 PO": "+3 ATQ" (attack bonus)
-    - "2 PO": "et +3 PV" (health bonus, cumulative)
-    - "1 PO": "+1 ATQ par raton" (per-card bonus)
+    - "2 PO": "+3 ATQ" (attack bonus)
+    - "4 PO": "quadruple son attaque" (attack multiplier)
 
-    This function determines which conditional abilities to activate based on
-    available PO and returns all effects. Dragon conditionals are CUMULATIVE -
-    spending 2 PO activates both the 1 PO and 2 PO effects if marked with "et".
+    This function uses HIGHEST-WINS logic (OQ006/OQ007):
+    - Only the ability at the specified PO tier activates
+    - Lower tier abilities do NOT activate (not cumulative)
+    - If po_to_spend=0 or None, no conditional abilities activate
 
     Args:
         player: The player whose abilities to resolve.
-        po_to_spend: Optional PO amount to spend. If None, uses player's full PO.
+        po_to_spend: Explicit PO amount to spend. If None or 0, no abilities activate.
 
     Returns:
-        ConditionalAbilityResult with all bonuses and PO spent.
+        ConditionalAbilityResult with bonuses from the specified tier only.
     """
     result = ConditionalAbilityResult()
-    available_po = po_to_spend if po_to_spend is not None else player.po
+
+    # OQ006: Explicit PO spending required - if no PO specified, no abilities activate
+    if po_to_spend is None or po_to_spend <= 0:
+        return result
 
     # Count cards by family for per-card bonuses
     family_counts: dict[Family, int] = {}
@@ -1018,21 +1021,25 @@ def resolve_conditional_abilities(
         if not conditionals:
             continue
 
-        # Collect all affordable abilities (Dragon conditionals are cumulative)
-        # Sort by PO cost to apply in order
-        affordable: list[tuple[int, ConditionalAbility]] = []
+        # OQ007: HIGHEST-WINS logic - only apply abilities at the exact PO tier
+        # Find ability that matches the specified PO spend exactly
+        matching_ability: ConditionalAbility | None = None
+        matching_cost = 0
         for ability in conditionals:
             match = _PO_CONDITION_PATTERN.search(ability.condition)
             if match:
                 po_cost = int(match.group(1))
-                if po_cost <= available_po:
-                    affordable.append((po_cost, ability))
+                if po_cost == po_to_spend:
+                    matching_ability = ability
+                    matching_cost = po_cost
+                    break
 
-        # Sort by cost and apply cumulative effects
-        affordable.sort(key=lambda x: x[0])
+        # If no exact match, no ability activates (highest-wins, not cumulative)
+        if matching_ability is None:
+            continue
 
-        max_po_spent = 0
-        for po_cost, ability in affordable:
+        # Apply only the matching ability
+        for po_cost, ability in [(matching_cost, matching_ability)]:
             effect = ability.effect
             effect_applied = False
 
@@ -1098,12 +1105,9 @@ def resolve_conditional_abilities(
                     effect_applied = True
 
             if effect_applied:
-                max_po_spent = max(max_po_spent, po_cost)
                 result.effects.append(f"{card.name}: {effect} ({po_cost} PO)")
-
-        if max_po_spent > 0:
-            result.po_spent += max_po_spent
-            available_po -= max_po_spent
+                # OQ006: Track exact PO spent (one tier per dragon)
+                result.po_spent += po_cost
 
     return result
 
@@ -1982,11 +1986,11 @@ def resolve_bonus_text_effects(
         # === WEAPON/EQUIPMENT ===
         weapon_ninja_match = _WEAPON_ATK_IF_NINJA_PATTERN.search(bonus)
         if weapon_ninja_match:
-            # TODO: Check if ninja was chosen (requires game state tracking)
-            atk_val = int(weapon_ninja_match.group(1))
-            # For now, store the potential bonus
-            result.weapon_atk_bonus += atk_val
-            result.effects.append(f"{card.name}: +{atk_val} ATQ armes (ninja)")
+            # OQ008: Only apply bonus if ninja was selected during draft
+            if player.ninja_selected:
+                atk_val = int(weapon_ninja_match.group(1))
+                result.weapon_atk_bonus += atk_val
+                result.effects.append(f"{card.name}: +{atk_val} ATQ armes (ninja)")
 
         weapon_raton_match = _WEAPON_ATK_PER_RATON_PATTERN.search(bonus)
         if weapon_raton_match:

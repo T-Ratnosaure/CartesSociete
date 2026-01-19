@@ -403,7 +403,9 @@ class TestConditionalAbilities:
     """Tests for conditional ability resolution (Dragon PO spending)."""
 
     def test_dragon_conditional_with_enough_po(self, repo) -> None:
-        """Test that Dragon conditional abilities work when PO is available."""
+        """Test that Dragon conditional abilities work when PO is explicitly spent."""
+        import re
+
         from src.game.abilities import resolve_conditional_abilities
 
         # Find a Dragon card with imblocable conditional abilities
@@ -425,11 +427,21 @@ class TestConditionalAbilities:
         dragon = dragons[0]
         state = create_initial_game_state(num_players=2)
         player = state.players[0]
-        player.po = 3  # Enough for highest tier
 
+        # Find the PO cost from the dragon's imblocable conditional
+        po_cost = 1  # Default
+        for cond in dragon.class_abilities.conditional:
+            if "imblocable" in cond.effect.lower():
+                match = re.search(r"(\d+)\s*PO", cond.condition, re.IGNORECASE)
+                if match:
+                    po_cost = int(match.group(1))
+                    break
+
+        player.po = po_cost
         player.board.append(deepcopy(dragon))
 
-        result = resolve_conditional_abilities(player)
+        # OQ006: Must explicitly specify PO to spend
+        result = resolve_conditional_abilities(player, po_to_spend=po_cost)
 
         # Should have imblocable damage and spent PO
         assert result.total_imblocable_damage > 0
@@ -863,7 +875,9 @@ class TestDragonAttackMultipliers:
     """Tests for Dragon attack multiplier conditional abilities."""
 
     def test_dragon_attack_multiplier_parsed(self, repo) -> None:
-        """Test that Dragon attack multipliers are recognized."""
+        """Test that Dragon attack multipliers are recognized with explicit PO."""
+        import re
+
         from src.game.abilities import resolve_conditional_abilities
 
         # Find a Dragon card with attack multiplier conditionals
@@ -886,17 +900,34 @@ class TestDragonAttackMultipliers:
         dragon = dragons[0]
         state = create_initial_game_state(num_players=2)
         player = state.players[0]
-        player.po = 5  # Enough for any multiplier
 
+        # Find the PO cost for a multiplier ability
+        po_cost = 1
+        for cond in dragon.class_abilities.conditional:
+            effect_lower = cond.effect.lower()
+            if (
+                "double" in effect_lower
+                or "triple" in effect_lower
+                or "quadruple" in effect_lower
+            ):
+                match = re.search(r"(\d+)\s*PO", cond.condition, re.IGNORECASE)
+                if match:
+                    po_cost = int(match.group(1))
+                    break
+
+        player.po = po_cost
         player.board.append(deepcopy(dragon))
 
-        result = resolve_conditional_abilities(player)
+        # OQ006: Must explicitly specify PO to spend
+        result = resolve_conditional_abilities(player, po_to_spend=po_cost)
 
         # Should have an attack multiplier greater than 1
         assert result.attack_multiplier >= 2
 
     def test_dragon_multiplier_in_combat(self, repo) -> None:
-        """Test that Dragon attack multiplier is applied in combat."""
+        """Test that Dragon attack multiplier is applied in combat with explicit PO."""
+        import re
+
         # Find a Dragon card with attack multiplier conditionals
         dragons = [
             c
@@ -916,11 +947,21 @@ class TestDragonAttackMultipliers:
         state = create_initial_game_state(num_players=2)
         player1 = state.players[0]
         player2 = state.players[1]
-        player1.po = 5  # Enough PO
 
+        # Find the PO cost for double attack
+        po_cost = 1
+        for cond in dragon.class_abilities.conditional:
+            if "double" in cond.effect.lower():
+                match = re.search(r"(\d+)\s*PO", cond.condition, re.IGNORECASE)
+                if match:
+                    po_cost = int(match.group(1))
+                    break
+
+        player1.po = po_cost
         player1.board.append(deepcopy(dragon))
 
-        breakdown = calculate_damage(player1, player2)
+        # OQ006: Must explicitly pass dragon_po_spend to calculate_damage
+        breakdown = calculate_damage(player1, player2, dragon_po_spend=po_cost)
 
         # Multiplier should be applied
         assert breakdown.attack_multiplier >= 2
