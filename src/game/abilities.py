@@ -21,6 +21,24 @@ from src.cards.models import (
 from .state import PlayerState
 
 
+class UnmatchedBonusTextError(Exception):
+    """Raised when a bonus_text pattern is not recognized in strict mode.
+
+    This error indicates that a card has bonus_text that doesn't match any
+    known pattern. In strict mode, this is treated as an error rather than
+    being silently ignored.
+
+    Attributes:
+        card_name: Name of the card with unmatched text.
+        bonus_text: The unmatched bonus_text value.
+    """
+
+    def __init__(self, card_name: str, bonus_text: str) -> None:
+        self.card_name = card_name
+        self.bonus_text = bonus_text
+        super().__init__(f"Unmatched bonus_text for card '{card_name}': '{bonus_text}'")
+
+
 class PassiveType(Enum):
     """Types of passive abilities."""
 
@@ -549,6 +567,80 @@ _CYBORG_STEAM_BONUS_PATTERN = re.compile(
 _WOMEN_FAMILY_BONUS_PATTERN = re.compile(
     r"\+(\d+)\s*ATQ\s+pour\s+les\s+femmes\s+(\w+)", re.IGNORECASE
 )
+
+# All patterns used in resolve_bonus_text_effects for strict mode validation.
+# If a bonus_text doesn't match ANY of these patterns, it's unrecognized.
+_ALL_BONUS_TEXT_PATTERNS: tuple[re.Pattern[str], ...] = (
+    _BONUS_FOR_FAMILY_PATTERN,
+    _BONUS_FOR_CLASS_PATTERN,
+    _BONUS_IF_THRESHOLD_PATTERN,
+    _NEGATIVE_ATK_FOR_CLASS_PATTERN,
+    _ON_ATTACKED_DAMAGE_PATTERN,
+    _PER_TURN_IMBLOCABLE_PATTERN,
+    _FLAT_IMBLOCABLE_PATTERN,
+    _LIFELINK_PATTERN,
+    _SPELL_DAMAGE_BLOCK_PATTERN,
+    _PO_PER_TURN_IF_PATTERN,
+    _PO_PER_RATONS_PATTERN,
+    _RACCOON_FAMILY_BONUS_PATTERN,
+    _SOLO_NINJA_PATTERN,
+    _BONUS_IF_JOE_PATTERN,
+    _BONUS_IF_REINE_PATTERN,
+    _BONUS_IF_RATON_MIGNON_PATTERN,
+    _BONUS_IF_MAITRE_RAT_PATTERN,
+    _PV_IF_MAITRE_RAT_PATTERN,
+    _ATK_PER_ENEMY_ECONOME_PATTERN,
+    _PV_PER_TURN_IF_PATTERN,
+    _MULTI_PO_IF_PATTERN,
+    _ATK_PENALTY_IF_CARD_PATTERN,
+    _MIN_ATK_FLOOR_PATTERN,
+    _DECK_REVEAL_ATK_PATTERN,
+    _DECK_REVEAL_MULT_PATTERN,
+    _DIPLO_COMBINED_PATTERN,
+    _DIPLO_CROSS_ATK_PATTERN,
+    _DIPLO_CROSS_PV_PATTERN,
+    _SPELL_DAMAGE_PATTERN,
+    _SPELL_DAMAGE_BONUS_PATTERN,
+    _MAGIE_CAROTTES_PATTERN,
+    _DOUBLE_PV_DEFENSE_PATTERN,
+    _ATK_PV_TRADEOFF_CLASS_PATTERN,
+    _DEMON_IMBLOCABLE_BONUS_PATTERN,
+    _DEMON_ATK_PV_PATTERN,
+    _DEMONS_GAIN_BONUSES_PATTERN,
+    _WEAPON_ATK_IF_NINJA_PATTERN,
+    _WEAPON_ATK_PER_RATON_PATTERN,
+    _KDO_PV_BONUS_PATTERN,
+    _KDO_ATK_EXTRA_PATTERN,
+    _IMBLOCABLE_SCALING_PATTERN,
+    _PER_TURN_SELF_DAMAGE_PATTERN,
+    _ENEMY_HIGH_ATK_DEBUFF_PATTERN,
+    _FIRE_VULNERABILITY_PATTERN,
+    _REDUCED_MONTURE_PATTERN,
+    _GOLD_IF_IMBLOCABLE_PATTERN,
+    _PV_DAMAGE_FROM_HEALING_PATTERN,
+    _CLASS_BONUS_THRESHOLD_PATTERN,
+    _FAMILY_COUNT_THRESHOLD_PATTERN,
+    _HALL_OF_WIN_THRESHOLD_PATTERN,
+    _CYBORG_STEAM_BONUS_PATTERN,
+    _WOMEN_FAMILY_BONUS_PATTERN,
+    _LAPIN_BOARD_EXPANSION_PATTERN,
+    _BOARD_EXPANSION_PATTERN,
+)
+
+
+def _bonus_text_matches_any_pattern(bonus_text: str) -> bool:
+    """Check if bonus_text matches any known pattern.
+
+    Args:
+        bonus_text: The bonus_text to check.
+
+    Returns:
+        True if any pattern matches, False otherwise.
+    """
+    for pattern in _ALL_BONUS_TEXT_PATTERNS:
+        if pattern.search(bonus_text):
+            return True
+    return False
 
 
 def count_cards_by_class(player: PlayerState) -> Counter[CardClass]:
@@ -1367,6 +1459,8 @@ def can_play_lapin_card(
 def resolve_bonus_text_effects(
     player: PlayerState,
     opponent: PlayerState | None = None,
+    *,
+    strict: bool = False,
 ) -> BonusTextResult:
     """Resolve bonus_text effects for combat.
 
@@ -1386,9 +1480,15 @@ def resolve_bonus_text_effects(
     Args:
         player: The player whose bonus_text to resolve.
         opponent: Optional opponent for opponent-dependent effects.
+        strict: If True, raise UnmatchedBonusTextError for unrecognized patterns.
+            Default is False (silent ignore for backwards compatibility).
 
     Returns:
         BonusTextResult with total bonuses from bonus_text.
+
+    Raises:
+        UnmatchedBonusTextError: If strict=True and a bonus_text doesn't match
+            any known pattern.
     """
     result = BonusTextResult()
     class_counts = count_cards_by_class(player)
@@ -1463,6 +1563,10 @@ def resolve_bonus_text_effects(
             continue
 
         bonus_lower = bonus.lower()
+
+        # Strict mode validation: check if this bonus_text matches any known pattern
+        if strict and not _bonus_text_matches_any_pattern(bonus):
+            raise UnmatchedBonusTextError(card.name, bonus)
 
         # === NEGATIVE ATK MODIFIERS ===
         neg_match = _NEGATIVE_ATK_FOR_CLASS_PATTERN.search(bonus)
@@ -2003,6 +2107,10 @@ def resolve_bonus_text_effects(
         bonus = card.bonus_text
         if not bonus:
             continue
+
+        # Strict mode validation for demon bonus_text
+        if strict and not _bonus_text_matches_any_pattern(bonus):
+            raise UnmatchedBonusTextError(card.name, bonus)
 
         # Flat imblocable damage (e.g., "10 dgt imblocable")
         flat_imb_match = _FLAT_IMBLOCABLE_PATTERN.search(bonus)

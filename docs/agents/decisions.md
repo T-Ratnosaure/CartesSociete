@@ -1,8 +1,8 @@
 # Agent Ecosystem Decisions Log - CartesSociete
 
-**Version**: 1.0
+**Version**: 1.2
 **Last Updated**: 2026-01-19
-**Phase**: BMAD+AGENTIC Phase 6 - Decisions & Memory
+**Phase**: BMAD+AGENTIC Phase 6 - Decisions & Memory (D011-D016 implemented, D015 audit completed)
 
 ---
 
@@ -349,6 +349,240 @@ CartesSociete exists to analyze the game mathematically, statistically, and stra
 
 ---
 
+### Decision D011: Ability Parsing Strict Mode
+
+**Date**: 2026-01-19
+**Decision**: Unmatched ability patterns must raise errors when strict mode is enabled.
+
+**Context**:
+Technical review finding S-02 identified silent regex failure in `abilities.py`. When bonus_text does not match any pattern, the system silently returns 0 without indication.
+
+**Options Considered**:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Maintain silent behavior** | No changes, stable | Missing patterns invisible |
+| **B: Add logging only** | Visibility gained | Silent failures still occur |
+| **C: Add strict mode** | Failure is explicit | Requires mode flag |
+| **D: Track match metrics** | Statistical visibility | No per-card feedback |
+
+**Decision**: Option C — Strict mode
+
+**Rationale**:
+- Unknown card text is invalid, not ignorable
+- Missing patterns indicate incomplete implementation or data errors
+- Strict mode converts ambiguity into explicit failure
+- Mode flag allows gradual rollout
+
+**Consequences**:
+- Strict mode enabled → unmatched patterns raise errors
+- All card text must be parseable or explicitly ignored
+- Missing patterns are no longer silently tolerated
+
+**Technical Debt**: Resolves TD005
+
+**Source**: Technical review finding S-02
+
+---
+
+### Decision D012: Lapin Board Expansion Asymmetry Accepted
+
+**Date**: 2026-01-19
+**Decision**: Lapin family's unique board expansion mechanics are accepted as intentional design.
+
+**Context**:
+Technical review finding G-02 identified that Lapin is the only family with board expansion mechanics (Lapincruste +2/+4 slots, family thresholds +1/+2 slots).
+
+**Options Considered**:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Accept as intended asymmetry** | Preserves design identity | Asymmetric strategy space |
+| **B: Add expansion to other families** | Symmetry | Dilutes Lapin identity |
+
+**Decision**: Option A — Accept as intended asymmetry
+
+**Rationale**:
+- Lapin asymmetry is a design identity, not a balance accident
+- Board expansion defines Lapin's strategic niche
+- Symmetry is not a requirement for good design
+
+**Consequences**:
+- Lapin remains the only family with board expansion
+- This is documented design intent, not technical debt
+- Future balance discussions must respect this identity
+
+**Technical Debt**: None (design acceptance)
+
+**Source**: Technical review finding G-02
+
+---
+
+### Decision D013: S-Team Board Limit Bypass Accepted
+
+**Date**: 2026-01-19
+**Decision**: S-Team cards intentionally do not count toward board limit.
+
+**Context**:
+Technical review finding G-05 identified that S-Team passive ("Ne compte pas comme un monstre du plateau") bypasses the board limit.
+
+**Options Considered**:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Accept as intended asymmetry** | Preserves class identity | Free board presence |
+| **B: Remove or modify passive** | Symmetry | Removes S-Team uniqueness |
+
+**Decision**: Option A — Accept as intended asymmetry
+
+**Rationale**:
+- Free board presence is a class identity, not a loophole
+- S-Team's passive is their defining characteristic
+- Removing it would require fundamental class redesign
+
+**Consequences**:
+- S-Team maintains unique board bypass
+- This is documented design intent, not technical debt
+- Strategic implications are accepted
+
+**Technical Debt**: None (design acceptance)
+
+**Source**: Technical review finding G-05
+
+---
+
+### Decision D014: Configurable RL Reward Shaping
+
+**Date**: 2026-01-19
+**Decision**: Reward shaping constants become configuration parameters.
+
+**Context**:
+Technical review finding RL-01 identified asymmetric reward shaping (+0.1 damage dealt, -0.05 damage taken) that may influence learned agent strategies toward aggression.
+
+**Options Considered**:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Keep current rewards** | Stable | Playstyle hard-coded |
+| **B: Equalize damage rewards** | Neutrality | May reduce learning signal |
+| **C: Remove shaping entirely** | Pure win/lose signal | Sparse rewards |
+| **D: Make rewards configurable** | Experimentation enabled | Configuration complexity |
+
+**Decision**: Option D — Make rewards configurable
+
+**Rationale**:
+- Playstyle is not hard-coded; it is a tunable axis
+- Research project benefits from experimentation
+- Default values can remain, but flexibility is explicitly supported
+- No single reward structure is known to be "correct"
+
+**Consequences**:
+- Reward constants move to TrainingConfig
+- Experiments can compare different reward structures
+- Trained agents are explicitly shaped by their config
+
+**Technical Debt**: None
+
+**Source**: Technical review finding RL-01
+
+---
+
+### Decision D015: No Hidden-Information Leakage in RL
+
+**Date**: 2026-01-19
+**Decision**: RL agents must not observe hidden information (opponent hand, deck order, etc.).
+
+**Context**:
+Technical review finding RL-03 identified potential for observation space to leak hidden game state to agents.
+
+**Options Considered**:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Verify encoding is correct** | Certainty gained | Requires audit |
+| **B: Implement partial observability** | Training validity | May reduce performance |
+
+**Decision**: No leakage allowed — full partial observability required
+
+**Rationale**:
+- Training validity > short-term performance
+- Agents that rely on hidden info do not transfer to real play
+- This is a correctness requirement, not a preference
+
+**Consequences**:
+- Observation encoding MUST be audited
+- Any trained agents that relied on leaked info become INVALID
+- RL training is FROZEN until audit is complete
+- `_encode_observation()` must only expose:
+  - Agent's own hand
+  - Public board state (both players' boards)
+  - Visible opponent info (health, PO, card counts)
+  - Turn and phase information
+
+**Invalidation Notice**:
+All previously trained agents are NON-AUTHORITATIVE until observation audit confirms no leakage. Win rate baselines established before this decision may not reflect valid gameplay.
+
+**Audit Completion (2026-01-19)**:
+Observation encoding audit completed. **NO LEAKAGE DETECTED.**
+
+Observation includes:
+- Player stats: health, PO, board count, hand size, turn ✅
+- Player's own hand ✅ (valid - player sees own hand)
+- Player's board ✅ (public)
+- Opponent's board ✅ (public)
+- Market cards ✅ (public)
+
+NOT included (correctly hidden):
+- Opponent's hand ✅
+- Opponent's deck ✅
+- Player's deck ✅
+- Deck order/composition ✅
+
+**STATUS: AUDIT PASSED - RL training unblocked**
+
+**Technical Debt**: None (requirement)
+
+**Source**: Technical review finding RL-03
+
+---
+
+### Decision D016: Create agent-architecture.md
+
+**Date**: 2026-01-19
+**Decision**: Create the missing `docs/agents/agent-architecture.md` file per workflow specification.
+
+**Context**:
+Technical review finding D-02 identified that the global CLAUDE.md workflow specifies `docs/agents/agent-architecture.md` as a Phase 4 output, but this file does not exist.
+
+**Options Considered**:
+
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Create the file** | Workflow compliance | Documentation work |
+| **B: Update global workflow** | No new file needed | Workflow deviation |
+| **C: Document deviation** | Explicit exception | Workflow incomplete |
+
+**Decision**: Option A — Create the file
+
+**Rationale**:
+- Workflow spec is authoritative; implementation conforms
+- Architecture information exists but is scattered
+- Consolidation improves navigability
+
+**Consequences**:
+- File will be created consolidating:
+  - Agent routing architecture
+  - Responsibility boundaries
+  - Escalation paths
+  - Governance notes
+- Content extracted from AGENTS.md, friction-map.md, expanded-inventory.md
+
+**Technical Debt**: None
+
+**Source**: Technical review finding D-02
+
+---
+
 ## Part 2: Open Questions
 
 ### OQ001: Should Balance Analysis Be In-Scope for Agents?
@@ -387,21 +621,13 @@ We don't have:
 
 ### OQ003: Should abilities.py Fail Loudly?
 
+**Status**: ✅ RESOLVED by D011 (Ability Parsing Strict Mode)
+
 **Question**: When bonus_text doesn't match any pattern, should the system fail loudly or log and continue?
 
-**Current Answer**: Implicit silent failure (not designed either way).
+**Resolution**: D011 establishes strict mode — unmatched patterns raise errors when strict mode is enabled.
 
-**Arguments for Loud Failure**:
-- Catches data errors immediately
-- Prevents incorrect game behavior
-
-**Arguments for Silent + Log**:
-- Allows partial functionality
-- Doesn't crash for optional features
-
-**Implications**: Current behavior is undefined - it's neither loud nor logged.
-
-**Required Action**: Define explicit behavior (Decision D008 pending).
+**Final Answer**: Unknown card text is invalid, not ignorable. Strict mode converts ambiguity into explicit failure. Missing patterns are no longer silently tolerated.
 
 ---
 
@@ -434,7 +660,7 @@ We don't have:
 | TD002 | Balance analysis partially automated | MEDIUM | D002 | Human interpretation | Define workflow, accept limitation |
 | TD003 | No ML diagnosis step | LOW | D004 | Escalation protocol | Add lightweight triage if escalations excessive |
 | TD004 | Small changes to abilities.py | LOW | D006 | Commit messages | Lower handoff threshold for this file |
-| TD005 | Silent ability parsing failure | HIGH | OQ003 | None | Implement logging (D008 pending) |
+| TD005 | Silent ability parsing failure | ✅ RESOLVED | OQ003 | D011 | Strict mode implemented per D011 |
 | TD006 | No RL behavior validation | MEDIUM | OQ002 | Manual inspection | Add qualitative metrics |
 
 ---
@@ -533,6 +759,12 @@ We don't have:
 8. **abilities.py is high-risk** - extra care for changes
 9. **Human checkpoints are MANDATORY** - for combat.py, abilities.py, state.py
 10. **Design phase is CLOSED** - all changes are governed, not exploratory
+11. **ABILITY PARSING STRICT MODE** - Unmatched patterns must fail explicitly (see D011)
+12. **LAPIN ASYMMETRY ACCEPTED** - Board expansion is intentional design identity (see D012)
+13. **S-TEAM ASYMMETRY ACCEPTED** - Board limit bypass is intentional class identity (see D013)
+14. **REWARD SHAPING IS CONFIGURABLE** - Playstyle is tunable, not hard-coded (see D014)
+15. **NO HIDDEN-INFO LEAKAGE IN RL** - Partial observability required; AUDIT PASSED 2026-01-19 (see D015)
+16. **RL TRAINING UNBLOCKED** - Observation audit confirmed no leakage; training can resume (see D015)
 
 ### Patterns That Work
 
