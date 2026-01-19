@@ -719,21 +719,46 @@ We don't have:
 
 ## Part 3: Technical Debt Register
 
-| ID | Description | Severity | Origin | Mitigation | Resolution Plan |
-|----|-------------|----------|--------|------------|-----------------|
-| TD001 | Game mechanics gap | HIGH | D002 | Documentation + human | Revisit if human escalation bottlenecks |
-| TD002 | Balance analysis partially automated | MEDIUM | D002 | Human interpretation | Define workflow, accept limitation |
-| TD003 | No ML diagnosis step | LOW | D004 | Escalation protocol | Add lightweight triage if escalations excessive |
-| TD004 | Small changes to abilities.py | LOW | D006 | Commit messages | Lower handoff threshold for this file |
-| TD005 | Silent ability parsing failure | ✅ RESOLVED | OQ003 | D011 | Strict mode implemented per D011 |
-| TD006 | No RL behavior validation | MEDIUM | OQ002 | Manual inspection | Add qualitative metrics |
-| TD007 | Deck reveal ATK approximation | ✅ RESOLVED | OQ005 | - | Fixed via actual deck peek in PR #27 |
-| TD008 | Women family bonus approximation | ✅ RESOLVED | OQ005 | - | Fixed via gender attribute in PR #28 |
-| TD009 | Ninja check not implemented | ✅ RESOLVED | OQ008 | - | Fixed via ninja_selected field in PR #29 |
-| TD010 | Windows parallelism limitation | LOW | RL-05 | DummyVecEnv | Accept or document Linux requirement |
-| TD011 | Dual RNG sources | ✅ RESOLVED | S-01 | - | Fixed via Shuffler protocol in PR #26 |
-| TD012 | MCTS no default timeout | ✅ RESOLVED | S-04 | - | Fixed via 5s default in PR #26 |
-| TD013 | Self-play callback stub | ✅ RESOLVED | RL-02 | - | Fixed via ModelOpponentPlayer in PR #26 |
+### Technical Debt Review (2026-01-19)
+
+**Reclassification Summary:**
+- TD001 and TD002 are reclassified as **intentional system limitations**, not debt.
+- TD004 and TD010 are **operational constraints** handled by process or platform choice.
+- TD003 and TD006 remain **optional improvements** to be revisited only if escalation volume or interpretability needs justify the cost.
+- **No technical debt item blocks current execution.**
+
+### Resolved Items
+
+| ID | Description | Status | Resolution |
+|----|-------------|--------|------------|
+| TD005 | Silent ability parsing failure | ✅ RESOLVED | Strict mode implemented per D011 |
+| TD007 | Deck reveal ATK approximation | ✅ RESOLVED | Fixed via actual deck peek in PR #27 |
+| TD008 | Women family bonus approximation | ✅ RESOLVED | Fixed via gender attribute in PR #28 |
+| TD009 | Ninja check not implemented | ✅ RESOLVED | Fixed via ninja_selected field in PR #29 |
+| TD011 | Dual RNG sources | ✅ RESOLVED | Fixed via Shuffler protocol in PR #26 |
+| TD012 | MCTS no default timeout | ✅ RESOLVED | Fixed via 5s default in PR #26 |
+| TD013 | Self-play callback stub | ✅ RESOLVED | Fixed via ModelOpponentPlayer in PR #26 |
+
+### Permanent System Limitations (Not Debt)
+
+| ID | Description | Classification | Rationale |
+|----|-------------|----------------|-----------|
+| TD001 | Game mechanics gap | 🔒 SYSTEM LIMITATION | Intentional by Analytical Mandate - Layer 2/3 authority separation |
+| TD002 | Balance analysis interpretation | 🔒 DESIGNED WORKFLOW | Agents provide metrics (Layer 1), humans interpret (Layer 2) |
+
+### Operational Constraints (Not Debt)
+
+| ID | Description | Classification | Handling |
+|----|-------------|----------------|----------|
+| TD004 | abilities.py change sensitivity | 📋 PROCESS NOTE | Use detailed commit messages; human discipline |
+| TD010 | Windows parallelism limitation | 💻 PLATFORM CONSTRAINT | Accept or use Linux for RL training |
+
+### Optional Improvements (True Debt - Deferred)
+
+| ID | Description | Priority | Revisit Trigger |
+|----|-------------|----------|-----------------|
+| TD003 | No ML diagnosis step | LOW | N ML escalations/week with trivial root cause |
+| TD006 | No RL behavior validation | LOW | When agent behavior becomes a design input |
 
 ---
 
