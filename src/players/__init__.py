@@ -16,8 +16,14 @@ Family-focused strategy agents:
 - RatonPlayer: Raton linear scaling
 - HallOfWinPlayer: Hall of Win variance/gambling
 
+Cross-cutting archetype agents:
+- AggroPlayer: Maximum damage per turn
+- TempoPlayer: PO/action efficiency
+- ControlPlayer: Defensive stability
+- SpellMagePlayer: Spell damage scaling
+
 Example usage:
-    from src.players import RandomPlayer, GreedyPlayer, LapinPlayer, CyborgPlayer
+    from src.players import RandomPlayer, GreedyPlayer, AggroPlayer, TempoPlayer
     from src.game.executor import get_legal_actions_for_player, execute_action
 
     # Create players
@@ -33,8 +39,10 @@ Example usage:
 """
 
 from .action import Action, ActionType
+from .aggro_player import AggroPlayer
 from .atlantide_player import AtlantidePlayer
 from .base import Player, PlayerInfo
+from .control_player import ControlPlayer
 from .cyborg_player import CyborgPlayer
 from .evaluation import (
     DEFAULT_WEIGHTS,
@@ -60,6 +68,8 @@ from .neige_player import NeigePlayer
 from .ninja_player import NinjaPlayer
 from .random_player import RandomPlayer
 from .raton_player import RatonPlayer
+from .spellmage_player import SpellMagePlayer
+from .tempo_player import TempoPlayer
 
 __all__ = [
     # Base classes
@@ -83,6 +93,11 @@ __all__ = [
     "NeigePlayer",
     "RatonPlayer",
     "HallOfWinPlayer",
+    # Cross-cutting archetype players
+    "AggroPlayer",
+    "TempoPlayer",
+    "ControlPlayer",
+    "SpellMagePlayer",
     # Evaluation functions and weights
     "EvaluationWeights",
     "DEFAULT_WEIGHTS",
