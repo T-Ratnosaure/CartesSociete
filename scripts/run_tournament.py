@@ -18,7 +18,9 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.players import (  # noqa: E402
+    AggroPlayer,
     AtlantidePlayer,
+    ControlPlayer,
     CyborgPlayer,
     GreedyPlayer,
     HallOfWinPlayer,
@@ -30,6 +32,8 @@ from src.players import (  # noqa: E402
     NinjaPlayer,
     RandomPlayer,
     RatonPlayer,
+    SpellMagePlayer,
+    TempoPlayer,
 )
 from src.players.base import Player  # noqa: E402
 from src.simulation import MatchConfig, MatchRunner  # noqa: E402
@@ -49,6 +53,11 @@ PLAYER_TYPES = {
     "neige": NeigePlayer,
     "raton": RatonPlayer,
     "hallofwin": HallOfWinPlayer,
+    # Cross-cutting archetype strategies
+    "aggro": AggroPlayer,
+    "tempo": TempoPlayer,
+    "control": ControlPlayer,
+    "spellmage": SpellMagePlayer,
 }
 
 # Validation constants (matches MatchConfig.MAX_GAMES)
