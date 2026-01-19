@@ -6,6 +6,27 @@ card revealing, deck mixing, and market refreshing.
 
 import copy
 import random
+from typing import Protocol, runtime_checkable
+
+
+@runtime_checkable
+class Shuffler(Protocol):
+    """Protocol for objects that can shuffle lists in-place."""
+
+    def shuffle(self, x: list) -> None:
+        """Shuffle list x in-place."""
+        ...
+
+
+class _GlobalRandomShuffler:
+    """Adapter to use global random.shuffle with Shuffler protocol."""
+
+    def shuffle(self, x: list) -> None:
+        random.shuffle(x)
+
+
+# Default shuffler uses global random module
+_default_shuffler = _GlobalRandomShuffler()
 
 from src.cards.models import Card, CardType, CreatureCard, DemonCard, WeaponCard
 
@@ -15,6 +36,7 @@ from .state import GameState
 def setup_decks(
     all_cards: list[Card],
     copies_per_card: int = 5,
+    rng: Shuffler | None = None,
 ) -> tuple[
     list[Card],  # cost_1
     list[Card],  # cost_2
@@ -32,10 +54,12 @@ def setup_decks(
     Args:
         all_cards: List of unique cards to use.
         copies_per_card: Number of copies of each card.
+        rng: Optional RNG for shuffling. If None, uses global random.
 
     Returns:
         Tuple of (cost_1, cost_2, cost_3, cost_4, cost_5, weapons, demons) decks.
     """
+    shuffler = rng if rng is not None else _default_shuffler
     cost_decks: dict[int, list[Card]] = {i: [] for i in range(1, 6)}
     weapons: list[WeaponCard] = []
     demons: list[DemonCard] = []
@@ -59,9 +83,9 @@ def setup_decks(
 
     # Shuffle all decks
     for deck in cost_decks.values():
-        random.shuffle(deck)
-    random.shuffle(weapons)
-    random.shuffle(demons)
+        shuffler.shuffle(deck)
+    shuffler.shuffle(weapons)
+    shuffler.shuffle(demons)
 
     return (
         cost_decks[1],
@@ -99,7 +123,7 @@ def reveal_market_cards(
     return revealed
 
 
-def mix_decks(state: GameState) -> int:
+def mix_decks(state: GameState, rng: Shuffler | None = None) -> int:
     """Mix remaining cards from current deck into the next tier.
 
     Called after every even turn. Takes remaining cards from current
@@ -108,10 +132,12 @@ def mix_decks(state: GameState) -> int:
 
     Args:
         state: Current game state.
+        rng: Optional RNG for shuffling. If None, uses global random.
 
     Returns:
         Number of cards mixed into next tier.
     """
+    shuffler = rng if rng is not None else _default_shuffler
     current_tier = state.get_current_cost_tier()
     max_tier = state.config.max_cost_tier
 
@@ -130,7 +156,7 @@ def mix_decks(state: GameState) -> int:
     state.market_cards.clear()
 
     # Shuffle remaining cards
-    random.shuffle(current_deck)
+    shuffler.shuffle(current_deck)
 
     # Split roughly in half
     half = len(current_deck) // 2
@@ -139,7 +165,7 @@ def mix_decks(state: GameState) -> int:
 
     # Mix into next tier
     next_deck.extend(to_mix)
-    random.shuffle(next_deck)
+    shuffler.shuffle(next_deck)
 
     # Discard the other half
     state.discard_pile.extend(to_discard)

@@ -418,7 +418,7 @@ class GameRunner:
 
         # Handle deck mixing after even turns
         if should_mix_decks(state):
-            mix_decks(state)
+            mix_decks(state, rng=self._rng)
 
         # Reset per-turn tracking (spells, sacrifices) for all players
         state.reset_turn_tracking_all_players()
