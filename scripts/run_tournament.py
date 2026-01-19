@@ -18,21 +18,37 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.players import (  # noqa: E402
+    AtlantidePlayer,
+    CyborgPlayer,
     GreedyPlayer,
+    HallOfWinPlayer,
     HeuristicPlayer,
     LapinPlayer,
     MCTSPlayer,
+    NaturePlayer,
+    NeigePlayer,
+    NinjaPlayer,
     RandomPlayer,
+    RatonPlayer,
 )
 from src.players.base import Player  # noqa: E402
 from src.simulation import MatchConfig, MatchRunner  # noqa: E402
 
 PLAYER_TYPES = {
+    # Generic strategies
     "random": RandomPlayer,
     "greedy": GreedyPlayer,
     "heuristic": HeuristicPlayer,
-    "lapin": LapinPlayer,
     "mcts": MCTSPlayer,
+    # Family-focused strategies
+    "lapin": LapinPlayer,
+    "cyborg": CyborgPlayer,
+    "nature": NaturePlayer,
+    "atlantide": AtlantidePlayer,
+    "ninja": NinjaPlayer,
+    "neige": NeigePlayer,
+    "raton": RatonPlayer,
+    "hallofwin": HallOfWinPlayer,
 }
 
 # Validation constants (matches MatchConfig.MAX_GAMES)

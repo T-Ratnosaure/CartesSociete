@@ -4,11 +4,20 @@ This package provides various AI player implementations:
 - RandomPlayer: Baseline random agent
 - GreedyPlayer: Maximizes immediate card value
 - HeuristicPlayer: Rule-based strategy with synergy/evolution awareness
-- LapinPlayer: Lapin family swarm strategy specialist
 - MCTSPlayer: Monte Carlo Tree Search (stub)
 
+Family-focused strategy agents:
+- LapinPlayer: Lapin swarm strategy (board flooding)
+- CyborgPlayer: Cyborg aggression (demon summoning)
+- NaturePlayer: Nature imblocable damage strategy
+- AtlantidePlayer: Atlantide healing sustain
+- NinjaPlayer: Ninja economy/replay strategy
+- NeigePlayer: Neige economy engine
+- RatonPlayer: Raton linear scaling
+- HallOfWinPlayer: Hall of Win variance/gambling
+
 Example usage:
-    from src.players import RandomPlayer, GreedyPlayer, HeuristicPlayer, LapinPlayer
+    from src.players import RandomPlayer, GreedyPlayer, LapinPlayer, CyborgPlayer
     from src.game.executor import get_legal_actions_for_player, execute_action
 
     # Create players
@@ -24,7 +33,9 @@ Example usage:
 """
 
 from .action import Action, ActionType
+from .atlantide_player import AtlantidePlayer
 from .base import Player, PlayerInfo
+from .cyborg_player import CyborgPlayer
 from .evaluation import (
     DEFAULT_WEIGHTS,
     EvaluationWeights,
@@ -40,10 +51,15 @@ from .evaluation import (
     evaluate_threat_level,
 )
 from .greedy_player import GreedyPlayer
+from .hallofwin_player import HallOfWinPlayer
 from .heuristic import HeuristicPlayer
 from .lapin_player import LapinPlayer
 from .mcts_player import MCTSConfig, MCTSNode, MCTSPlayer
+from .nature_player import NaturePlayer
+from .neige_player import NeigePlayer
+from .ninja_player import NinjaPlayer
 from .random_player import RandomPlayer
+from .raton_player import RatonPlayer
 
 __all__ = [
     # Base classes
@@ -51,14 +67,22 @@ __all__ = [
     "ActionType",
     "Player",
     "PlayerInfo",
-    # Player implementations
+    # Generic player implementations
     "RandomPlayer",
     "GreedyPlayer",
     "HeuristicPlayer",
-    "LapinPlayer",
     "MCTSPlayer",
     "MCTSConfig",
     "MCTSNode",
+    # Family-focused strategy players
+    "LapinPlayer",
+    "CyborgPlayer",
+    "NaturePlayer",
+    "AtlantidePlayer",
+    "NinjaPlayer",
+    "NeigePlayer",
+    "RatonPlayer",
+    "HallOfWinPlayer",
     # Evaluation functions and weights
     "EvaluationWeights",
     "DEFAULT_WEIGHTS",
