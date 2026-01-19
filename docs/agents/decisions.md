@@ -674,60 +674,46 @@ We don't have:
 
 ### OQ006: Dragon PO Spending Auto-Maximize
 
-**Status**: OPEN - Awaiting Human Decision
+**Status**: ✅ RESOLVED - Human chose Option B (PR #29)
 
 **Context**: Technical review finding R-03 notes that Dragon conditional abilities auto-maximize PO spending rather than allowing explicit player choice.
 
-**Current Behavior**: If a Dragon has abilities at 1 PO, 2 PO, and 4 PO costs, and the player has 4 PO, all affordable cumulative effects automatically activate.
-
-**Question**: Should players/agents explicitly choose how much PO to spend on Dragon abilities?
-
-**Options**:
-| Option | Pros | Cons |
-|--------|------|------|
-| **A: Keep auto-maximize** | Simpler, consistent | No resource allocation decision |
-| **B: Require explicit spending** | Adds strategy depth | Increases action space complexity |
-
-**Recommendation**: Human decision required. This affects game design and strategy space.
+**Resolution**: Implemented explicit PO spending:
+- `resolve_conditional_abilities(player, po_to_spend)` requires explicit PO
+- `calculate_damage(attacker, defender, dragon_po_spend)` - new parameter
+- `resolve_combat(state, dragon_po_choices)` - dict mapping player_id to PO spend
+- If no PO specified, Dragon abilities do NOT activate
 
 ---
 
 ### OQ007: Class Scaling - Highest Wins vs Cumulative
 
-**Status**: OPEN - Awaiting Human Decision
+**Status**: ✅ RESOLVED - Human chose Highest-Wins (PR #29)
 
 **Context**: Technical review findings R-04 and R-05 note inconsistency in scaling behavior:
 - **Class abilities**: Only highest threshold applies (R-04)
-- **Dragon conditionals**: Cumulative effects (R-03)
-- **Lapin thresholds**: Code comment shows interpretive uncertainty (R-05)
+- **Dragon conditionals**: Previously cumulative effects (R-03)
+- **Lapin thresholds**: Code comment showed interpretive uncertainty (R-05)
 
-**Question**: Should all scaling abilities use consistent behavior (highest-wins OR cumulative)?
-
-**Implications**: Different interpretation changes game balance significantly.
-
-**Recommendation**: Human decision required. This is a game design question.
+**Resolution**: Unified to highest-wins for all scaling:
+- Dragon conditional abilities now use highest-wins instead of cumulative
+- Only the ability at the specified PO tier activates
+- Lower tier abilities do NOT stack
+- Example: Spending 2 PO activates only 2 PO effect, not 1+2 PO effects
 
 ---
 
 ### OQ008: Ninja Check TODO
 
-**Status**: OPEN - Awaiting Human Decision
+**Status**: ✅ RESOLVED - Human chose Option A (PR #29)
 
-**Context**: Technical review finding R-06 identified a TODO at abilities.py:1840:
-```python
-# TODO: Check if ninja was chosen (requires game state tracking)
-```
+**Context**: Technical review finding R-06 identified a TODO for ninja selection check.
 
-The weapon ATK bonus for ninja cards does not verify ninja selection.
-
-**Question**: Should this check be implemented?
-
-**Options**:
-| Option | Pros | Cons |
-|--------|------|------|
-| **A: Implement check** | Correct behavior | Requires game state tracking |
-| **B: Remove check requirement** | Simpler | May not match card text |
-| **C: Accept as-is** | No change needed | Documented technical debt |
+**Resolution**: Implemented ninja selection tracking:
+- Added `ninja_selected: bool` field to `PlayerState` (default False)
+- Weapon ATK bonus from "si ninja choisi" now requires `ninja_selected=True`
+- Bonus no longer applies unconditionally
+- Must be set during draft phase when player selects a Ninja card
 
 ---
 
@@ -743,7 +729,7 @@ The weapon ATK bonus for ninja cards does not verify ninja selection.
 | TD006 | No RL behavior validation | MEDIUM | OQ002 | Manual inspection | Add qualitative metrics |
 | TD007 | Deck reveal ATK approximation | ✅ RESOLVED | OQ005 | - | Fixed via actual deck peek in PR #27 |
 | TD008 | Women family bonus approximation | ✅ RESOLVED | OQ005 | - | Fixed via gender attribute in PR #28 |
-| TD009 | Ninja check not implemented | LOW | OQ008 | Unconditional bonus | Awaiting OQ008 decision |
+| TD009 | Ninja check not implemented | ✅ RESOLVED | OQ008 | - | Fixed via ninja_selected field in PR #29 |
 | TD010 | Windows parallelism limitation | LOW | RL-05 | DummyVecEnv | Accept or document Linux requirement |
 | TD011 | Dual RNG sources | ✅ RESOLVED | S-01 | - | Fixed via Shuffler protocol in PR #26 |
 | TD012 | MCTS no default timeout | ✅ RESOLVED | S-04 | - | Fixed via 5s default in PR #26 |
@@ -855,7 +841,10 @@ The weapon ATK bonus for ninja cards does not verify ninja selection.
 18. **MCTS DEFAULT TIMEOUT** - 5 second timeout prevents DoS (S-04, PR #26)
 19. **SELF-PLAY WORKS** - ModelOpponentPlayer + SelfPlayCallback properly copy model weights (RL-02, PR #26)
 20. **OQ005 RESOLVED** - Both R-01 (deck reveal) and R-02 (women bonus) now use exact computation (PR #27, #28)
-21. **OPEN QUESTIONS PENDING** - OQ006-OQ008 await human decisions on game mechanics interpretation
+21. **OQ006-OQ008 RESOLVED** - All game mechanics decisions implemented (PR #29):
+    - OQ006: Dragon abilities require explicit PO spending
+    - OQ007: All scaling uses highest-wins (not cumulative)
+    - OQ008: Ninja weapon bonus requires ninja_selected flag
 
 ### Patterns That Work
 
