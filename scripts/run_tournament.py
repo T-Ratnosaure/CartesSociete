@@ -20,6 +20,7 @@ sys.path.insert(0, str(project_root))
 from src.players import (  # noqa: E402
     GreedyPlayer,
     HeuristicPlayer,
+    LapinPlayer,
     MCTSPlayer,
     RandomPlayer,
 )
@@ -30,6 +31,7 @@ PLAYER_TYPES = {
     "random": RandomPlayer,
     "greedy": GreedyPlayer,
     "heuristic": HeuristicPlayer,
+    "lapin": LapinPlayer,
     "mcts": MCTSPlayer,
 }
 

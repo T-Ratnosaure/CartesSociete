@@ -4,10 +4,11 @@ This package provides various AI player implementations:
 - RandomPlayer: Baseline random agent
 - GreedyPlayer: Maximizes immediate card value
 - HeuristicPlayer: Rule-based strategy with synergy/evolution awareness
+- LapinPlayer: Lapin family swarm strategy specialist
 - MCTSPlayer: Monte Carlo Tree Search (stub)
 
 Example usage:
-    from src.players import RandomPlayer, GreedyPlayer, HeuristicPlayer
+    from src.players import RandomPlayer, GreedyPlayer, HeuristicPlayer, LapinPlayer
     from src.game.executor import get_legal_actions_for_player, execute_action
 
     # Create players
@@ -40,6 +41,7 @@ from .evaluation import (
 )
 from .greedy_player import GreedyPlayer
 from .heuristic import HeuristicPlayer
+from .lapin_player import LapinPlayer
 from .mcts_player import MCTSConfig, MCTSNode, MCTSPlayer
 from .random_player import RandomPlayer
 
@@ -53,6 +55,7 @@ __all__ = [
     "RandomPlayer",
     "GreedyPlayer",
     "HeuristicPlayer",
+    "LapinPlayer",
     "MCTSPlayer",
     "MCTSConfig",
     "MCTSNode",
