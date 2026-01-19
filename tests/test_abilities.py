@@ -8,10 +8,12 @@ from src.cards.models import CardClass
 from src.cards.repository import get_repository
 from src.game.abilities import (
     AbilityTarget,
+    UnmatchedBonusTextError,
     apply_per_turn_effects,
     get_active_scaling_ability,
     parse_ability_effect,
     resolve_all_abilities,
+    resolve_bonus_text_effects,
     resolve_class_abilities,
     resolve_per_turn_effects,
 )
@@ -1825,3 +1827,65 @@ class TestDeckInteractions:
         for player in state.players:
             assert player.spells_cast_this_turn == 0
             assert player.spell_damage_dealt == 0
+
+
+class TestStrictMode:
+    """Tests for strict mode in bonus_text parsing (D011)."""
+
+    def test_strict_mode_raises_on_unknown_bonus_text(self, repo) -> None:
+        """Test that strict mode raises UnmatchedBonusTextError for unknown text."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get any card and modify its bonus_text
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        card.bonus_text = "This is completely unknown text that matches no pattern"
+        player.board.append(card)
+
+        with pytest.raises(UnmatchedBonusTextError) as exc_info:
+            resolve_bonus_text_effects(player, strict=True)
+
+        assert exc_info.value.card_name == card.name
+        assert "unknown text" in exc_info.value.bonus_text
+
+    def test_strict_mode_accepts_known_patterns(self, repo) -> None:
+        """Test that strict mode doesn't raise for recognized patterns."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get any card and set a known bonus_text pattern
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        card.bonus_text = "+2 ATQ pour les lapins"  # Known pattern
+        player.board.append(card)
+
+        # Should not raise
+        result = resolve_bonus_text_effects(player, strict=True)
+        assert result is not None
+
+    def test_non_strict_mode_silently_ignores_unknown(self, repo) -> None:
+        """Test that non-strict mode (default) silently ignores unknown text."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get any card and set unknown bonus_text
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        card.bonus_text = "Completely unknown pattern xyz"
+        player.board.append(card)
+
+        # Should not raise - default is strict=False
+        result = resolve_bonus_text_effects(player)
+        assert result is not None
+        # No effects should be applied since pattern is unknown
+        assert len(result.effects) == 0
+
+    def test_unmatched_bonus_text_error_attributes(self) -> None:
+        """Test that UnmatchedBonusTextError has correct attributes."""
+        error = UnmatchedBonusTextError("TestCard", "unknown bonus text")
+
+        assert error.card_name == "TestCard"
+        assert error.bonus_text == "unknown bonus text"
+        assert "TestCard" in str(error)
+        assert "unknown bonus text" in str(error)

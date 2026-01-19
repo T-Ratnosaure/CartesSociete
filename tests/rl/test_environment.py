@@ -132,3 +132,68 @@ class TestCartesSocieteEnv:
 
         assert steps < max_steps, "Game did not terminate within step limit"
         env.close()
+
+
+class TestRewardConfig:
+    """Tests for RewardConfig (D014)."""
+
+    def test_default_reward_config(self) -> None:
+        """Test that default reward config is used when not specified."""
+        from src.rl.environment import DEFAULT_REWARD_CONFIG
+
+        env = CartesSocieteEnv()
+        assert env.reward_config == DEFAULT_REWARD_CONFIG
+        assert env.reward_config.win == 10.0
+        assert env.reward_config.lose == -10.0
+        assert env.reward_config.damage_dealt == 0.1
+        assert env.reward_config.damage_taken == -0.05
+        env.close()
+
+    def test_custom_reward_config(self) -> None:
+        """Test that custom reward config can be passed."""
+        from src.rl.environment import RewardConfig
+
+        custom_config = RewardConfig(
+            win=100.0,
+            lose=-100.0,
+            damage_dealt=0.5,
+            damage_taken=-0.2,
+        )
+        env = CartesSocieteEnv(reward_config=custom_config)
+
+        assert env.reward_config.win == 100.0
+        assert env.reward_config.lose == -100.0
+        assert env.reward_config.damage_dealt == 0.5
+        assert env.reward_config.damage_taken == -0.2
+        # Unchanged defaults
+        assert env.reward_config.draw == 0.0
+        assert env.reward_config.card_bought == 0.05
+        assert env.reward_config.evolution == 0.3
+        env.close()
+
+    def test_reward_config_affects_rewards(self) -> None:
+        """Test that custom reward config affects actual rewards during gameplay."""
+        from src.rl.environment import RewardConfig
+
+        # Create env with zero reward shaping
+        no_shaping_config = RewardConfig(
+            win=0.0,
+            lose=0.0,
+            damage_dealt=0.0,
+            damage_taken=0.0,
+            card_bought=0.0,
+            evolution=0.0,
+        )
+        env = CartesSocieteEnv(reward_config=no_shaping_config, seed=42)
+        env.reset()
+
+        # Take a step
+        mask = env.action_masks()
+        valid_actions = np.where(mask)[0]
+        if len(valid_actions) > 0:
+            _, reward, _, _, _ = env.step(valid_actions[0])
+            # With zero shaping, intermediate rewards should be 0
+            # (unless game ends with win/lose, which is also 0)
+            assert reward == 0.0
+
+        env.close()

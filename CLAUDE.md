@@ -367,6 +367,28 @@ CartesSociete/
 
 ## Git Workflow
 
+### MANDATORY: Commit → CI → Fix → Push
+
+**After completing any code changes, you MUST follow this workflow:**
+
+```
+1. COMMIT your changes (create branch if needed)
+2. PUSH to remote and create PR
+3. WATCH CI pipeline run
+4. IF CI FAILS:
+   - Read the error logs
+   - Fix the issues locally
+   - Commit and push fixes
+   - Repeat until CI passes
+5. WHEN CI PASSES:
+   - Merge the PR
+   - Sync local master
+```
+
+**This is NON-NEGOTIABLE. Every change must pass CI before being considered complete.**
+
+### Standard Workflow Steps
+
 After completing any significant feature, fix, or change:
 
 1. Create a new feature branch: `git checkout -b feat/description` or `fix/description`

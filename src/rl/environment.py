@@ -4,6 +4,7 @@ This module provides a Gymnasium-compatible environment for training
 reinforcement learning agents to play CartesSociete.
 """
 
+from dataclasses import dataclass
 from typing import Any
 
 import gymnasium as gym
@@ -19,6 +20,37 @@ from src.game.market import refresh_market, setup_decks
 from src.game.state import GamePhase, GameState, PlayerState, create_initial_game_state
 from src.players.action import Action, ActionType
 from src.players.base import Player, PlayerInfo
+
+
+@dataclass
+class RewardConfig:
+    """Configuration for reward shaping in the RL environment.
+
+    These parameters control how different game events contribute to the
+    reward signal during training. Making these configurable allows
+    experimentation with different reward shaping strategies.
+
+    Attributes:
+        win: Reward for winning the game.
+        lose: Reward (typically negative) for losing the game.
+        draw: Reward for drawing the game.
+        damage_dealt: Reward per point of damage dealt to opponent.
+        damage_taken: Reward (typically negative) per point of damage taken.
+        card_bought: Reward for buying a card.
+        evolution: Reward for evolving a card.
+    """
+
+    win: float = 10.0
+    lose: float = -10.0
+    draw: float = 0.0
+    damage_dealt: float = 0.1
+    damage_taken: float = -0.05
+    card_bought: float = 0.05
+    evolution: float = 0.3
+
+
+# Default reward configuration (matches original hardcoded values)
+DEFAULT_REWARD_CONFIG = RewardConfig()
 
 
 class RLPlayer(Player):
@@ -101,21 +133,13 @@ class CartesSocieteEnv(gym.Env):
         card_class: i for i, card_class in enumerate(CardClass)
     }
 
-    # Reward shaping
-    REWARD_WIN: float = 10.0
-    REWARD_LOSE: float = -10.0
-    REWARD_DRAW: float = 0.0
-    REWARD_DAMAGE_DEALT: float = 0.1
-    REWARD_DAMAGE_TAKEN: float = -0.05
-    REWARD_CARD_BOUGHT: float = 0.05
-    REWARD_EVOLUTION: float = 0.3
-
     def __init__(
         self,
         opponent_factory: Any = None,
         config: GameConfig | None = None,
         max_actions: int = 50,
         seed: int | None = None,
+        reward_config: RewardConfig | None = None,
     ) -> None:
         """Initialize the environment.
 
@@ -125,10 +149,13 @@ class CartesSocieteEnv(gym.Env):
             config: Game configuration. Uses default if None.
             max_actions: Maximum actions per turn (to bound action space).
             seed: Random seed for reproducibility.
+            reward_config: Reward shaping configuration. Uses DEFAULT_REWARD_CONFIG
+                if None. See RewardConfig for available parameters.
         """
         super().__init__()
 
         self.config = config or DEFAULT_CONFIG
+        self.reward_config = reward_config or DEFAULT_REWARD_CONFIG
         self.max_actions = max_actions
         self._seed = seed
         self._rng = np.random.default_rng(seed)
@@ -305,9 +332,9 @@ class CartesSocieteEnv(gym.Env):
         # Reward for action success
         if result.success:
             if selected_action.action_type == ActionType.BUY_CARD:
-                reward += self.REWARD_CARD_BOUGHT
+                reward += self.reward_config.card_bought
             elif selected_action.action_type == ActionType.EVOLVE:
-                reward += self.REWARD_EVOLUTION
+                reward += self.reward_config.evolution
 
         # Check if we should end phase and progress game
         game_over = False
@@ -329,20 +356,20 @@ class CartesSocieteEnv(gym.Env):
         health_delta = self._state.players[0].health - prev_health
         opp_health_delta = self._state.players[1].health - prev_opp_health
         if opp_health_delta < 0:
-            reward += abs(opp_health_delta) * self.REWARD_DAMAGE_DEALT
+            reward += abs(opp_health_delta) * self.reward_config.damage_dealt
         if health_delta < 0:
-            reward += abs(health_delta) * self.REWARD_DAMAGE_TAKEN
+            reward += abs(health_delta) * self.reward_config.damage_taken
 
         # Terminal rewards
         terminated = game_over or self._state.is_game_over()
         if terminated:
             winner = self._state.get_winner()
             if winner and winner.player_id == 0:
-                reward += self.REWARD_WIN
+                reward += self.reward_config.win
             elif winner and winner.player_id == 1:
-                reward += self.REWARD_LOSE
+                reward += self.reward_config.lose
             else:
-                reward += self.REWARD_DRAW
+                reward += self.reward_config.draw
 
         # Truncation (max steps reached)
         truncated = self._step_count >= self._max_steps
@@ -403,7 +430,7 @@ class CartesSocieteEnv(gym.Env):
             # Calculate damage reward
             for breakdown in combat_result.damage_dealt:
                 if breakdown.source_player.player_id == 0:
-                    reward += breakdown.total_damage * self.REWARD_DAMAGE_DEALT
+                    reward += breakdown.total_damage * self.reward_config.damage_dealt
 
             # Check for game over
             if self._state.is_game_over():
