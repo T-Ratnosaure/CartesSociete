@@ -1,8 +1,8 @@
 # Agent Ecosystem Decisions Log - CartesSociete
 
-**Version**: 1.2
+**Version**: 1.3
 **Last Updated**: 2026-01-19
-**Phase**: BMAD+AGENTIC Phase 6 - Decisions & Memory (D011-D016 implemented, D015 audit completed)
+**Phase**: BMAD+AGENTIC Phase 6 - Decisions & Memory (D011-D016 + S-01, S-04, RL-02 implemented)
 
 ---
 
@@ -652,6 +652,92 @@ We don't have:
 
 ---
 
+### OQ005: Hardcoded Approximations in Ability Effects
+
+**Status**: OPEN - Awaiting Human Decision
+
+**Context**: Technical review found two hardcoded approximations in abilities.py:
+
+1. **R-01 (Deck Reveal ATK)**: `avg_atk = 3` used instead of actual deck contents
+   - Line: abilities.py:1723-1727
+   - Affects: Cards that reveal deck and gain ATK
+
+2. **R-02 (Women Family Bonus)**: `women_count = fam_count // 2 + 1`
+   - Line: abilities.py:1988-1994
+   - No gender data exists in card definitions
+
+**Question**: Are these approximations acceptable or should exact computation be implemented?
+
+**Options**:
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Keep approximations** | Simple, fast | Not accurate |
+| **B: Implement exact computation** | Accurate | Requires deck state access / gender data |
+| **C: Remove these effects** | No approximation needed | Loses card functionality |
+
+**Recommendation**: Human decision required. This is a game mechanics interpretation question.
+
+---
+
+### OQ006: Dragon PO Spending Auto-Maximize
+
+**Status**: OPEN - Awaiting Human Decision
+
+**Context**: Technical review finding R-03 notes that Dragon conditional abilities auto-maximize PO spending rather than allowing explicit player choice.
+
+**Current Behavior**: If a Dragon has abilities at 1 PO, 2 PO, and 4 PO costs, and the player has 4 PO, all affordable cumulative effects automatically activate.
+
+**Question**: Should players/agents explicitly choose how much PO to spend on Dragon abilities?
+
+**Options**:
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Keep auto-maximize** | Simpler, consistent | No resource allocation decision |
+| **B: Require explicit spending** | Adds strategy depth | Increases action space complexity |
+
+**Recommendation**: Human decision required. This affects game design and strategy space.
+
+---
+
+### OQ007: Class Scaling - Highest Wins vs Cumulative
+
+**Status**: OPEN - Awaiting Human Decision
+
+**Context**: Technical review findings R-04 and R-05 note inconsistency in scaling behavior:
+- **Class abilities**: Only highest threshold applies (R-04)
+- **Dragon conditionals**: Cumulative effects (R-03)
+- **Lapin thresholds**: Code comment shows interpretive uncertainty (R-05)
+
+**Question**: Should all scaling abilities use consistent behavior (highest-wins OR cumulative)?
+
+**Implications**: Different interpretation changes game balance significantly.
+
+**Recommendation**: Human decision required. This is a game design question.
+
+---
+
+### OQ008: Ninja Check TODO
+
+**Status**: OPEN - Awaiting Human Decision
+
+**Context**: Technical review finding R-06 identified a TODO at abilities.py:1840:
+```python
+# TODO: Check if ninja was chosen (requires game state tracking)
+```
+
+The weapon ATK bonus for ninja cards does not verify ninja selection.
+
+**Question**: Should this check be implemented?
+
+**Options**:
+| Option | Pros | Cons |
+|--------|------|------|
+| **A: Implement check** | Correct behavior | Requires game state tracking |
+| **B: Remove check requirement** | Simpler | May not match card text |
+| **C: Accept as-is** | No change needed | Documented technical debt |
+
+---
+
 ## Part 3: Technical Debt Register
 
 | ID | Description | Severity | Origin | Mitigation | Resolution Plan |
@@ -662,6 +748,13 @@ We don't have:
 | TD004 | Small changes to abilities.py | LOW | D006 | Commit messages | Lower handoff threshold for this file |
 | TD005 | Silent ability parsing failure | ✅ RESOLVED | OQ003 | D011 | Strict mode implemented per D011 |
 | TD006 | No RL behavior validation | MEDIUM | OQ002 | Manual inspection | Add qualitative metrics |
+| TD007 | Deck reveal ATK approximation | LOW | OQ005 | avg_atk=3 | Awaiting OQ005 decision |
+| TD008 | Women family bonus approximation | LOW | OQ005 | fam/2+1 | Awaiting OQ005 decision |
+| TD009 | Ninja check not implemented | LOW | OQ008 | Unconditional bonus | Awaiting OQ008 decision |
+| TD010 | Windows parallelism limitation | LOW | RL-05 | DummyVecEnv | Accept or document Linux requirement |
+| TD011 | Dual RNG sources | ✅ RESOLVED | S-01 | - | Fixed via Shuffler protocol in PR #26 |
+| TD012 | MCTS no default timeout | ✅ RESOLVED | S-04 | - | Fixed via 5s default in PR #26 |
+| TD013 | Self-play callback stub | ✅ RESOLVED | RL-02 | - | Fixed via ModelOpponentPlayer in PR #26 |
 
 ---
 
@@ -765,6 +858,10 @@ We don't have:
 14. **REWARD SHAPING IS CONFIGURABLE** - Playstyle is tunable, not hard-coded (see D014)
 15. **NO HIDDEN-INFO LEAKAGE IN RL** - Partial observability required; AUDIT PASSED 2026-01-19 (see D015)
 16. **RL TRAINING UNBLOCKED** - Observation audit confirmed no leakage; training can resume (see D015)
+17. **RNG UNIFIED** - market.py now accepts optional Shuffler for reproducibility (S-01, PR #26)
+18. **MCTS DEFAULT TIMEOUT** - 5 second timeout prevents DoS (S-04, PR #26)
+19. **SELF-PLAY WORKS** - ModelOpponentPlayer + SelfPlayCallback properly copy model weights (RL-02, PR #26)
+20. **OPEN QUESTIONS PENDING** - OQ005-OQ008 await human decisions on game mechanics interpretation
 
 ### Patterns That Work
 
