@@ -36,7 +36,7 @@ class MCTSConfig:
         num_simulations: Number of simulations per decision (1-10000).
         exploration_constant: UCB1 exploration parameter (sqrt(2) default).
         max_rollout_depth: Maximum depth for random rollouts (1-100).
-        timeout_seconds: Maximum time for MCTS search (None = no timeout).
+        timeout_seconds: Maximum time for MCTS search in seconds (default 5.0).
         use_stub: When True, falls back to random play (for testing).
 
     Note:
@@ -49,7 +49,7 @@ class MCTSConfig:
     num_simulations: int = 100
     exploration_constant: float = 1.414  # sqrt(2)
     max_rollout_depth: int = 10
-    timeout_seconds: float | None = None  # None = no timeout
+    timeout_seconds: float | None = 5.0  # Default 5 second timeout for DoS protection
     use_stub: bool = False
 
     # Maximum bounds to prevent DoS
