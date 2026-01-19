@@ -18,7 +18,7 @@ from src.cards.models import (
     ScalingAbility,
 )
 
-from .state import PlayerState
+from .state import GameState, PlayerState
 
 
 class UnmatchedBonusTextError(Exception):
@@ -1460,6 +1460,7 @@ def resolve_bonus_text_effects(
     player: PlayerState,
     opponent: PlayerState | None = None,
     *,
+    game_state: GameState | None = None,
     strict: bool = False,
 ) -> BonusTextResult:
     """Resolve bonus_text effects for combat.
@@ -1476,10 +1477,13 @@ def resolve_bonus_text_effects(
     - "Les raccoon Familly gagne +X ATQ" - raccoon family bonus
     - "+X ATQ si c'est le seul ninja" - solo ninja bonus
     - Card-specific bonuses (Joe, Reine, Raton Mignon, etc.)
+    - "retourner une carte de la pile, gagne son ATQ" - deck reveal ATK
 
     Args:
         player: The player whose bonus_text to resolve.
         opponent: Optional opponent for opponent-dependent effects.
+        game_state: Optional game state for deck-dependent effects (deck reveal).
+            If None, deck reveal effects use a fallback approximation (avg_atk=3).
         strict: If True, raise UnmatchedBonusTextError for unrecognized patterns.
             Default is False (silent ignore for backwards compatibility).
 
@@ -1824,24 +1828,60 @@ def resolve_bonus_text_effects(
         deck_reveal_match = _DECK_REVEAL_ATK_PATTERN.search(bonus)
         if deck_reveal_match:
             # This effect reveals a card from deck and adds its ATK
-            # For now, we'll use an average ATK value (3) as placeholder
-            # In a full implementation, this would interact with the deck
-            avg_atk = 3  # Average card ATK as approximation
-            result.deck_reveal_atk += avg_atk
-            result.effects.append(f"{card.name}: {bonus} (~{avg_atk} ATK)")
+            if game_state is not None:
+                # Use actual deck reveal - peek at top card of current deck
+                top_cards = game_state.peek_current_deck(1)
+                if top_cards:
+                    revealed_card = top_cards[0]
+                    revealed_atk = revealed_card.attack
+                    result.deck_reveal_atk += revealed_atk
+                    result.effects.append(
+                        f"{card.name}: {bonus} (revealed {revealed_card.name}, "
+                        f"+{revealed_atk} ATK)"
+                    )
+                else:
+                    # Deck is empty, no bonus
+                    result.effects.append(f"{card.name}: {bonus} (deck empty)")
+            else:
+                # Fallback approximation when game_state not provided
+                avg_atk = 3  # Average card ATK as approximation
+                result.deck_reveal_atk += avg_atk
+                result.effects.append(f"{card.name}: {bonus} (~{avg_atk} ATK)")
 
         # === DECK REVEAL WITH MULTIPLIER (Yetiir) ===
         deck_mult_match = _DECK_REVEAL_MULT_PATTERN.search(bonus)
         if deck_mult_match:
-            avg_atk = 3  # Average card ATK
             multiplier = 1
             if deck_mult_match.group(1):
                 multiplier = int(deck_mult_match.group(1))
-            result.deck_reveal_atk += avg_atk
-            result.deck_reveal_multiplier = max(
-                result.deck_reveal_multiplier, multiplier
-            )
-            result.effects.append(f"{card.name}: {bonus} (~{avg_atk * multiplier} ATK)")
+
+            if game_state is not None:
+                # Use actual deck reveal
+                top_cards = game_state.peek_current_deck(1)
+                if top_cards:
+                    revealed_card = top_cards[0]
+                    revealed_atk = revealed_card.attack
+                    result.deck_reveal_atk += revealed_atk
+                    result.deck_reveal_multiplier = max(
+                        result.deck_reveal_multiplier, multiplier
+                    )
+                    total_atk = revealed_atk * multiplier
+                    result.effects.append(
+                        f"{card.name}: {bonus} (revealed {revealed_card.name}, "
+                        f"+{total_atk} ATK)"
+                    )
+                else:
+                    result.effects.append(f"{card.name}: {bonus} (deck empty)")
+            else:
+                # Fallback approximation
+                avg_atk = 3
+                result.deck_reveal_atk += avg_atk
+                result.deck_reveal_multiplier = max(
+                    result.deck_reveal_multiplier, multiplier
+                )
+                result.effects.append(
+                    f"{card.name}: {bonus} (~{avg_atk * multiplier} ATK)"
+                )
 
         # === DIPLO SYNERGY ===
         diplo_combined = _DIPLO_COMBINED_PATTERN.search(bonus)
