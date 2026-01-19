@@ -1889,3 +1889,88 @@ class TestStrictMode:
         assert error.bonus_text == "unknown bonus text"
         assert "TestCard" in str(error)
         assert "unknown bonus text" in str(error)
+
+
+class TestDeckRevealMechanic:
+    """Tests for actual deck reveal ATK bonus (R-01 implementation)."""
+
+    def test_deck_reveal_with_game_state(self, repo) -> None:
+        """Test that deck reveal uses actual top card ATK when game_state provided."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        # Get a card and set deck reveal bonus_text
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        card.bonus_text = "retourner une carte de la pile, gagne son ATQ"
+        player.board.append(card)
+
+        # Set up a deck with a known top card
+        top_card = deepcopy(cards[1])
+        top_card.attack = 7  # Known ATK value
+        state.cost_1_deck = [top_card]
+        state.turn = 1  # Ensure we're at tier 1
+
+        result = resolve_bonus_text_effects(player, game_state=state)
+
+        assert result.deck_reveal_atk == 7
+        assert "revealed" in result.effects[0].lower()
+        assert "+7 ATK" in result.effects[0]
+
+    def test_deck_reveal_fallback_without_game_state(self, repo) -> None:
+        """Test that deck reveal uses avg_atk=3 when game_state not provided."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        card.bonus_text = "retourner une carte de la pile, gagne son ATQ"
+        player.board.append(card)
+
+        # No game_state provided
+        result = resolve_bonus_text_effects(player)
+
+        assert result.deck_reveal_atk == 3  # Fallback approximation
+        assert "~3 ATK" in result.effects[0]
+
+    def test_deck_reveal_empty_deck(self, repo) -> None:
+        """Test deck reveal with empty deck gives no bonus."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        card.bonus_text = "retourner une carte de la pile, gagne son ATQ"
+        player.board.append(card)
+
+        # Empty deck
+        state.cost_1_deck = []
+        state.turn = 1
+
+        result = resolve_bonus_text_effects(player, game_state=state)
+
+        assert result.deck_reveal_atk == 0
+        assert "deck empty" in result.effects[0].lower()
+
+    def test_deck_reveal_with_multiplier(self, repo) -> None:
+        """Test deck reveal with multiplier uses actual ATK."""
+        state = create_initial_game_state(num_players=2)
+        player = state.players[0]
+
+        cards = repo.get_all()
+        card = deepcopy(cards[0])
+        # Yetiir-style pattern with x2 multiplier (note the /tour format)
+        card.bonus_text = "1/tour +ATQ de la 1ère carte de la pile x2"
+        player.board.append(card)
+
+        top_card = deepcopy(cards[1])
+        top_card.attack = 5
+        state.cost_1_deck = [top_card]
+        state.turn = 1
+
+        result = resolve_bonus_text_effects(player, game_state=state)
+
+        assert result.deck_reveal_atk == 5  # Base ATK
+        assert result.deck_reveal_multiplier == 2
+        # Total effect should show 10 ATK (5 * 2)
+        assert "+10 ATK" in result.effects[0]
